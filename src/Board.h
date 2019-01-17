@@ -1,10 +1,3 @@
-//
-//  Board.h
-//  Chess
-//
-//  Created by Armand Sarkani on 1/14/19.
-//  Copyright © 2019 Armand Sarkani. All rights reserved.
-//
 
 #ifndef Board_h
 #define Board_h
