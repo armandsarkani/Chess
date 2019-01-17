@@ -1,6 +1,6 @@
 #include "Board.h"
 
-char * tag[8][8];
+char *tag[8][8];
 int main()
 {
     PLAYER *p1 = malloc(sizeof(PLAYER));

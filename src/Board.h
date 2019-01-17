@@ -21,7 +21,7 @@ typedef enum PieceName {Pawn1, Pawn2, Pawn3, Pawn4, Pawn5, Pawn6, Pawn7, Pawn8, 
 
 struct Player {
     char color;
-    int type;  //AI or human
+    int type;  //type of player: AI or human
     PIECE *piecelist[16];
 };
 
