@@ -64,7 +64,8 @@ void DrawBoard()
 }
 
 void makeMove(PLAYER *p)
-{;
+{
+    assert(p);
     char cCol_src;
     int row_src;
     int col_src;
@@ -74,21 +75,24 @@ void makeMove(PLAYER *p)
     printf("Enter the location of the piece you wish to move. \n");
     scanf(" %c%d", &cCol_src, &row_src);
     col_src = AlphatoNum(cCol_src);
-    PIECE *piece = findPiece(p, row_src, col_src);
-    while(piece == NULL)
+    while((!(col_src >= 1 && col_src <= 8)) || !(row_src >= 1 && row_src <= 7))
     {
-        printf("Enter a different location of a piece you wish to move. \n");
+        printf("You have entered an invalid input. Please enter a different location \n");
         scanf(" %c%d", &cCol_src, &row_src);
         col_src = AlphatoNum(cCol_src);
-        piece = findPiece(p, row_src, col_src);
+        
     }
+    while(findPiece(p, row_src, col_src) == NULL)
+    {
+        printf("You have made an invalid move. Please enter a different location \n");
+        scanf(" %c%d", &cCol_src, &row_src);
+        col_src = AlphatoNum(cCol_src);
+    }
+    PIECE *piece = findPiece(p, row_src, col_src);
     printf("Enter the location to move the piece. \n");
     scanf(" %c%d", &cCol_dest, &row_dest);
     col_dest = AlphatoNum(cCol_dest);
     movePiece(piece, row_dest-1, col_dest-1);
-    
-    
-    
 }
 
 PIECE *CreatePiece(int r, int c, char piece, char color)
@@ -142,6 +146,7 @@ PIECE *CreatePiece(int r, int c, char piece, char color)
 }
 void movePiece(PIECE *piece, int newr, int newc)
 {
+    assert(piece);
     char *temp = tag[piece->r][piece->c];
     tag[newr][newc] = temp;
     tag[piece->r][piece->c] = "  ";
@@ -174,7 +179,11 @@ int AlphatoNum(char alpha)
         case 'g':
             num = 7;
             break;
+        case 'h':
+            num = 8;
+            break;
         default:
+            num = 9;
             break;
     }
     return num;
@@ -182,7 +191,8 @@ int AlphatoNum(char alpha)
 
 PIECE *findPiece(PLAYER *p, int r, int c)
 {
-    PIECE *piece;
+    assert(p);
+    PIECE *piece = malloc(sizeof(PIECE));
     for(int i = 0; i < 16; i++)
     {
         int rx = p->piecelist[i]->r;
@@ -193,6 +203,5 @@ PIECE *findPiece(PLAYER *p, int r, int c)
             return piece;
         }
     }
-    printf("You are trying to move an opponent's piece or entered another invalid location. Please try again. \n");
     return NULL;
 }

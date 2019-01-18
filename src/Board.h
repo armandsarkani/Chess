@@ -1,11 +1,3 @@
-//
-//  Board.h
-//  Chess
-//
-//  Created by Armand Sarkani on 1/14/19.
-//  Copyright © 2019 Armand Sarkani. All rights reserved.
-//
-
 #ifndef Board_h
 #define Board_h
 
@@ -13,6 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 typedef struct Player PLAYER;
 typedef struct Piece PIECE;
