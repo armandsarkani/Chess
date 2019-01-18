@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> b9809db2242eeaed9cc6279cc60ea7bcad63ac28
 #ifndef Board_h
 #define Board_h
 
