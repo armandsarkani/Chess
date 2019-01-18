@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-
->>>>>>> b9809db2242eeaed9cc6279cc60ea7bcad63ac28
 #ifndef Board_h
 #define Board_h
 
@@ -10,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+
 
 typedef struct Player PLAYER;
 typedef struct Piece PIECE;
@@ -23,16 +20,20 @@ struct Player {
 };
 
 struct Piece{
-    char piece;
+    PLAYER *player;
+    char piecetype;
     int r;
     int c;
     int value; // AI
 };
+
+
 void DrawBoard(void);
-void makeMove(PLAYER *p);
-PIECE *CreatePiece(int r, int c, char piece, char color);
-void movePiece(PIECE *piece, int newr, int newc);
+void MakeMove(PLAYER *p);
+PIECE *CreatePiece(int r, int c, char piece, char color, PLAYER *player);
+void MovePiece(PIECE *piece, int newr, int newc);
 int AlphatoNum(char alpha);
-PIECE *findPiece(PLAYER *p, int r, int c);
+PIECE *CheckPiece(PLAYER *p, int r, int c);
+int FindEmptySpace(int r, int c);
 
 #endif /* Board_h */

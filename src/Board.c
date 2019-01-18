@@ -1,4 +1,5 @@
 #include "Board.h"
+#include "Pieces.h"
 
 char *tag[8][8];
 int main()
@@ -11,28 +12,28 @@ int main()
     // player 1 and 2 initial pawns
     for(int pawn = Pawn1; pawn <= Pawn8; pawn++)
     {
-        p1->piecelist[pawn] = CreatePiece(1, pawncol, 'P', p1->color);
-        p2->piecelist[pawn] = CreatePiece(6, pawncol, 'P', p2->color);
+        p1->piecelist[pawn] = CreatePiece(1, pawncol, 'P', p1->color, p1);
+        p2->piecelist[pawn] = CreatePiece(6, pawncol, 'P', p2->color, p2);
         pawncol++;
     }
     // player 1 initial pieces
-    p1->piecelist[Rook1] = CreatePiece(0, 0, 'R', p1->color);
-    p1->piecelist[Rook2] = CreatePiece(0, 7, 'R', p1->color);
-    p1->piecelist[Knight1] = CreatePiece(0, 1, 'N', p1->color);
-    p1->piecelist[Knight2] = CreatePiece(0, 6, 'N', p1->color);
-    p1->piecelist[Bishop1] = CreatePiece(0, 2, 'B', p1->color);
-    p1->piecelist[Bishop2] = CreatePiece(0, 5, 'B', p1->color);
-    p1->piecelist[Queen] = CreatePiece(0, 3, 'Q', p1->color);
-    p1->piecelist[King] = CreatePiece(0, 4, 'K', p1->color);
+    p1->piecelist[Rook1] = CreatePiece(0, 0, 'R', p1->color, p1);
+    p1->piecelist[Rook2] = CreatePiece(0, 7, 'R', p1->color, p1);
+    p1->piecelist[Knight1] = CreatePiece(0, 1, 'N', p1->color, p1);
+    p1->piecelist[Knight2] = CreatePiece(0, 6, 'N', p1->color, p1);
+    p1->piecelist[Bishop1] = CreatePiece(0, 2, 'B', p1->color, p1);
+    p1->piecelist[Bishop2] = CreatePiece(0, 5, 'B', p1->color, p1);
+    p1->piecelist[Queen] = CreatePiece(0, 3, 'Q', p1->color, p1);
+    p1->piecelist[King] = CreatePiece(0, 4, 'K', p1->color, p1);
     // player 2 initial pieces
-    p2->piecelist[Rook1] = CreatePiece(7, 0, 'R', p2->color);
-    p2->piecelist[Rook2] = CreatePiece(7, 7, 'R', p2->color);
-    p2->piecelist[Knight1] = CreatePiece(7, 1, 'N', p2->color);
-    p2->piecelist[Knight2] = CreatePiece(7, 6, 'N', p2->color);
-    p2->piecelist[Bishop1] = CreatePiece(7, 2, 'B', p2->color);
-    p2->piecelist[Bishop2] = CreatePiece(7, 5, 'B', p2->color);
-    p2->piecelist[Queen] = CreatePiece(7, 3, 'Q', p2->color);
-    p2->piecelist[King] = CreatePiece(7, 4, 'K', p2->color);
+    p2->piecelist[Rook1] = CreatePiece(7, 0, 'R', p2->color, p2);
+    p2->piecelist[Rook2] = CreatePiece(7, 7, 'R', p2->color, p2);
+    p2->piecelist[Knight1] = CreatePiece(7, 1, 'N', p2->color, p2);
+    p2->piecelist[Knight2] = CreatePiece(7, 6, 'N', p2->color, p2);
+    p2->piecelist[Bishop1] = CreatePiece(7, 2, 'B', p2->color, p2);
+    p2->piecelist[Bishop2] = CreatePiece(7, 5, 'B', p2->color, p2);
+    p2->piecelist[Queen] = CreatePiece(7, 3, 'Q', p2->color, p2);
+    p2->piecelist[King] = CreatePiece(7, 4, 'K', p2->color, p2);
     for(int i = 5; i >= 2; i--)
     {
         for(int j = 0; j < 8; j++)
@@ -43,10 +44,11 @@ int main()
 
     // draw initial board
     DrawBoard();
-    makeMove(p1);
+    MakeMove(p1);
     DrawBoard();
-    makeMove(p2);
+    MakeMove(p2);
     DrawBoard();
+    
 }
 void DrawBoard()
 {
@@ -59,11 +61,9 @@ void DrawBoard()
     }
     printf("  +------+------+------+------+------+------+------+------+\n");
     printf("      a      b      c      d      e      f      g      h   \n");
-
-    
 }
 
-void makeMove(PLAYER *p)
+void MakeMove(PLAYER *p)
 {
     assert(p);
     char cCol_src;
@@ -82,23 +82,25 @@ void makeMove(PLAYER *p)
         col_src = AlphatoNum(cCol_src);
         
     }
-    while(findPiece(p, row_src, col_src) == NULL)
+    while(CheckPiece(p, row_src, col_src) == NULL)
     {
         printf("You have made an invalid move. Please enter a different location \n");
         scanf(" %c%d", &cCol_src, &row_src);
         col_src = AlphatoNum(cCol_src);
     }
-    PIECE *piece = findPiece(p, row_src, col_src);
+    PIECE *piece = CheckPiece(p, row_src, col_src);
     printf("Enter the location to move the piece. \n");
     scanf(" %c%d", &cCol_dest, &row_dest);
     col_dest = AlphatoNum(cCol_dest);
-    movePiece(piece, row_dest-1, col_dest-1);
+    CallPiece(piece, 1, 2, 1, 2);
+    MovePiece(piece, row_dest-1, col_dest-1);
 }
 
-PIECE *CreatePiece(int r, int c, char piece, char color)
+PIECE *CreatePiece(int r, int c, char piece, char color, PLAYER *player)
 {
     PIECE *p = malloc(sizeof(PIECE));
-    p->piece = piece;
+    p->piecetype = piece;
+    p->player = player;
     p->r = r;
     p->c = c;
     if(color == 'w')
@@ -144,7 +146,7 @@ PIECE *CreatePiece(int r, int c, char piece, char color)
     }
     return p;
 }
-void movePiece(PIECE *piece, int newr, int newc)
+void MovePiece(PIECE *piece, int newr, int newc)
 {
     assert(piece);
     char *temp = tag[piece->r][piece->c];
@@ -189,19 +191,31 @@ int AlphatoNum(char alpha)
     return num;
 }
 
-PIECE *findPiece(PLAYER *p, int r, int c)
+PIECE *CheckPiece(PLAYER *p, int r, int c) // check if its your piece in a particular location
 {
     assert(p);
-    PIECE *piece = malloc(sizeof(PIECE));
     for(int i = 0; i < 16; i++)
     {
         int rx = p->piecelist[i]->r;
         int cx = p->piecelist[i]->c;
         if((rx == r-1) && (cx == c-1))
         {
-            piece = p->piecelist[i];
+            PIECE *piece = p->piecelist[i];
             return piece;
         }
     }
     return NULL;
 }
+
+int FindEmptySpace(int r, int c)
+{
+    if(strcmp(tag[r][c], "  ") == 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
