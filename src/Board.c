@@ -4,36 +4,66 @@
 char *tag[8][8];
 int main()
 {
-    PLAYER *p1 = malloc(sizeof(PLAYER));
-    PLAYER *p2 = malloc(sizeof(PLAYER));
-    p1->color = 'w';
-    p2->color = 'b';
+    PLAYER *white = malloc(sizeof(PLAYER));
+    PLAYER *black = malloc(sizeof(PLAYER));
+    char human_color;
+    printf("Which color would you like to be? \n");
+    printf("(w = white, b = black) \n");
+    scanf(" %c", &human_color);
+    if(human_color == 'w')
+    {
+        printf("You are the white player. \n");
+        white->type = 'h';
+        black->type = 'a';
+    }
+    else if(human_color == 'b')
+    {
+        printf("You are the black player. \n");
+        black->type = 'h';
+        white->type = 'a';
+    }
+    InitializeBoard(white, black);
+    bool IsGameOver = false; // replace with win condition checking functions in modules TBD
+    DrawBoard();
+    while(IsGameOver == false)
+    {
+        MakeMove(white);
+        DrawBoard();
+        MakeMove(black);
+        DrawBoard();
+    }
+    
+}
+
+void InitializeBoard(PLAYER *white, PLAYER *black)
+{
+    // White is by default the player that initially occupies first two rows, black is by default the player that initially occupies the top two rows
+    // White and 2 initial pawns
     int pawncol = 0;
-    // player 1 and 2 initial pawns
     for(int pawn = Pawn1; pawn <= Pawn8; pawn++)
     {
-        p1->piecelist[pawn] = CreatePiece(1, pawncol, 'P', p1->color, p1);
-        p2->piecelist[pawn] = CreatePiece(6, pawncol, 'P', p2->color, p2);
+        white->piecelist[pawn] = CreatePiece(1, pawncol, 'P', 'w', white);
+        black->piecelist[pawn] = CreatePiece(6, pawncol, 'P', 'b', black);
         pawncol++;
     }
-    // player 1 initial pieces
-    p1->piecelist[Rook1] = CreatePiece(0, 0, 'R', p1->color, p1);
-    p1->piecelist[Rook2] = CreatePiece(0, 7, 'R', p1->color, p1);
-    p1->piecelist[Knight1] = CreatePiece(0, 1, 'N', p1->color, p1);
-    p1->piecelist[Knight2] = CreatePiece(0, 6, 'N', p1->color, p1);
-    p1->piecelist[Bishop1] = CreatePiece(0, 2, 'B', p1->color, p1);
-    p1->piecelist[Bishop2] = CreatePiece(0, 5, 'B', p1->color, p1);
-    p1->piecelist[Queen] = CreatePiece(0, 3, 'Q', p1->color, p1);
-    p1->piecelist[King] = CreatePiece(0, 4, 'K', p1->color, p1);
+    // White initial non-pawn pieces
+    white->piecelist[Rook1] = CreatePiece(0, 0, 'R', 'w', white);
+    white->piecelist[Rook2] = CreatePiece(0, 7, 'R', 'w', white);
+    white->piecelist[Knight1] = CreatePiece(0, 1, 'N', 'w', white);
+    white->piecelist[Knight2] = CreatePiece(0, 6, 'N', 'w', white);
+    white->piecelist[Bishop1] = CreatePiece(0, 2, 'B', 'w', white);
+    white->piecelist[Bishop2] = CreatePiece(0, 5, 'B', 'w', white);
+    white->piecelist[Queen] = CreatePiece(0, 3, 'Q', 'w', white);
+    white->piecelist[King] = CreatePiece(0, 4, 'K', 'w', white);
     // player 2 initial pieces
-    p2->piecelist[Rook1] = CreatePiece(7, 0, 'R', p2->color, p2);
-    p2->piecelist[Rook2] = CreatePiece(7, 7, 'R', p2->color, p2);
-    p2->piecelist[Knight1] = CreatePiece(7, 1, 'N', p2->color, p2);
-    p2->piecelist[Knight2] = CreatePiece(7, 6, 'N', p2->color, p2);
-    p2->piecelist[Bishop1] = CreatePiece(7, 2, 'B', p2->color, p2);
-    p2->piecelist[Bishop2] = CreatePiece(7, 5, 'B', p2->color, p2);
-    p2->piecelist[Queen] = CreatePiece(7, 3, 'Q', p2->color, p2);
-    p2->piecelist[King] = CreatePiece(7, 4, 'K', p2->color, p2);
+    black->piecelist[Rook1] = CreatePiece(7, 0, 'R', 'b', black);
+    black->piecelist[Rook2] = CreatePiece(7, 7, 'R', 'b', black);
+    black->piecelist[Knight1] = CreatePiece(7, 1, 'N', 'b', black);
+    black->piecelist[Knight2] = CreatePiece(7, 6, 'N', 'b', black);
+    black->piecelist[Bishop1] = CreatePiece(7, 2, 'B', 'b', black);
+    black->piecelist[Bishop2] = CreatePiece(7, 5, 'B', 'b', black);
+    black->piecelist[Queen] = CreatePiece(7, 3, 'Q', 'b', black);
+    black->piecelist[King] = CreatePiece(7, 4, 'K', 'b', black);
     for(int i = 5; i >= 2; i--)
     {
         for(int j = 0; j < 8; j++)
@@ -41,15 +71,8 @@ int main()
             tag[i][j] = "  ";
         }
     }
-
-    // draw initial board
-    DrawBoard();
-    MakeMove(p1);
-    DrawBoard();
-    MakeMove(p2);
-    DrawBoard();
-    
 }
+
 void DrawBoard()
 {
     int cols = 0;
@@ -66,6 +89,15 @@ void DrawBoard()
 void MakeMove(PLAYER *p)
 {
     assert(p);
+    if(p->type == 'a')
+    {
+        printf("AI's turn. \n");
+        // insert function call for AI module
+    }
+    if(p->type == 'h')
+    {
+        printf("Your turn. \n");
+    }
     char cCol_src;
     int row_src;
     int col_src;
@@ -77,14 +109,14 @@ void MakeMove(PLAYER *p)
     col_src = AlphatoNum(cCol_src);
     while((!(col_src >= 1 && col_src <= 8)) || !(row_src >= 1 && row_src <= 7))
     {
-        printf("You have entered an invalid input. Please enter a different location \n");
+        printf("You have entered an invalid input. Please enter a different location. \n");
         scanf(" %c%d", &cCol_src, &row_src);
         col_src = AlphatoNum(cCol_src);
         
     }
     while(CheckPiece(p, row_src, col_src) == NULL)
     {
-        printf("You have made an invalid move. Please enter a different location \n");
+        printf("You have made an invalid move. Please enter a different location. \n");
         scanf(" %c%d", &cCol_src, &row_src);
         col_src = AlphatoNum(cCol_src);
     }
@@ -92,7 +124,12 @@ void MakeMove(PLAYER *p)
     printf("Enter the location to move the piece. \n");
     scanf(" %c%d", &cCol_dest, &row_dest);
     col_dest = AlphatoNum(cCol_dest);
-    CallPiece(piece, 1, 2, 1, 2);
+    while((CallPiece(piece, row_src, col_src, row_dest, col_dest)) != 0)
+    {
+        printf("Please enter a different location. \n");
+        scanf(" %c%d", &cCol_dest, &row_dest);
+        col_dest = AlphatoNum(cCol_dest);
+    }
     MovePiece(piece, row_dest-1, col_dest-1);
 }
 
@@ -124,7 +161,7 @@ PIECE *CreatePiece(int r, int c, char piece, char color, PLAYER *player)
     switch(piece)
     {
         case 'P':
-            p->value = 1;
+            p->value = 2; // initial value 2, then goes down to 1 after first move of a pawn to up to 2 spaces
             break;
         case 'N':
             p->value = 3;
@@ -163,25 +200,49 @@ int AlphatoNum(char alpha)
         case 'a':
             num = 1;
             break;
+        case 'A':
+            num = 1;
+            break;
         case 'b':
+            num = 2;
+            break;
+        case 'B':
             num = 2;
             break;
         case 'c':
             num = 3;
             break;
+        case 'C':
+            num = 3;
+            break;
         case 'd':
+            num = 4;
+            break;
+        case 'D':
             num = 4;
             break;
         case 'e':
             num = 5;
             break;
+        case 'E':
+            num = 5;
+            break;
         case 'f':
+            num = 6;
+            break;
+        case 'F':
             num = 6;
             break;
         case 'g':
             num = 7;
             break;
+        case 'G':
+            num = 7;
+            break;
         case 'h':
+            num = 8;
+            break;
+        case 'H':
             num = 8;
             break;
         default:
@@ -209,7 +270,7 @@ PIECE *CheckPiece(PLAYER *p, int r, int c) // check if its your piece in a parti
 
 int FindEmptySpace(int r, int c)
 {
-    if(strcmp(tag[r][c], "  ") == 0)
+    if(strcmp(tag[r-1][c-1], "  ") == 0)
     {
         return 1;
     }
