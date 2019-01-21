@@ -39,8 +39,39 @@ int MovePawn(PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
 {
     if(FindEmptySpace(dest_row, dest_col) == 1) // moving pawn to empty space
     {
-        printf("Condition 1");
-        return 0;
+        if(piece->player->color == 'w')
+        {
+            if((piece->value == 2) && (src_col == dest_col) && ((dest_row == src_row + 1) || (dest_row == src_row + 2)))
+            {
+                return 0;
+            }
+            else if((piece->value == 1) && (src_col == dest_col) && (dest_row == src_row + 1))
+            {
+                return 0;
+            }
+            else
+            {
+                printf("This is not a valid move, please try again. \n");
+                return 1;
+            }
+        }
+        else
+        {
+            if((piece->value == 2) && (src_col == dest_col) && ((src_row == dest_row + 1) || (src_row == dest_row + 2)))
+            {
+                return 0;
+            }
+            if((piece->value == 1) && (src_col == dest_col) && (src_row == dest_row + 1))
+            {
+                return 0;
+            }
+            else
+            {
+                printf("This is not a valid move, please try again. \n");
+                return 1;
+            }
+               
+        }
     }
     else if(CheckPiece(piece->player, dest_row, dest_col) != NULL) // moving pawn to a space with your own piece
     {
@@ -50,6 +81,7 @@ int MovePawn(PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
     }
     else // otherwise must be moving to a space with a different player's piece
     {
+        
         printf("Condition 3");
         return 0;
     }

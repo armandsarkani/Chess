@@ -5,7 +5,9 @@ char *tag[8][8];
 int main()
 {
     PLAYER *white = malloc(sizeof(PLAYER));
+    white->color = 'w';
     PLAYER *black = malloc(sizeof(PLAYER));
+    black->color = 'b';
     char human_color;
     printf("Which color would you like to be? \n");
     printf("(w = white, b = black) \n");
@@ -14,6 +16,7 @@ int main()
     {
         printf("You are the white player. \n");
         white->type = 'h';
+        white->color = 'w';
         black->type = 'a';
     }
     else if(human_color == 'b')
