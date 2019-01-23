@@ -9,6 +9,8 @@ int main()
     PLAYER *black = malloc(sizeof(PLAYER));
     black->color = 'b';
     char human_color;
+	char row; 
+	int col;
     printf("Which color would you like to be? \n");
     printf("(w = white, b = black) \n");
     scanf(" %c", &human_color);
@@ -25,20 +27,24 @@ int main()
         black->type = 'h';
         white->type = 'a';
     }
-    InitializeBoard(white, black);
+	BOARDS *boards = CreateBoards();
+    InitializeBoard(white, black, boards);
     bool IsGameOver = false; // replace with win condition checking functions in modules TBD
     DrawBoard();
     while(IsGameOver == false)
     {
         MakeMove(white);
         DrawBoard();
+		printf("Surveying the board. Enter row and column to find piece.\n");
+		scanf(" %c%d", &row, &col);
+		PieceInfo(FindPiece(boards, row, col);
         MakeMove(black);
         DrawBoard();
     }
     
 }
 
-void InitializeBoard(PLAYER *white, PLAYER *black)
+void InitializeBoard(PLAYER *white, PLAYER *black, BOARDS *boards)
 {
     // White is by default the player that initially occupies first two rows, black is by default the player that initially occupies the top two rows
     // White and 2 initial pawns
@@ -46,7 +52,10 @@ void InitializeBoard(PLAYER *white, PLAYER *black)
     for(int pawn = Pawn1; pawn <= Pawn8; pawn++)
     {
         white->piecelist[pawn] = CreatePiece(1, pawncol, 'P', 'w', white);
+		boards->piecelist[pawn][pawncol] = white->piecelist[pawn];
+		
         black->piecelist[pawn] = CreatePiece(6, pawncol, 'P', 'b', black);
+		boards->piecelist[pawn][pawncol] = black->piecelist[pawn];
         pawncol++;
     }
     // White initial non-pawn pieces
@@ -58,6 +67,16 @@ void InitializeBoard(PLAYER *white, PLAYER *black)
     white->piecelist[Bishop2] = CreatePiece(0, 5, 'B', 'w', white);
     white->piecelist[Queen] = CreatePiece(0, 3, 'Q', 'w', white);
     white->piecelist[King] = CreatePiece(0, 4, 'K', 'w', white);
+	
+	boards->piecelist[Rook1][0] = white->piecelist[Rook1];
+	boards->piecelist[Rook2][7] = white->piecelist[Rook1];
+	boards->piecelist[Knight1][1] = white->piecelist[Knight1];
+	boards->piecelist[Knight2][6] = white->piecelist[Knight2];
+	boards->piecelist[Bishop1][2] = white->piecelist[Bishop1];
+	boards->piecelist[Bishop2][5] = white->piecelist[Bishop2];
+	boards->piecelist[Queen][3] = white->piecelist[Queen];
+	boards->piecelist[King][4] = white->piecelist[King];
+	
     // player 2 initial pieces
     black->piecelist[Rook1] = CreatePiece(7, 0, 'R', 'b', black);
     black->piecelist[Rook2] = CreatePiece(7, 7, 'R', 'b', black);
@@ -67,11 +86,22 @@ void InitializeBoard(PLAYER *white, PLAYER *black)
     black->piecelist[Bishop2] = CreatePiece(7, 5, 'B', 'b', black);
     black->piecelist[Queen] = CreatePiece(7, 3, 'Q', 'b', black);
     black->piecelist[King] = CreatePiece(7, 4, 'K', 'b', black);
+	
+	boards->piecelist[Rook1][0] = black->piecelist[Rook1];
+	boards->piecelist[Rook2][7] = black->piecelist[Rook1];
+	boards->piecelist[Knight1][1] = black->piecelist[Knight1];
+	boards->piecelist[Knight2][6] = black->piecelist[Knight2];
+	boards->piecelist[Bishop1][2] = black->piecelist[Bishop1];
+	boards->piecelist[Bishop2][5] = black->piecelist[Bishop2];
+	boards->piecelist[Queen][3] = black->piecelist[Queen];
+	boards->piecelist[King][4] = black->piecelist[King];
+	
     for(int i = 5; i >= 2; i--)
     {
         for(int j = 0; j < 8; j++)
         {
             tag[i][j] = "  ";
+			boards->piecelist[i][j] = NULL;
         }
     }
 }
@@ -186,14 +216,24 @@ PIECE *CreatePiece(int r, int c, char piece, char color, PLAYER *player)
     }
     return p;
 }
-void MovePiece(PIECE *piece, int newr, int newc)
+void MovePiece(PIECE *piece, int newr, int newc, BOARDS *boards)
 {
     assert(piece);
+	assert(boards);
     char *temp = tag[piece->r][piece->c];
+	PIECE *tempPiece = malloc(sizeof(PIECE));
+	tempPiece = boards->pieceboard[piece->r][piece->c];
+	
     tag[newr][newc] = temp;
+	boards->pieceboard[newr][newc] = tempPiece;
+
     tag[piece->r][piece->c] = "  ";
+	boards->pieceboard[piece->r][piece->c] = NULL;
+	
     piece->r = newc;
     piece->c = newr;
+	
+	
 }
 int AlphatoNum(char alpha)
 {
@@ -255,6 +295,41 @@ int AlphatoNum(char alpha)
     return num;
 }
 
+char NumtoAlpha(int num){
+	char alpha;
+    switch(num)
+    {
+        case 0:
+            alpha = 'A';
+            break;
+        case 1:
+            alpha = 'B';
+            break;
+        case 2:
+            alpha = 'C';
+            break;
+        case 3:
+            alpha = 'D';
+            break;
+        case 4:
+            alpha = 'E';
+            break;
+        case 5:
+            alpha = 'F';
+            break;
+        case 6:
+            alpha = 'G';
+            break;
+        case 7:
+            alpha = 'H';
+            break;
+        default:
+            alpha = 'N';
+            break;
+    }
+    return alpha;
+}
+
 PIECE *CheckPiece(PLAYER *p, int r, int c) // check if its your piece in a particular location
 {
     assert(p);
@@ -281,5 +356,23 @@ int FindEmptySpace(int r, int c)
     {
         return 0;
     }
+}
+
+BOARDS *CreateBoards(){
+	BOARDS *boards = malloc(sizeof(BOARDS));
+	
+	return boards;
+}
+PIECE *FindPiece(BOARDS *boards, char r, int c){
+	assert(boards);
+	return boards->pieceboard[AlphatoNum(r)][c];
+	
+}
+
+void PieceInfo(PIECE *piece){
+	assert(piece);
+	printf("Piece color: %c\n", piece->player->color);
+	printf("Piece type: %c\n", piece->piecetype);
+	printf("Piece location: %c%d", NumtoAlpha(piece->r), piece->c);
 }
 
