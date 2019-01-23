@@ -370,19 +370,13 @@ int MoveKing(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
 }
 int MoveQueen(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
 {
-    if(FindEmptySpace(dest_row, dest_col) == 1) // moving queen to empty space
+    if((MoveRook(opponent, piece, src_row, src_col, dest_row, dest_col) == 0) || (MoveBishop(opponent, piece, src_row, src_col, dest_row, dest_col) == 0))
     {
         return 0;
     }
-    else if(CheckPiece(piece->player, dest_row, dest_col) != NULL) // moving pawn to a space with your own piece
+    else
     {
-        printf("You cannot move to a spot that currently contains your own piece. ");
         return 1;
-        
-    }
-    else // otherwise must be moving to a space with a different player's piece
-    {
-        return 0;
     }
 }
 
