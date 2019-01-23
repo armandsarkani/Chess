@@ -11,12 +11,13 @@
 
 #include "Board.h"
 
-int CallPiece(PIECE *piece, int src_row, int src_col, int dest_row, int dest_col);
-int MovePawn(PIECE *piece, int src_row, int src_col, int dest_row, int dest_col);
-int MoveRook(PIECE *piece, int src_row, int src_col, int dest_row, int dest_col);
-int MoveBishop(PIECE *piece, int src_row, int src_col, int dest_row, int dest_col);
-int MoveQueen(PIECE *piece, int src_row, int src_col, int dest_row, int dest_col);
-int MoveKnight(PIECE *piece, int src_row, int src_col, int dest_row, int dest_col);
-int MoveKing(PIECE *piece, int src_row, int src_col, int dest_row, int dest_col);
+
+int CallPiece(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col);
+int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col);
+int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col);
+int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col);
+int MoveQueen(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col);
+int MoveKnight(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col);
+int MoveKing(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col);
 
 #endif /* Pieces_h */

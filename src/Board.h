@@ -35,7 +35,7 @@ struct Boards{
 
 void InitializeBoard(PLAYER *p1, PLAYER *p2, BOARDS *boards);
 void DrawBoard(void);
-void MakeMove(PLAYER *p);
+void MakeMove(PLAYER *p, PLAYER *opponent);
 PIECE *CreatePiece(int r, int c, char piece, char color, PLAYER *player);
 void MovePiece(PIECE *piece, int newr, int newc);
 int AlphatoNum(char alpha);
@@ -45,6 +45,6 @@ int FindEmptySpace(int r, int c);
 BOARDS *CreateBoards(void);
 PIECE *FindPiece(BOARDS *boards, int r, int c);
 void PieceInfo(PIECE *piece);
-
+void CapturePiece(PIECE *piece);
 
 #endif /* Board_h */
