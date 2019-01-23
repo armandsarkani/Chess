@@ -29,11 +29,12 @@ struct Piece{
 
 void InitializeBoard(PLAYER *p1, PLAYER *p2);
 void DrawBoard(void);
-void MakeMove(PLAYER *p);
+void MakeMove(PLAYER *p, PLAYER *opponent);
 PIECE *CreatePiece(int r, int c, char piece, char color, PLAYER *player);
 void MovePiece(PIECE *piece, int newr, int newc);
 int AlphatoNum(char alpha);
 PIECE *CheckPiece(PLAYER *p, int r, int c);
 int FindEmptySpace(int r, int c);
+void CapturePiece(PIECE *piece);
 
 #endif /* Board_h */

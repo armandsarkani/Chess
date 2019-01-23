@@ -30,9 +30,9 @@ int main()
     DrawBoard();
     while(IsGameOver == false)
     {
-        MakeMove(white);
+        MakeMove(white, black);
         DrawBoard();
-        MakeMove(black);
+        MakeMove(black, white);
         DrawBoard();
     }
     
@@ -89,7 +89,7 @@ void DrawBoard()
     printf("      a      b      c      d      e      f      g      h   \n");
 }
 
-void MakeMove(PLAYER *p)
+void MakeMove(PLAYER *p, PLAYER *opponent)
 {
     assert(p);
     if(p->type == 'a')
@@ -110,7 +110,7 @@ void MakeMove(PLAYER *p)
     printf("Enter the location of the piece you wish to move. \n");
     scanf(" %c%d", &cCol_src, &row_src);
     col_src = AlphatoNum(cCol_src);
-    while((!(col_src >= 1 && col_src <= 8)) || !(row_src >= 1 && row_src <= 7))
+    while((!(col_src >= 1 && col_src <= 8)) || !(row_src >= 1 && row_src <=8))
     {
         printf("You have entered an invalid input. Please enter a different location. \n");
         scanf(" %c%d", &cCol_src, &row_src);
@@ -127,13 +127,14 @@ void MakeMove(PLAYER *p)
     printf("Enter the location to move the piece. \n");
     scanf(" %c%d", &cCol_dest, &row_dest);
     col_dest = AlphatoNum(cCol_dest);
-    while((CallPiece(piece, row_src, col_src, row_dest, col_dest)) != 0)
+    while((CallPiece(opponent, piece, row_src, col_src, row_dest, col_dest)) != 0)
     {
         printf("Please enter a different location. \n");
         scanf(" %c%d", &cCol_dest, &row_dest);
         col_dest = AlphatoNum(cCol_dest);
     }
     MovePiece(piece, row_dest-1, col_dest-1);
+    
 }
 
 PIECE *CreatePiece(int r, int c, char piece, char color, PLAYER *player)
@@ -192,8 +193,8 @@ void MovePiece(PIECE *piece, int newr, int newc)
     char *temp = tag[piece->r][piece->c];
     tag[newr][newc] = temp;
     tag[piece->r][piece->c] = "  ";
-    piece->r = newc;
-    piece->c = newr;
+    piece->r = newr;
+    piece->c = newc;
 }
 int AlphatoNum(char alpha)
 {
@@ -283,3 +284,13 @@ int FindEmptySpace(int r, int c)
     }
 }
 
+void CapturePiece(PIECE *piece)
+{
+    tag[piece->r][piece->c] = "  ";
+    free(piece);
+    piece->r = 9; // 9 = off board
+    piece->c = 9; // 9 = off board
+    piece->value = 0;
+    piece = NULL;
+
+}
