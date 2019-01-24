@@ -9,6 +9,8 @@ int main()
     PLAYER *black = malloc(sizeof(PLAYER));
     black->color = 'b';
     char human_color;
+	int row; 
+	char col;
     printf("Which color would you like to be? \n");
     printf("(w = white, b = black) \n");
     scanf(" %c", &human_color);
@@ -30,9 +32,13 @@ int main()
     DrawBoard();
     while(IsGameOver == false)
     {
-        MakeMove(white, black);
+        MakeMove(white, black, boards);
         DrawBoard();
-        MakeMove(black, white);
+		printf("Surveying the board. Enter row and column to find piece.\n");
+		scanf(" %c%d", &col, &row);
+        int Ncol = AlphatoNum(col);
+		PieceInfo(FindPiece(boards, 8-row, Ncol-1));
+        MakeMove(black, white, boards);
         DrawBoard();
     }
     
@@ -46,7 +52,10 @@ void InitializeBoard(PLAYER *white, PLAYER *black)
     for(int pawn = Pawn1; pawn <= Pawn8; pawn++)
     {
         white->piecelist[pawn] = CreatePiece(1, pawncol, 'P', 'w', white);
+		boards->pieceboard[pawn][pawncol] = white->piecelist[pawn];
+		
         black->piecelist[pawn] = CreatePiece(6, pawncol, 'P', 'b', black);
+		boards->pieceboard[pawn][pawncol] = black->piecelist[pawn];
         pawncol++;
     }
     // White initial non-pawn pieces
@@ -58,6 +67,16 @@ void InitializeBoard(PLAYER *white, PLAYER *black)
     white->piecelist[Bishop2] = CreatePiece(0, 5, 'B', 'w', white);
     white->piecelist[Queen] = CreatePiece(0, 3, 'Q', 'w', white);
     white->piecelist[King] = CreatePiece(0, 4, 'K', 'w', white);
+	
+	boards->pieceboard[7][0] = white->piecelist[Rook1];
+	boards->pieceboard[7][7] = white->piecelist[Rook1];
+	boards->pieceboard[7][1] = white->piecelist[Knight1];
+	boards->pieceboard[7][6] = white->piecelist[Knight2];
+	boards->pieceboard[7][2] = white->piecelist[Bishop1];
+	boards->pieceboard[7][5] = white->piecelist[Bishop2];
+	boards->pieceboard[7][3] = white->piecelist[Queen];
+	boards->pieceboard[7][4] = white->piecelist[King];
+	
     // player 2 initial pieces
     black->piecelist[Rook1] = CreatePiece(7, 0, 'R', 'b', black);
     black->piecelist[Rook2] = CreatePiece(7, 7, 'R', 'b', black);
@@ -67,11 +86,22 @@ void InitializeBoard(PLAYER *white, PLAYER *black)
     black->piecelist[Bishop2] = CreatePiece(7, 5, 'B', 'b', black);
     black->piecelist[Queen] = CreatePiece(7, 3, 'Q', 'b', black);
     black->piecelist[King] = CreatePiece(7, 4, 'K', 'b', black);
+	
+	boards->pieceboard[0][0] = black->piecelist[Rook1];
+	boards->pieceboard[0][7] = black->piecelist[Rook1];
+	boards->pieceboard[0][1] = black->piecelist[Knight1];
+	boards->pieceboard[0][6] = black->piecelist[Knight2];
+	boards->pieceboard[0][2] = black->piecelist[Bishop1];
+	boards->pieceboard[0][5] = black->piecelist[Bishop2];
+	boards->pieceboard[0][3] = black->piecelist[Queen];
+	boards->pieceboard[0][4] = black->piecelist[King];
+	
     for(int i = 5; i >= 2; i--)
     {
         for(int j = 0; j < 8; j++)
         {
             tag[i][j] = "  ";
+  	    boards->pieceboard[i][j] = NULL;
         }
     }
 }
@@ -89,7 +119,7 @@ void DrawBoard()
     printf("      a      b      c      d      e      f      g      h   \n");
 }
 
-void MakeMove(PLAYER *p, PLAYER *opponent)
+void MakeMove(PLAYER *p, PLAYER *opponent, BOARDS *boards)
 {
     assert(p);
     if(p->type == 'a')
@@ -134,7 +164,7 @@ void MakeMove(PLAYER *p, PLAYER *opponent)
         scanf(" %c%d", &cCol_dest, &row_dest);
         col_dest = AlphatoNum(cCol_dest);
     }
-    MovePiece(piece, row_dest-1, col_dest-1);
+    MovePiece(piece, row_dest-1, col_dest-1, boards);
     
 }
 
@@ -196,6 +226,9 @@ void MovePiece(PIECE *piece, int newr, int newc)
     tag[piece->r][piece->c] = "  ";
     piece->r = newr;
     piece->c = newc;
+
+    free(tempPiece);
+    tempPiece = NULL;
 }
 int AlphatoNum(char alpha)
 {
@@ -283,6 +316,27 @@ int FindEmptySpace(int r, int c)
     {
         return 0;
     }
+}
+
+BOARDS *CreateBoards(){
+	BOARDS *boards = malloc(sizeof(BOARDS));
+	
+	return boards;
+}
+PIECE *FindPiece(BOARDS *boards, int r, int c){
+	assert(boards);
+	return boards->pieceboard[r][c];
+	
+}
+
+void PieceInfo(PIECE *piece){
+	if(piece != NULL){
+	    printf("Piece color: %c\n", piece->player->color);
+	    printf("Piece type: %c\n", piece->piecetype);
+	    printf("Piece location: %c%d\n", NumtoAlpha(piece->c), piece->r+1);
+	}
+	else
+	    printf("No piece there\n");
 }
 
 void CapturePiece(PIECE *piece)
