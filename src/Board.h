@@ -35,9 +35,9 @@ struct Boards{
 
 void InitializeBoard(PLAYER *p1, PLAYER *p2, BOARDS *boards);
 void DrawBoard(void);
-void MakeMove(PLAYER *p, PLAYER *opponent);
+void MakeMove(PLAYER *p, PLAYER *opponent, BOARDS *boards);
 PIECE *CreatePiece(int r, int c, char piece, char color, PLAYER *player);
-void MovePiece(PIECE *piece, int newr, int newc);
+void MovePiece(PIECE *piece, int newr, int newc, BOARDS *boards);
 int AlphatoNum(char alpha);
 char NumtoAlpha(int num);
 PIECE *CheckPiece(PLAYER *p, int r, int c);
