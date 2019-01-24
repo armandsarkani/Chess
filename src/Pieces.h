@@ -1,11 +1,3 @@
-//
-//  Pieces.h
-//  Chess
-//
-//  Created by Armand Sarkani on 1/17/19.
-//  Copyright © 2019 Armand Sarkani. All rights reserved.
-//
-
 #ifndef Pieces_h
 #define Pieces_h
 

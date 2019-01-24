@@ -1,11 +1,3 @@
-//
-//  Pieces.c
-//  Chess
-//
-//  Created by Armand Sarkani on 1/17/19.
-//  Copyright © 2019 Armand Sarkani. All rights reserved.
-//
-
 #include "Pieces.h"
 
 int CallPiece(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
@@ -221,18 +213,18 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
 }
 int MoveKnight(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
 {
-    if(FindEmptySpace(dest_row, dest_col) == 1) // moving knight to empty space
+    if(FindEmptySpace(dest_row, dest_col) == 1 || CheckPiece(opponent, dest_row, dest_col) != NULL) // moving knight to empty space or a capture space
     {
-        return 0;
+        if(((dest_row == src_row+1) && (dest_col == src_col+2)) || ((dest_row == src_row+2) && (dest_col == src_col+1)) || ((dest_row == src_row+2) && (dest_col == src_col-1)) || ((dest_row == src_row+1) && (dest_col == src_col-2)) || ((dest_row == src_row-1) && (dest_col == src_col-2)) || ((dest_row == src_row-2) && (dest_col == src_col-1)) || ((dest_row == src_row-2) && (dest_col == src_col+1)) || ((dest_row == src_row-1) && (dest_col == src_col+2)))
+        {
+            return 0;
+        }
+        return 1;
     }
-    else if(CheckPiece(piece->player, dest_row, dest_col) != NULL) // moving pawn to a space with your own piece
+    else // moving pawn to a space with your own piece
     {
         return 1;
         
-    }
-    else // otherwise must be moving to a space with a different player's piece
-    {
-        return 0;
     }
 }
 int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
@@ -342,18 +334,19 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
 }
 int MoveKing(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
 {
-    if(FindEmptySpace(dest_row, dest_col) == 1) // moving king to empty space
+    if(FindEmptySpace(dest_row, dest_col) == 1 || CheckPiece(opponent, dest_row, dest_col) != NULL) // moving king to empty space or a capture space
     {
-        return 0;
+        if(((dest_row == src_row+1) && (dest_col == src_col-1)) || ((dest_row == src_row+1) && (dest_col == src_col)) || ((dest_row == src_row+1) && (dest_col == src_col+1)) || ((dest_row == src_row) && (dest_col == src_col-1)) || ((dest_row == src_row) && (dest_col == src_col+1)) || ((dest_row == src_row-1) && (dest_col == src_col-1)) || ((dest_row == src_row-1) && (dest_col == src_col)) || ((dest_row == src_row-1) && (dest_col == src_col+1)))
+
+        {
+               return 0;
+        }
+        return 1;
     }
-    else if(CheckPiece(piece->player, dest_row, dest_col) != NULL) // moving pawn to a space with your own piece
+    else  // moving pawn to a space with your own piece
     {
         return 1;
         
-    }
-    else // otherwise must be moving to a space with a different player's piece
-    {
-        return 0;
     }
 }
 int MoveQueen(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
