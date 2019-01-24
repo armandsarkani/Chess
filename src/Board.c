@@ -27,8 +27,7 @@ int main()
         black->type = 'h';
         white->type = 'a';
     }
-	BOARDS *boards = CreateBoards();
-    InitializeBoard(white, black, boards);
+    InitializeBoard(white, black);
     bool IsGameOver = false; // replace with win condition checking functions in modules TBD
     DrawBoard();
     while(IsGameOver == false)
@@ -45,7 +44,7 @@ int main()
     
 }
 
-void InitializeBoard(PLAYER *white, PLAYER *black, BOARDS *boards)
+void InitializeBoard(PLAYER *white, PLAYER *black)
 {
     // White is by default the player that initially occupies first two rows, black is by default the player that initially occupies the top two rows
     // White and 2 initial pawns
@@ -102,7 +101,7 @@ void InitializeBoard(PLAYER *white, PLAYER *black, BOARDS *boards)
         for(int j = 0; j < 8; j++)
         {
             tag[i][j] = "  ";
-			boards->pieceboard[i][j] = NULL;
+  	    boards->pieceboard[i][j] = NULL;
         }
     }
 }
@@ -160,6 +159,7 @@ void MakeMove(PLAYER *p, PLAYER *opponent, BOARDS *boards)
     col_dest = AlphatoNum(cCol_dest);
     while((CallPiece(opponent, piece, row_src, col_src, row_dest, col_dest)) != 0)
     {
+        printf("Invalid move. \n");
         printf("Please enter a different location. \n");
         scanf(" %c%d", &cCol_dest, &row_dest);
         col_dest = AlphatoNum(cCol_dest);
@@ -218,19 +218,12 @@ PIECE *CreatePiece(int r, int c, char piece, char color, PLAYER *player)
     }
     return p;
 }
-void MovePiece(PIECE *piece, int newr, int newc, BOARDS *boards)
+void MovePiece(PIECE *piece, int newr, int newc)
 {
     assert(piece);
-	assert(boards);
     char *temp = tag[piece->r][piece->c];
-	PIECE *tempPiece = malloc(sizeof(PIECE));
-	tempPiece = boards->pieceboard[piece->r][piece->c];
-	
     tag[newr][newc] = temp;
-	boards->pieceboard[newr][newc] = tempPiece;
-
     tag[piece->r][piece->c] = "  ";
-	boards->pieceboard[piece->r][piece->c] = NULL;
     piece->r = newr;
     piece->c = newc;
 
@@ -295,41 +288,6 @@ int AlphatoNum(char alpha)
             break;
     }
     return num;
-}
-
-char NumtoAlpha(int num){
-	char alpha;
-    switch(num)
-    {
-        case 0:
-            alpha = 'A';
-            break;
-        case 1:
-            alpha = 'B';
-            break;
-        case 2:
-            alpha = 'C';
-            break;
-        case 3:
-            alpha = 'D';
-            break;
-        case 4:
-            alpha = 'E';
-            break;
-        case 5:
-            alpha = 'F';
-            break;
-        case 6:
-            alpha = 'G';
-            break;
-        case 7:
-            alpha = 'H';
-            break;
-        default:
-            alpha = 'N';
-            break;
-    }
-    return alpha;
 }
 
 PIECE *CheckPiece(PLAYER *p, int r, int c) // check if its your piece in a particular location
