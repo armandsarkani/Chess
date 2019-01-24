@@ -43,8 +43,20 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
         {
             if((piece->value == 2) && (src_col == dest_col) && ((dest_row == src_row + 1) || (dest_row == src_row + 2)))
             {
-                piece->value = 1;
-                return 0;
+                if(dest_row == src_row + 2 && (CheckPiece(piece->player, src_row+1, src_col) == NULL) && (CheckPiece(opponent, src_row+1, src_col) == NULL))
+                {
+                    piece->value = 1;
+                    return 0;
+                }
+                else if(dest_row == src_row + 1)
+                {
+                    piece->value = 1;
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
             }
             else if((piece->value == 1) && (src_col == dest_col) && (dest_row == src_row + 1))
             {
@@ -52,7 +64,6 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
             }
             else
             {
-                printf("This is not a valid move, please try again. \n");
                 return 1;
             }
         }
@@ -72,17 +83,15 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
                 }
                 else
                 {
-                    printf("This is not a valid move, please try again. \n");
                     return 1;
                 }
             }
-            if((piece->value == 1) && (src_col == dest_col) && (src_row == dest_row + 1))
+            else if((piece->value == 1) && (src_col == dest_col) && (src_row == dest_row + 1))
             {
                 return 0;
             }
             else
             {
-                printf("This is not a valid move, please try again. \n");
                 return 1;
             }
                
@@ -90,7 +99,6 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
     }
     else if(CheckPiece(piece->player, dest_row, dest_col) != NULL) // moving pawn to a space with your own piece
     {
-        printf("You cannot move to a spot that currently contains your own piece. ");
         return 1;
         
     }
@@ -107,7 +115,6 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
             }
             else
             {
-                printf("This is not a valid move, please try again. \n");
                 return 1;
             }
         }
@@ -121,7 +128,6 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
             }
             else
             {
-                printf("This is not a valid move, please try again. \n");
                 return 1;
             }
         }
@@ -139,7 +145,6 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
                 {
                     if(FindEmptySpace(src_row, i) == 0)
                     {
-                        printf("This is not a valid move, please try again. \n");
                         return 1;
                     }
                 }
@@ -156,7 +161,6 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
                 {
                     if(FindEmptySpace(src_row, i) == 0)
                     {
-                        printf("This is not a valid move, please try again. \n");
                         return 1;
                     }
                 }
@@ -176,7 +180,6 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
                 {
                     if(FindEmptySpace(i, src_col) == 0)
                     {
-                        printf("This is not a valid move, please try again. \n");
                         return 1;
                     }
                 }
@@ -193,7 +196,6 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
                 {
                     if(FindEmptySpace(i, src_col) == 0)
                     {
-                        printf("This is not a valid move, please try again. \n");
                         return 1;
                     }
                 }
@@ -207,14 +209,12 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
         }
         else
         {
-            printf("This is not a valid move, please try again. \n");
             return 1;
         }
         return 0;
     }
     else // moving pawn to a space with your own piece
     {
-        printf("You cannot move to a spot that currently contains your own piece. ");
         return 1;
         
     }
@@ -227,7 +227,6 @@ int MoveKnight(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
     }
     else if(CheckPiece(piece->player, dest_row, dest_col) != NULL) // moving pawn to a space with your own piece
     {
-        printf("You cannot move to a spot that currently contains your own piece. ");
         return 1;
         
     }
@@ -252,7 +251,6 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
                 {
                     if(FindEmptySpace(src_row-i, src_col-i) == 0) // if there is a piece in the way
                     {
-                        printf("This is not a valid move, please try again. \n");
                         return 1;
                     }
                 }
@@ -263,7 +261,6 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
                 }
                 return 0;
             }
-            printf("This is not a valid move, please try again. \n");
             return 1;
         }
         else if((dest_row < src_row) && (dest_col > src_col)) // moving to bottom right
@@ -276,7 +273,6 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
                 {
                     if(FindEmptySpace(src_row-i, src_col+i) == 0) // if there is a piece in the way
                     {
-                        printf("This is not a valid move, please try again. \n");
                         return 1;
                     }
                 }
@@ -287,7 +283,6 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
                 }
                 return 0;
             }
-            printf("This is not a valid move, please try again. \n");
             return 1;
         }
         else if((dest_row > src_row) && (dest_col < src_col)) // moving to top left
@@ -300,7 +295,6 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
                 {
                     if(FindEmptySpace(src_row+i, src_col-i) == 0) // if there is a piece in the way
                     {
-                        printf("This is not a valid move, please try again. \n");
                         return 1;
                     }
                 }
@@ -311,7 +305,6 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
                 }
                 return 0;
             }
-            printf("This is not a valid move, please try again. \n");
             return 1;
         }
         else if((dest_row > src_row) && (dest_col > src_col)) // moving to top right
@@ -324,7 +317,6 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
                 {
                     if(FindEmptySpace(src_row+i, src_col+i) == 0) // if there is a piece in the way
                     {
-                        printf("This is not a valid move, please try again. \n");
                         return 1;
                     }
                 }
@@ -335,18 +327,15 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
                 }
                 return 0;
             }
-            printf("This is not a valid move, please try again. \n");
             return 1;
         }
         else
         {
-            printf("This is not a valid move, please try again. \n");
             return 1;
         }
     }
     else // moving pawn to a space with your own piece
     {
-        printf("You cannot move to a spot that currently contains your own piece. ");
         return 1;
         
     }
@@ -359,7 +348,6 @@ int MoveKing(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
     }
     else if(CheckPiece(piece->player, dest_row, dest_col) != NULL) // moving pawn to a space with your own piece
     {
-        printf("You cannot move to a spot that currently contains your own piece. ");
         return 1;
         
     }
