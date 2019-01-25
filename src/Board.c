@@ -9,8 +9,6 @@ int main()
     PLAYER *black = malloc(sizeof(PLAYER));
     black->color = 'b';
     char human_color;
-	int row; 
-	char col;
     printf("Which color would you like to be? \n");
     printf("(w = white, b = black) \n");
     scanf(" %c", &human_color);
@@ -32,13 +30,9 @@ int main()
     DrawBoard();
     while(IsGameOver == false)
     {
-        MakeMove(white, black, boards);
+        MakeMove(white, black);
         DrawBoard();
-		printf("Surveying the board. Enter row and column to find piece.\n");
-		scanf(" %c%d", &col, &row);
-        int Ncol = AlphatoNum(col);
-		PieceInfo(FindPiece(boards, 8-row, Ncol-1));
-        MakeMove(black, white, boards);
+        MakeMove(black, white);
         DrawBoard();
     }
     
@@ -52,10 +46,7 @@ void InitializeBoard(PLAYER *white, PLAYER *black)
     for(int pawn = Pawn1; pawn <= Pawn8; pawn++)
     {
         white->piecelist[pawn] = CreatePiece(1, pawncol, 'P', 'w', white);
-		boards->pieceboard[pawn][pawncol] = white->piecelist[pawn];
-		
         black->piecelist[pawn] = CreatePiece(6, pawncol, 'P', 'b', black);
-		boards->pieceboard[pawn][pawncol] = black->piecelist[pawn];
         pawncol++;
     }
     // White initial non-pawn pieces
@@ -67,16 +58,6 @@ void InitializeBoard(PLAYER *white, PLAYER *black)
     white->piecelist[Bishop2] = CreatePiece(0, 5, 'B', 'w', white);
     white->piecelist[Queen] = CreatePiece(0, 3, 'Q', 'w', white);
     white->piecelist[King] = CreatePiece(0, 4, 'K', 'w', white);
-	
-	boards->pieceboard[7][0] = white->piecelist[Rook1];
-	boards->pieceboard[7][7] = white->piecelist[Rook1];
-	boards->pieceboard[7][1] = white->piecelist[Knight1];
-	boards->pieceboard[7][6] = white->piecelist[Knight2];
-	boards->pieceboard[7][2] = white->piecelist[Bishop1];
-	boards->pieceboard[7][5] = white->piecelist[Bishop2];
-	boards->pieceboard[7][3] = white->piecelist[Queen];
-	boards->pieceboard[7][4] = white->piecelist[King];
-	
     // player 2 initial pieces
     black->piecelist[Rook1] = CreatePiece(7, 0, 'R', 'b', black);
     black->piecelist[Rook2] = CreatePiece(7, 7, 'R', 'b', black);
@@ -86,22 +67,11 @@ void InitializeBoard(PLAYER *white, PLAYER *black)
     black->piecelist[Bishop2] = CreatePiece(7, 5, 'B', 'b', black);
     black->piecelist[Queen] = CreatePiece(7, 3, 'Q', 'b', black);
     black->piecelist[King] = CreatePiece(7, 4, 'K', 'b', black);
-	
-	boards->pieceboard[0][0] = black->piecelist[Rook1];
-	boards->pieceboard[0][7] = black->piecelist[Rook1];
-	boards->pieceboard[0][1] = black->piecelist[Knight1];
-	boards->pieceboard[0][6] = black->piecelist[Knight2];
-	boards->pieceboard[0][2] = black->piecelist[Bishop1];
-	boards->pieceboard[0][5] = black->piecelist[Bishop2];
-	boards->pieceboard[0][3] = black->piecelist[Queen];
-	boards->pieceboard[0][4] = black->piecelist[King];
-	
     for(int i = 5; i >= 2; i--)
     {
         for(int j = 0; j < 8; j++)
         {
             tag[i][j] = "  ";
-  	    boards->pieceboard[i][j] = NULL;
         }
     }
 }
@@ -119,7 +89,7 @@ void DrawBoard()
     printf("      a      b      c      d      e      f      g      h   \n");
 }
 
-void MakeMove(PLAYER *p, PLAYER *opponent, BOARDS *boards)
+void MakeMove(PLAYER *p, PLAYER *opponent)
 {
     assert(p);
     if(p->type == 'a')
@@ -145,7 +115,6 @@ void MakeMove(PLAYER *p, PLAYER *opponent, BOARDS *boards)
         printf("You have entered an invalid input. Please enter a different location. \n");
         scanf(" %c%d", &cCol_src, &row_src);
         col_src = AlphatoNum(cCol_src);
-        
     }
     while(CheckPiece(p, row_src, col_src) == NULL)
     {
@@ -157,14 +126,30 @@ void MakeMove(PLAYER *p, PLAYER *opponent, BOARDS *boards)
     printf("Enter the location to move the piece. \n");
     scanf(" %c%d", &cCol_dest, &row_dest);
     col_dest = AlphatoNum(cCol_dest);
-    while((CallPiece(opponent, piece, row_src, col_src, row_dest, col_dest)) != 0)
+    while((!(col_dest >= 1 && col_dest <= 8)) || !(row_dest >= 1 && row_dest <=8))
+    {
+        printf("You have entered an invalid input. Please enter a different location. \n");
+        scanf(" %c%d", &cCol_dest, &row_dest);
+        col_dest = AlphatoNum(cCol_dest);
+    }
+    int callreturn = CallPiece(opponent, piece, row_src, col_src, row_dest, col_dest);
+    while(callreturn == 1)
     {
         printf("Invalid move. \n");
         printf("Please enter a different location. \n");
         scanf(" %c%d", &cCol_dest, &row_dest);
         col_dest = AlphatoNum(cCol_dest);
+        callreturn = CallPiece(opponent, piece, row_src, col_src, row_dest, col_dest);
     }
-    MovePiece(piece, row_dest-1, col_dest-1, boards);
+    if(callreturn == 2) // a piece has been captured
+    {
+        Log(p->color, piece->piecetype, cCol_dest, row_dest, 1);
+    }
+    else
+    {
+        Log(p->color, piece->piecetype, cCol_dest, row_dest, 0);
+    }
+    MovePiece(tag, piece, row_dest-1, col_dest-1);
     
 }
 
@@ -218,17 +203,14 @@ PIECE *CreatePiece(int r, int c, char piece, char color, PLAYER *player)
     }
     return p;
 }
-void MovePiece(PIECE *piece, int newr, int newc)
+void MovePiece(char *board[8][8], PIECE *piece, int newr, int newc) // only called when the move is legal
 {
     assert(piece);
-    char *temp = tag[piece->r][piece->c];
-    tag[newr][newc] = temp;
-    tag[piece->r][piece->c] = "  ";
+    char *temp = board[piece->r][piece->c];
+    board[newr][newc] = temp;
+    board[piece->r][piece->c] = "  ";
     piece->r = newr;
     piece->c = newc;
-
-    free(tempPiece);
-    tempPiece = NULL;
 }
 int AlphatoNum(char alpha)
 {
@@ -318,27 +300,6 @@ int FindEmptySpace(int r, int c)
     }
 }
 
-BOARDS *CreateBoards(){
-	BOARDS *boards = malloc(sizeof(BOARDS));
-	
-	return boards;
-}
-PIECE *FindPiece(BOARDS *boards, int r, int c){
-	assert(boards);
-	return boards->pieceboard[r][c];
-	
-}
-
-void PieceInfo(PIECE *piece){
-	if(piece != NULL){
-	    printf("Piece color: %c\n", piece->player->color);
-	    printf("Piece type: %c\n", piece->piecetype);
-	    printf("Piece location: %c%d\n", NumtoAlpha(piece->c), piece->r+1);
-	}
-	else
-	    printf("No piece there\n");
-}
-
 void CapturePiece(PIECE *piece)
 {
     tag[piece->r][piece->c] = "  ";
@@ -348,4 +309,40 @@ void CapturePiece(PIECE *piece)
     piece->value = 0;
     piece = NULL;
 
+}
+void Log(char color, char piecetype, char destcol, int destrow, int isCaptured)
+{
+    FILE *log = fopen("Chess Move Log.txt", "a");
+    char *color_string;
+    if(color == 'w')
+    {
+       color_string = "White";
+    }
+    else
+    {
+        color_string = "Black";
+    }
+    if(isCaptured == 1)
+    {
+        if(piecetype == 'P')
+        {
+            fprintf(log, "%s: x%c%d\n", color_string, destcol, destrow);
+        }
+        else
+        {
+            fprintf(log, "%s: %cx%c%d\n", color_string, piecetype, destcol, destrow);
+        }
+    }
+    else
+    {
+        if(piecetype == 'P')
+        {
+            fprintf(log, "%s: %c%d\n", color_string, destcol, destrow);
+        }
+        else
+        {
+            fprintf(log, "%s: %c%c%d\n", color_string, piecetype, destcol, destrow);
+        }
+    }
+    fclose(log);
 }

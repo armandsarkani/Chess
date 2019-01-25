@@ -102,8 +102,7 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
             {
                 PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
                 CapturePiece(opponentpiece);
-                
-                return 0;
+                return 2;
             }
             else
             {
@@ -116,7 +115,7 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
             {
                 PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
                 CapturePiece(opponentpiece);
-                return 0;
+                return 2;
             }
             else
             {
@@ -144,6 +143,7 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
                 {
                     PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
                     CapturePiece(opponentpiece);
+                    return 2;
                 }
                 return 0;
             }
@@ -160,6 +160,7 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
                 {
                     PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
                     CapturePiece(opponentpiece);
+                    return 2;
                 }
                 return 0;
             }
@@ -179,6 +180,7 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
                 {
                     PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
                     CapturePiece(opponentpiece);
+                    return 2;
                 }
                 return 0;
             }
@@ -195,6 +197,7 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
                 {
                     PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
                     CapturePiece(opponentpiece);
+                    return 2;
                 }
                 return 0;
             }
@@ -250,6 +253,7 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
                 {
                     PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
                     CapturePiece(opponentpiece);
+                    return 2;
                 }
                 return 0;
             }
@@ -272,6 +276,7 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
                 {
                     PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
                     CapturePiece(opponentpiece);
+                    return 2;
                 }
                 return 0;
             }
@@ -294,6 +299,7 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
                 {
                     PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
                     CapturePiece(opponentpiece);
+                    return 2;
                 }
                 return 0;
             }
@@ -316,6 +322,7 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
                 {
                     PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
                     CapturePiece(opponentpiece);
+                    return 2;
                 }
                 return 0;
             }

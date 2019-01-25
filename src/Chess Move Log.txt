@@ -1,0 +1,10 @@
+*** CHESSTER MOVE LOG ***
+White: a4
+Black: b5
+White: xb5
+Black: g6
+White: d3
+Black: g5
+White: Bxg5
+Black: h5
+White: Rxa7
