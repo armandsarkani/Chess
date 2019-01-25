@@ -23,4 +23,8 @@ struct movelist {
 	MOVE *last;	
 };
 
+void AI(char *board[8][8],);
+
+int NegaMax(int depth, MOVE *origmove, int alpha, int beta);
+
 #endif /* AI_h */
