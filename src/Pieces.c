@@ -98,7 +98,7 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
     {
         if(piece->player->color == 'w')
         {
-            if(((dest_col == src_col + 1) || (dest_col == src_col - 1)) && (dest_row = src_row + 1))
+            if(((dest_col == src_col + 1) || (dest_col == src_col - 1)) && (dest_row == src_row + 1))
             {
                 PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
                 CapturePiece(opponentpiece);
@@ -111,7 +111,7 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
         }
         else
         {
-            if(((dest_col == src_col - 1) || (dest_col == src_col + 1)) && (dest_row = src_row - 1))
+            if(((dest_col == src_col - 1) || (dest_col == src_col + 1)) && (dest_row == src_row - 1))
             {
                 PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
                 CapturePiece(opponentpiece);
@@ -358,9 +358,15 @@ int MoveKing(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
 }
 int MoveQueen(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
 {
-    if((MoveRook(opponent, piece, src_row, src_col, dest_row, dest_col) == 0) || (MoveBishop(opponent, piece, src_row, src_col, dest_row, dest_col) == 0))
+    int rookreturn = MoveRook(opponent, piece, src_row, src_col, dest_row, dest_col);
+    int bishopreturn = MoveBishop(opponent, piece, src_row, src_col, dest_row, dest_col);
+    if(rookreturn == 0 || rookreturn == 2)
     {
-        return 0;
+        return rookreturn;
+    }
+    else if(bishopreturn == 0 || bishopreturn == 2)
+    {
+        return bishopreturn;
     }
     else
     {

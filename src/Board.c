@@ -12,14 +12,14 @@ int main()
     printf("Which color would you like to be? \n");
     printf("(w = white, b = black) \n");
     scanf(" %c", &human_color);
-    if(human_color == 'w')
+    if(human_color == 'w' || human_color == 'W')
     {
         printf("You are the white player. \n");
         white->type = 'h';
         white->color = 'w';
         black->type = 'a';
     }
-    else if(human_color == 'b')
+    else if(human_color == 'b' || human_color == 'B')
     {
         printf("You are the black player. \n");
         black->type = 'h';
@@ -139,6 +139,7 @@ void MakeMove(PLAYER *p, PLAYER *opponent)
         printf("Please enter a different location. \n");
         scanf(" %c%d", &cCol_dest, &row_dest);
         col_dest = AlphatoNum(cCol_dest);
+        piece = CheckPiece(p, row_src, col_src);
         callreturn = CallPiece(opponent, piece, row_src, col_src, row_dest, col_dest);
     }
     FILE *log;
