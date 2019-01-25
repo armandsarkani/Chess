@@ -141,13 +141,14 @@ void MakeMove(PLAYER *p, PLAYER *opponent)
         col_dest = AlphatoNum(cCol_dest);
         callreturn = CallPiece(opponent, piece, row_src, col_src, row_dest, col_dest);
     }
+    FILE *log;
     if(callreturn == 2) // a piece has been captured
     {
-        Log(p->color, piece->piecetype, cCol_dest, row_dest, 1);
+        log = Log(p->color, piece->piecetype, cCol_dest, row_dest, 1);
     }
     else
     {
-        Log(p->color, piece->piecetype, cCol_dest, row_dest, 0);
+        log = Log(p->color, piece->piecetype, cCol_dest, row_dest, 0);
     }
     MovePiece(tag, piece, row_dest-1, col_dest-1);
     
@@ -310,7 +311,7 @@ void CapturePiece(PIECE *piece)
     piece = NULL;
 
 }
-void Log(char color, char piecetype, char destcol, int destrow, int isCaptured)
+FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured)
 {
     FILE *log = fopen("Chess Move Log.txt", "a");
     char *color_string;
@@ -345,4 +346,5 @@ void Log(char color, char piecetype, char destcol, int destrow, int isCaptured)
         }
     }
     fclose(log);
+    return log;
 }

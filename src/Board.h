@@ -37,7 +37,7 @@ int AlphatoNum(char alpha);
 PIECE *CheckPiece(PLAYER *p, int r, int c);
 int FindEmptySpace(int r, int c);
 void CapturePiece(PIECE *piece);
-void Log(char color, char piecetype, char destcol, int destrow, int isCaptured);
+FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured);
 
 
 #endif /* Board_h */
