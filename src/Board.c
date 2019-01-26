@@ -1,3 +1,4 @@
+// known bugs
 #include "Board.h"
 #include "Pieces.h"
 
