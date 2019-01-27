@@ -1,3 +1,10 @@
+//  Pieces.c
+//  Chess
+//
+//  First release was created by Armand Ahadi-Sarkani on 1/18/19.
+//  Copyright © 2019 Armand Ahadi-Sarkani. All rights reserved.
+//
+
 #include "Pieces.h"
 
 int CallPiece(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)

@@ -1,3 +1,10 @@
+//  Board.c
+//  Chess
+//
+//  First release was created by Armand Ahadi-Sarkani on 1/16/19.
+//  Copyright © 2019 Armand Ahadi-Sarkani. All rights reserved.
+//
+
 #include "Board.h"
 #include "Pieces.h"
 
@@ -305,7 +312,6 @@ int FindEmptySpace(int r, int c)
 void CapturePiece(PIECE *piece)
 {
     tag[piece->r][piece->c] = "  ";
-    free(piece);
     piece->r = 9; // 9 = off board
     piece->c = 9; // 9 = off board
     piece->value = 0;
