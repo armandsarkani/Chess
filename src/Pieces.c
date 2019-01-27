@@ -227,6 +227,12 @@ int MoveKnight(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
     {
         if(((dest_row == src_row+1) && (dest_col == src_col+2)) || ((dest_row == src_row+2) && (dest_col == src_col+1)) || ((dest_row == src_row+2) && (dest_col == src_col-1)) || ((dest_row == src_row+1) && (dest_col == src_col-2)) || ((dest_row == src_row-1) && (dest_col == src_col-2)) || ((dest_row == src_row-2) && (dest_col == src_col-1)) || ((dest_row == src_row-2) && (dest_col == src_col+1)) || ((dest_row == src_row-1) && (dest_col == src_col+2)))
         {
+           if(CheckPiece(opponent, dest_row, dest_col) != NULL)
+            {
+                PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                CapturePiece(opponentpiece);
+                return 2;
+            }
             return 0;
         }
         return 1;
@@ -353,6 +359,12 @@ int MoveKing(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
         if(((dest_row == src_row+1) && (dest_col == src_col-1)) || ((dest_row == src_row+1) && (dest_col == src_col)) || ((dest_row == src_row+1) && (dest_col == src_col+1)) || ((dest_row == src_row) && (dest_col == src_col-1)) || ((dest_row == src_row) && (dest_col == src_col+1)) || ((dest_row == src_row-1) && (dest_col == src_col-1)) || ((dest_row == src_row-1) && (dest_col == src_col)) || ((dest_row == src_row-1) && (dest_col == src_col+1)))
 
         {
+            if(CheckPiece(opponent, dest_row, dest_col) != NULL)
+            {
+                PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                CapturePiece(opponentpiece);
+                return 2;
+            }
                return 0;
         }
         return 1;
