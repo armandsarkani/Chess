@@ -1,26 +1,16 @@
-fndef AI_h
+#ifndef AI_h
 #define AI_h
 
 #include "Board.h"
 #include "Pieces.h"
+#include "Movegen.c"
 
 typedef struct move MOVE;
 typedef struct movelist MOVELIST;
 
-struct move {
-	int src_row;
-	int src_col;
-	int dst_row;
-	int dst_col;
-	MOVE *nextentry;
-	MOVE *preventry;
-	char newboard[8][8];
-	int score;
-};
 
-struct movelist {
-	MOVE *first;
-	MOVE *last;	
-};
+void AI(char *board[8][8], PLAYER *player, PLAYER *opponent);
+
+int NegaMax(int depth, MOVE *origmove, int alpha, int beta, int AI_tracker);
 
 #endif /* AI_h */
