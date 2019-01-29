@@ -54,6 +54,7 @@ int FindEmptySpace(BOARD *board, int r, int c);
 int Check(BOARD *board, PLAYER *player, PLAYER *opponent, int king_row, int king_col);
 void CapturePiece(BOARD *board, PIECE *piece);
 void UndoCapture(BOARD *board, PIECE *opponentcapture, int opponent_r, int opponent_c, int opponent_value, char *piecetag);
+PLAYER *CreatePlayer(char color, char type);
 BOARD *CreateBoard(PLAYER *human, PLAYER *AI, char *boardarray[8][8]);
 FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured, int CheckReturn);
 
