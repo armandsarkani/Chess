@@ -20,7 +20,7 @@ typedef struct Player PLAYER;
 typedef struct Piece PIECE;
 typedef struct Board BOARD;
 
-typedef enum PieceName {Pawn1, Pawn2, Pawn3, Pawn4, Pawn5, Pawn6, Pawn7, Pawn8, Rook1, Rook2, Bishop1, Bishop2, Knight1, Knight2, Queen, King} pieces;
+typedef enum PieceName {Pawn1, Pawn2, Pawn3, Pawn4, Pawn5, Pawn6, Pawn7, Pawn8, Rook1, Rook2, Bishop1, Bishop2, Knight1, Knight2, Queen, King} pieces; // Pawns = 0-7, Rooks = 8-9, Bishops = 10-11, Knights = 12-13, Queen = 14, King = 15
 
 struct Board {
     PLAYER *white;
@@ -47,14 +47,15 @@ void InitializeBoard(BOARD *global);
 void DrawBoard(BOARD *board);
 void MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent);
 PIECE *CreatePiece(BOARD *board, int r, int c, char piece, char color, PLAYER *player);
-int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc);
+void MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc);
 int AlphatoNum(char alpha);
 PIECE *CheckPiece(PLAYER *p, int r, int c);
 int FindEmptySpace(BOARD *board, int r, int c);
 int Check(BOARD *board, PLAYER *player, PLAYER *opponent, int king_row, int king_col);
 void CapturePiece(BOARD *board, PIECE *piece);
+void UndoCapture(BOARD *board, PIECE *opponentcapture, int opponent_r, int opponent_c, int opponent_value, char *piecetag);
 BOARD *CreateBoard(PLAYER *human, PLAYER *AI, char *boardarray[8][8]);
-FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured);
+FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured, int CheckReturn);
 
 
 #endif /* Board_h */

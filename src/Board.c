@@ -42,10 +42,26 @@ int main()
     DrawBoard(global);
     while(IsGameOver == false)
     {
+        if(white->type == 'h')
+        {
+            printf("Your turn!\n");
+        }
         MakeMove(global, white, black);
         DrawBoard(global);
+        if(Check(global, white, black, (black->piecelist[King]->r)+1, (black->piecelist[King]->c)+1) == 1)
+        {
+            printf("You are in check!\n");
+        }
+        if(black->type == 'h')
+        {
+            printf("Your turn!\n");
+        }
         MakeMove(global, black, white);
         DrawBoard(global);
+        if(Check(global, black, white, (white->piecelist[King]->r)+1, (white->piecelist[King]->c)+1) == 1)
+        {
+            printf("You are in check!\n");
+        }
     }
     
 }
@@ -103,59 +119,107 @@ void DrawBoard(BOARD *board)
 
 void MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent)
 {
-    assert(p);
-    if(p->type == 'a')
+    int EXIT = 0;
+    while(EXIT == 0)
     {
-        printf("AI's turn. \n");
-        // insert function call for AI module
-    }
-    if(p->type == 'h')
-    {
-        printf("Your turn. \n");
-    }
-    char cCol_src;
-    int row_src;
-    int col_src;
-    char cCol_dest;
-    int row_dest;
-    int col_dest;
-    printf("Enter the location of the piece you wish to move. \n");
-    scanf(" %c%d", &cCol_src, &row_src);
-    col_src = AlphatoNum(cCol_src);
-    while((!(col_src >= 1 && col_src <= 8)) || !(row_src >= 1 && row_src <=8))
-    {
-        printf("You have entered an invalid input. Please enter a different location. \n");
+        assert(p);
+        char cCol_src;
+        int row_src;
+        int col_src;
+        char cCol_dest;
+        int row_dest;
+        int col_dest;
+        char *piecetag = NULL;
+        PIECE *opponentcapture = NULL;
+        int opponent_r = 0;
+        int opponent_c = 0;
+        int opponent_value = 0;
+        printf("Enter the location of the piece you wish to move. \n");
         scanf(" %c%d", &cCol_src, &row_src);
         col_src = AlphatoNum(cCol_src);
-    }
-    while(CheckPiece(p, row_src, col_src) == NULL)
-    {
-        printf("You have made an invalid move. Please enter a different location. \n");
-        scanf(" %c%d", &cCol_src, &row_src);
-        col_src = AlphatoNum(cCol_src);
-    }
-    PIECE *piece = CheckPiece(p, row_src, col_src);
-    printf("Enter the location to move the piece. \n");
-    scanf(" %c%d", &cCol_dest, &row_dest);
-    col_dest = AlphatoNum(cCol_dest);
-    while((!(col_dest >= 1 && col_dest <= 8)) || !(row_dest >= 1 && row_dest <=8))
-    {
-        printf("You have entered an invalid input. Please enter a different location. \n");
+        while((!(col_src >= 1 && col_src <= 8)) || !(row_src >= 1 && row_src <=8))
+        {
+            printf("You have entered an invalid input. Please enter a different location. \n");
+            scanf(" %c%d", &cCol_src, &row_src);
+            col_src = AlphatoNum(cCol_src);
+        }
+        while(CheckPiece(p, row_src, col_src) == NULL)
+        {
+            printf("You have made an invalid move. Please enter a different location. \n");
+            scanf(" %c%d", &cCol_src, &row_src);
+            col_src = AlphatoNum(cCol_src);
+        }
+        PIECE *piece = CheckPiece(p, row_src, col_src);
+        int counter = 0;
+        for(int i = 1; i <= 8; i++)
+        {
+            for(int j = 1; j <= 8; j++)
+            {
+                if(CallPiece(board, opponent, piece, row_src, col_src, i, j, 0) == 1)
+                {
+                    counter++;
+                }
+            }
+        }
+        if(counter == 64)
+        {
+            printf("You have selected a piece that currently has no legal moves to make. Please try again.\n");
+            continue;
+            
+        }
+        printf("Enter the location to move the piece. \n");
         scanf(" %c%d", &cCol_dest, &row_dest);
         col_dest = AlphatoNum(cCol_dest);
+        while((!(col_dest >= 1 && col_dest <= 8)) || !(row_dest >= 1 && row_dest <=8))
+        {
+            printf("You have entered an invalid input. Please enter a different location. \n");
+            scanf(" %c%d", &cCol_dest, &row_dest);
+            col_dest = AlphatoNum(cCol_dest);
+        }
+        if(CheckPiece(opponent, row_dest, col_dest) != NULL)
+        {
+            opponentcapture = CheckPiece(opponent, row_dest, col_dest);
+            piecetag = board->boardarray[opponentcapture->r][opponentcapture->c];
+            opponent_r = opponentcapture->r;
+            opponent_c = opponentcapture->c;
+            opponent_value = opponentcapture->value;
+        }
+        int callreturn = CallPiece(board, opponent, piece, row_src, col_src, row_dest, col_dest, 1);
+        while(callreturn == 1)
+        {
+            printf("Invalid move. \n");
+            printf("Please enter a different location. \n");
+            scanf(" %c%d", &cCol_dest, &row_dest);
+            col_dest = AlphatoNum(cCol_dest);
+            piece = CheckPiece(p, row_src, col_src);
+            callreturn = CallPiece(board, opponent, piece, row_src, col_src, row_dest, col_dest, 1);
+        }
+        MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
+        if((piece->r == row_src-1) && (piece->c == col_src-1))
+        {
+            printf("You cannot make a move that will leave you in check. Please try again. \n");
+            if(callreturn == 2)
+            {
+                UndoCapture(board, opponentcapture, opponent_r, opponent_c, opponent_value, piecetag);
+            }
+            continue;
+        }
+        EXIT = 1;
+        FILE *log;
+        int CheckReturn = 0;
+        if(Check(board, p, opponent, (opponent->piecelist[King]->r)+1, (opponent->piecelist[King]->c)+1) == 1)
+        {
+            CheckReturn = 1;
+        }
+        if(callreturn == 2) // a piece has been captured
+        {
+            log = Log(p->color, piece->piecetype, cCol_dest, row_dest, 1, CheckReturn);
+        }
+        else
+        {
+            log = Log(p->color, piece->piecetype, cCol_dest, row_dest, 0, CheckReturn);
+        }
     }
-    int callreturn = CallPiece(board, opponent, piece, row_src, col_src, row_dest, col_dest);
-    while(callreturn == 1)
-    {
-        printf("Invalid move. \n");
-        printf("Please enter a different location. \n");
-        scanf(" %c%d", &cCol_dest, &row_dest);
-        col_dest = AlphatoNum(cCol_dest);
-        piece = CheckPiece(p, row_src, col_src);
-        callreturn = CallPiece(board, opponent, piece, row_src, col_src, row_dest, col_dest);
-    }
-    MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
-    
     
 }
 
@@ -209,15 +273,23 @@ PIECE *CreatePiece(BOARD *board, int r, int c, char piece, char color, PLAYER *p
     }
     return p;
 }
-int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc) // only called when the move is legal
+void MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc) // only called when the move is legal
 {
     assert(piece);
+    int tempR = piece->r;
+    int tempC = piece->c;
     char *temp = board->boardarray[piece->r][piece->c];
     board->boardarray[newr][newc] = temp;
     board->boardarray[piece->r][piece->c] = "  ";
     piece->r = newr;
     piece->c = newc;
-    return 0;
+    if(Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1) == 1)
+    {
+        board->boardarray[newr][newc] = "  ";
+        board->boardarray[tempR][tempC] = temp;
+        piece->r = tempR;
+        piece->c = tempC;
+    }
 }
 int AlphatoNum(char alpha)
 {
@@ -309,17 +381,28 @@ int FindEmptySpace(BOARD *board, int r, int c)
 
 void CapturePiece(BOARD *board, PIECE *piece)
 {
-    board->boardarray[piece->r][piece->c] = "  ";
-    piece->r = 9; // 9 = off board
-    piece->c = 9; // 9 = off board
-    piece->value = 0;
-    piece = NULL;
+    if(piece->piecetype != 'K')
+    {
+        board->boardarray[piece->r][piece->c] = "  ";
+        piece->r = 9; // 9 = off board
+        piece->c = 9; // 9 = off board
+        piece->value = 0;
+        piece = NULL;
+    }
 
 }
-FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured)
+void UndoCapture(BOARD *board, PIECE *opponentcapture, int opponent_r, int opponent_c, int opponent_value, char *piecetag)
+{
+    board->boardarray[opponent_r][opponent_c] = piecetag;
+    opponentcapture->r = opponent_r;
+    opponentcapture->c = opponent_c;
+    opponentcapture->value = opponent_value;
+}
+FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured, int CheckReturn)
 {
     FILE *log = fopen("Chess Move Log.txt", "a");
     char *color_string;
+    char check_char = '\0';
     if(color == 'w')
     {
        color_string = "White";
@@ -328,26 +411,30 @@ FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured)
     {
         color_string = "Black";
     }
+    if(CheckReturn == 1)
+    {
+        check_char = '+';
+    }
     if(isCaptured == 1)
     {
         if(piecetype == 'P')
         {
-            fprintf(log, "%s: x%c%d\n", color_string, destcol, destrow);
+            fprintf(log, "%s: x%c%d%c\n", color_string, destcol, destrow, check_char);
         }
         else
         {
-            fprintf(log, "%s: %cx%c%d\n", color_string, piecetype, destcol, destrow);
+            fprintf(log, "%s: %cx%c%d%c\n", color_string, piecetype, destcol, destrow, check_char);
         }
     }
     else
     {
         if(piecetype == 'P')
         {
-            fprintf(log, "%s: %c%d\n", color_string, destcol, destrow);
+            fprintf(log, "%s: %c%d%c\n", color_string, destcol, destrow, check_char);
         }
         else
         {
-            fprintf(log, "%s: %c%c%d\n", color_string, piecetype, destcol, destrow);
+            fprintf(log, "%s: %c%c%d%c\n", color_string, piecetype, destcol, destrow, check_char);
         }
     }
     fclose(log);
@@ -373,7 +460,7 @@ int Check(BOARD *board, PLAYER *player, PLAYER *opponent, int king_row, int king
     int piecereturn = 0;
     for(int i = 0; i < 16; i++)
     {
-        piecereturn = CallPiece(board, opponent, player->piecelist[i], player->piecelist[i]->r, player->piecelist[i]->c, king_row, king_col);
+        piecereturn = CallPiece(board, opponent, player->piecelist[i], (player->piecelist[i]->r)+1, (player->piecelist[i]->c)+1, king_row, king_col, 0);
         if(piecereturn == 2)
         {
             return 1; // king is in check automatically
