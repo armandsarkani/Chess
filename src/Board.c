@@ -455,6 +455,17 @@ BOARD *CreateBoard(PLAYER *white, PLAYER *black, char *boardarray[8][8])
     }
     return board;
 }
+PLAYER *CreatePlayer(char color, char type)
+{
+    PLAYER *newplayer = malloc(sizeof(PLAYER));
+    newplayer->color = color;
+    newplayer->type = type;
+    for(int i = Pawn1; i < King; i++)
+    {
+        newplayer->piecelist[i] = malloc(sizeof(PIECE));
+    }
+    return newplayer;
+}
 int Check(BOARD *board, PLAYER *player, PLAYER *opponent, int king_row, int king_col)
 {
     int piecereturn = 0;
