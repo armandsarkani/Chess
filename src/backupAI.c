@@ -29,6 +29,7 @@ void AI(board[8][8], PLAYER *player, PLAYER *opponent){
 	list = NewMoveList(); /*allocate mem*/
 	int value; 
 	int score = 0;
+	int bestscore = 0;
 	MOVE *tempmove;
 	for (int x = 0; x < 8; x++) {/*x: dummy variable for coordinate tracking on chess board*/
 		for (int y = 0; y < 8; y++){/*y: dummy variable for coordinate tracking on chess board*/
