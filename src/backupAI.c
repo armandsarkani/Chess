@@ -42,8 +42,11 @@ void AI(board[8][8], PLAYER *player, PLAYER *opponent){
 							value = CallPiece(board, opponent, piece, x, y, i, j, 1);
 							if(value == 2) {
 								piececaptured = CheckPiece(opponent, i, j);
-								score = score + (piececaptured -> value);
-								capturemove = tempmove; 
+								score = piececaptured -> value;
+								if(score > bestscore){
+									bestscore = score;
+									capturemove = tempmove;
+								}/*if end*/
 							}/*if end*/
 							tempmove = tempmove->nextentry;
 						}/*for end*/
