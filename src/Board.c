@@ -40,17 +40,20 @@ int main()
     InitializeBoard(global);
     bool IsGameOver = false; // replace with win condition checking functions in modules TBD
     DrawBoard(global);
+    int move = 0;
     while(IsGameOver == false)
     {
         if(white->type == 'h')
         {
             printf("Your turn!\n");
         }
-        MakeMove(global, white, black);
+        move = MakeMove(global, white, black);
         DrawBoard(global);
-        if(Check(global, white, black, (black->piecelist[King]->r)+1, (black->piecelist[King]->c)+1) == 1)
+        //if(Check(global, white, black, (black->piecelist[King]->r)+1, (black->piecelist[King]->c)+1) == 1)
+        if(move == 1 || move == 2)
         {
-            if(Checkmate(global, white, black) == 1) // if black is in checkmate
+            //if(Checkmate(global, white, black) == 1) // if black is in checkmate
+            if(move == 2)
             {
                 printf("Game over! White wins by checkmate!\n");
                 return 0;
@@ -65,11 +68,13 @@ int main()
         {
             printf("Your turn!\n");
         }
-        MakeMove(global, black, white);
+        move = MakeMove(global, black, white);
         DrawBoard(global);
-        if(Check(global, black, white, (white->piecelist[King]->r)+1, (white->piecelist[King]->c)+1) == 1)
+        //if(Check(global, black, white, (white->piecelist[King]->r)+1, (white->piecelist[King]->c)+1) == 1)
+        if(move == 1 || move == 2)
         {
-            if(Checkmate(global, black, white) == 1) // if white is in checkmate
+            //if(Checkmate(global, black, white) == 1) // if white is in checkmate
+            if(move == 2)
             {
                 printf("Game over! Black wins by checkmate!\n");
                 return 0;
@@ -136,7 +141,7 @@ void DrawBoard(BOARD *board)
     printf("      a      b      c      d      e      f      g      h   \n");
 }
 
-void MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent)
+int MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent)
 {
     int EXIT = 0;
     while(EXIT == 0)
@@ -229,19 +234,26 @@ void MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent)
         {
             CheckReturn = 1;
         }
+        board->boardarray[piece->r][piece->c] = originalpiecetag;
         if(callreturn == 2) // a piece has been captured
         {
-            if(CheckReturn == 2)
-            {
-                board->boardarray[piece->r][piece->c] = originalpiecetag;
-            }
             log = Log(p->color, piece->piecetype, cCol_dest, row_dest, 1, CheckReturn);
         }
         else
         {
             log = Log(p->color, piece->piecetype, cCol_dest, row_dest, 0, CheckReturn);
         }
+        if(CheckReturn == 2)
+        {
+            return 2;
+        }
+        else if(CheckReturn == 1)
+        {
+            return 1;
+        }
+        return 0;
     }
+    return 0;
     
 }
 

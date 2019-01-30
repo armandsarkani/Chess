@@ -45,7 +45,7 @@ struct Piece{
 
 void InitializeBoard(BOARD *global);
 void DrawBoard(BOARD *board);
-void MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent);
+int MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent);
 PIECE *CreatePiece(BOARD *board, int r, int c, char piece, char color, PLAYER *player);
 int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc);
 int AlphatoNum(char alpha);
