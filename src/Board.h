@@ -45,17 +45,19 @@ struct Piece{
 
 void InitializeBoard(BOARD *global);
 void DrawBoard(BOARD *board);
-void MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent);
+int MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent);
 PIECE *CreatePiece(BOARD *board, int r, int c, char piece, char color, PLAYER *player);
-void MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc);
+int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc);
 int AlphatoNum(char alpha);
 PIECE *CheckPiece(PLAYER *p, int r, int c);
 int FindEmptySpace(BOARD *board, int r, int c);
 int Check(BOARD *board, PLAYER *player, PLAYER *opponent, int king_row, int king_col);
+int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent);
 void CapturePiece(BOARD *board, PIECE *piece);
 void UndoCapture(BOARD *board, PIECE *opponentcapture, int opponent_r, int opponent_c, int opponent_value, char *piecetag);
 PLAYER *CreatePlayer(char color, char type);
 BOARD *CreateBoard(PLAYER *human, PLAYER *AI, char *boardarray[8][8]);
+int CheckNumberofIllegalMoves(BOARD *board, PLAYER *opponent, PIECE *piece, int row_src, int col_src);
 FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured, int CheckReturn);
 
 
