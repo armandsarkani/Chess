@@ -6,10 +6,6 @@
 //  //  Copyright © 2019 Jada Berenguer. All rights reserved.
 //  //  
 
-#include "Pieces.h"
-#include "Movegen.h"
-#include "Evaluate.h"
-
 /*AI function for now will just move based on capture pieces*/
 /*AI function will pass in: a board, a player, and an opponent)*/
 /*it will scan the board until it hits a piece*/
@@ -20,7 +16,7 @@
 /*random function: choose a random number, loop through that random number x times
  * and choose that move from getmoves*/
 
-void AI(board[8][8], PLAYER *player, PLAYER *opponent){
+MOVE *AI(board[8][8], PLAYER *player, PLAYER *opponent){
 	
 	PIECE *piece;
 	PIECE *piececaptured;
