@@ -1,92 +1,54 @@
-<<<<<<< HEAD
 /*Copyright Benny Lin*/
-/* Last modified 1/27/2019*/
-=======
-//Copyright Benny Lin
-/* Last modified 1/24/2019*/
-* 
-
-
-/*Things that need to be added:
-
-	DeleteMoveList
-	DeleteMoveEntry
+/* Last modified 1/30/2019*/
+/* 
+ * Things that need to be developed:
 	
+	Functions:
+		int score_move();
+		
+		int CheckKillerMoves();
+		int CheckCaptureMoves();
+		int EvaluatePosition();
+	
+	Constants:
+		Piece-SquareTable (needs some redefinition)
+			*A PST is a 1-D array of 64 elements. Each element represents a position on the board. A position is given more weight if it 
+			is better for the piece to be there. Higher values = better positions. The array encourages certain behaviors for the pieces.
+			i.e. Pawns are enccouraged to move forward and stay in the center, knights are encouraged to stay in the center of the board, 
+			kings are encouraged to stay out of corners of the board 
+		Piece value (needs more discussion on how much a piece is worth vs. position)
+		
+	General formula for what is a good move
 */
 
->>>>>>> e5bdb7aadda58ae5f1b0257438b03b8762da1cfc
-
-typedef struct move MOVE;
-typedef struct movelist MOVELIST;
-
-struct move {
-	int src_row;
-	int src_col;
-	int dst_row;
-	int dst_col;
-	MOVE *nextentry;
-	MOVE *preventry;
-<<<<<<< HEAD
-	char new_board[8][8];
-	int score;
-	MOVELIST *next_level;
-	MOVELIST *prev_level;
-=======
-	char newboard[8][8];
-	int score;
-	MOVELIST *next_level;
->>>>>>> e5bdb7aadda58ae5f1b0257438b03b8762da1cfc
-};
-struct movelist {
-	MOVE *first;
-	MOVE *last;
-<<<<<<< HEAD
-	MOVE *prevmove;
-	BOARD *board;
-}
-void getmoves(char *org_board[8][8],PLAYER *player, PLAYER *oppenent, MOVELIST *list);
-/*Adds entries for possible legal moves into a given list by evaluating a given board config and player perspective*/
-void AddLegalMoves(MOVELIST *list, src_row, src_col, dest_row, dest_col, board[8][8]);
-/*Adds move information into the given list, allocating space and making new entries; stores resulting board from making the move*/
-
-/*Deletes list of all possible legal moves: frees memory*/
-void DeleteMoveList(MOVELIST *list);
+int score_move(MOVE *move, PLAYER *opponent);
+	/*Passes a move entry. Move entry is accessed. Data( row, col, new_board) is used to evaluate ce
+  	Calls all other functions and sums the subscores for a final score
+  		Returns final score*/ 
 
 
-/*Deletes a single move entry within the movelist*/
-void DeleteMoveEntry(MOVE *entry);
+int CheckKillerMoves( int dest_row, int dest_col, PLAYER *opponent);
+	/*Scans the given board position and counts the number of ways the opponent can attack the given board position.
+  	Creates a subscore using the above data
+  		Returns a subscore*/
+	
 
 
-void DeleteBoard(BOARD *board);
+int CheckCaptureMoves(int dest_row. int dest_col, PIECE *piece, PLAYER *opponent);
+	/*Scans given board position and counts the number of opponent pieces the player can capture with that specific piece
+  	Creates a subscore using the above data
+  		Returns a subscore*/
 
 
-void DeletePlayer(PLAYER *entry);
-
-
-void DeletePiece(PIECE *piece);
-=======
-}
-void getmoves(char *org_board[8][8],PLAYER *player, PLAYER *oppenent, MOVELIST *list);
-//Adds entries for possible legal moves into a given list by evaluating a given board config and player perspective
-//
-void AddLegalMoves(MOVELIST *list, src_row, src_col, dest_row, dest_col, board[8][8]){
-////Adds move information into the given list, allocating space and making new entries; stores resulting board from making the move
-
-
-
-}
-
-////Deletes list of all possible legal moves: frees memory
-void DeleteMoveList(MOVELIST *list){
-
-}
-
-////Deletes a single move entry within the movelist
-void DeleteMoveEntry(MOVE *entry){
-
-}
-
-
-
->>>>>>> e5bdb7aadda58ae5f1b0257438b03b8762da1cfc
+int EvaluatePosiiton(int row, int col, PIECE *piece);
+	/*Needs more development; board position of player piece is only relative to positions of opponent piece*/
+	/*Evaluates the given board position and creates a subscore for it
+  	Uses the Piece Square Table of the respective piece and other data to calculate board position subscore
+ 		Returns subscore*/
+	
+int ReturnPosScore(char piecetype, int pos);
+	/*returns the value of the position of the square that the piece is on*/
+	
+int BoardtoPSQTable(int row, int col);
+	/*returns the square that the piece is on*/
 
