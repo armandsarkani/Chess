@@ -50,7 +50,16 @@ int main()
         DrawBoard(global);
         if(Check(global, white, black, (black->piecelist[King]->r)+1, (black->piecelist[King]->c)+1) == 1)
         {
-            printf("You are in check!\n");
+            if(Checkmate(global, white, black) == 1) // if black is in checkmate
+            {
+                printf("Game over! White wins by checkmate!\n");
+                return 0;
+            }
+            else
+            {
+                printf("You are in check!\n");
+
+            }
         }
         if(black->type == 'h')
         {
@@ -60,9 +69,19 @@ int main()
         DrawBoard(global);
         if(Check(global, black, white, (white->piecelist[King]->r)+1, (white->piecelist[King]->c)+1) == 1)
         {
-            printf("You are in check!\n");
+            if(Checkmate(global, black, white) == 1) // if white is in checkmate
+            {
+                printf("Game over! Black wins by checkmate!\n");
+                return 0;
+            }
+            else
+            {
+                printf("You are in check!\n");
+                
+            }
         }
     }
+    return 0;
     
 }
 
@@ -150,22 +169,12 @@ void MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent)
             col_src = AlphatoNum(cCol_src);
         }
         PIECE *piece = CheckPiece(p, row_src, col_src);
-        int counter = 0;
-        for(int i = 1; i <= 8; i++)
-        {
-            for(int j = 1; j <= 8; j++)
-            {
-                if(CallPiece(board, opponent, piece, row_src, col_src, i, j, 0) == 1)
-                {
-                    counter++;
-                }
-            }
-        }
-        if(counter == 64)
+        int original_piece_value = piece->value;
+        int illegalmoves = CheckNumberofIllegalMoves(board, opponent, piece, row_src, col_src);
+        if(illegalmoves == 64)
         {
             printf("You have selected a piece that currently has no legal moves to make. Please try again.\n");
             continue;
-            
         }
         printf("Enter the location to move the piece. \n");
         scanf(" %c%d", &cCol_dest, &row_dest);
@@ -194,20 +203,28 @@ void MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent)
             piece = CheckPiece(p, row_src, col_src);
             callreturn = CallPiece(board, opponent, piece, row_src, col_src, row_dest, col_dest, 1);
         }
-        MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
-        if((piece->r == row_src-1) && (piece->c == col_src-1))
+        int movereturn = MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
+        if(movereturn == 1)
         {
             printf("You cannot make a move that will leave you in check. Please try again. \n");
             if(callreturn == 2)
             {
                 UndoCapture(board, opponentcapture, opponent_r, opponent_c, opponent_value, piecetag);
             }
+            if(piece->value == 1 && original_piece_value == 2)
+            {
+                piece->value = 2;
+            }
             continue;
         }
         EXIT = 1;
         FILE *log;
         int CheckReturn = 0;
-        if(Check(board, p, opponent, (opponent->piecelist[King]->r)+1, (opponent->piecelist[King]->c)+1) == 1)
+        if(Checkmate(board, p, opponent) == 1)
+        {
+            CheckReturn = 2;
+        }
+        else if(Check(board, p, opponent, (opponent->piecelist[King]->r)+1, (opponent->piecelist[King]->c)+1) == 1)
         {
             CheckReturn = 1;
         }
@@ -273,7 +290,7 @@ PIECE *CreatePiece(BOARD *board, int r, int c, char piece, char color, PLAYER *p
     }
     return p;
 }
-void MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc) // only called when the move is legal
+int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc) // only called when the move is legal
 {
     assert(piece);
     int tempR = piece->r;
@@ -289,7 +306,9 @@ void MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc)
         board->boardarray[tempR][tempC] = temp;
         piece->r = tempR;
         piece->c = tempC;
+        return 1;
     }
+    return 0;
 }
 int AlphatoNum(char alpha)
 {
@@ -354,7 +373,7 @@ int AlphatoNum(char alpha)
 PIECE *CheckPiece(PLAYER *p, int r, int c) // check if its your piece in a particular location
 {
     assert(p);
-    for(int i = 0; i < 16; i++)
+    for(int i = Pawn1; i <= King; i++)
     {
         int rx = p->piecelist[i]->r;
         int cx = p->piecelist[i]->c;
@@ -415,6 +434,10 @@ FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured,
     {
         check_char = '+';
     }
+    else if(CheckReturn == 2)
+    {
+        check_char = '#';
+    }
     if(isCaptured == 1)
     {
         if(piecetype == 'P')
@@ -469,7 +492,7 @@ PLAYER *CreatePlayer(char color, char type)
 int Check(BOARD *board, PLAYER *player, PLAYER *opponent, int king_row, int king_col)
 {
     int piecereturn = 0;
-    for(int i = 0; i < 16; i++)
+    for(int i = Pawn1; i <= King; i++)
     {
         piecereturn = CallPiece(board, opponent, player->piecelist[i], (player->piecelist[i]->r)+1, (player->piecelist[i]->c)+1, king_row, king_col, 0);
         if(piecereturn == 2)
@@ -479,3 +502,78 @@ int Check(BOARD *board, PLAYER *player, PLAYER *opponent, int king_row, int king
     }
     return 0;
 }
+int CheckNumberofIllegalMoves(BOARD *board, PLAYER *opponent, PIECE *piece, int row_src, int col_src)
+{
+    int counter = 0;
+    for(int i = 1; i <= 8; i++)
+    {
+        for(int j = 1; j <= 8; j++)
+        {
+            if(CallPiece(board, opponent, piece, row_src, col_src, i, j, 0) == 1)
+            {
+                counter++;
+            }
+        }
+    }
+    return counter;
+}
+int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent)
+{
+    for(int i = Pawn1; i <= King; i++)
+    {
+        PIECE *piece = opponent->piecelist[i];
+        int originalR = piece->r;
+        int originalC = piece->c;
+        char *originalpiecetag = board->boardarray[piece->r][piece->c];
+        int original_piece_value = piece->value;
+        int movereturn = 0;
+        if(piece->value == 0) // captured piece cannot be moved to save the king
+        {
+            continue;
+        }
+        for(int j = 0; j < 8; j++)
+        {
+            for(int k = 0; k < 8; k++)
+            {
+                int IsLegalMove = CallPiece(board, player, piece, (piece->r)+1, (piece->c)+1, j+1, k+1, 0); // can the opponent make a legal move?
+                if(IsLegalMove == 1)
+                {
+                    continue;
+                }
+                else // if so, can that legal move get them out of check?
+                {
+                    char *originaldesttag = board->boardarray[j][k];
+                    movereturn = MovePiece(board, player, piece, j, k);
+                    if(movereturn == 1)
+                    {
+                        if(IsLegalMove == 2) // resetting captures and value updates
+                        {
+                            PIECE *opponentcapture = CheckPiece(player, j+1, k+1);
+                            char *piecetag = board->boardarray[opponentcapture->r][opponentcapture->c];
+                            int opponent_r = opponentcapture->r;
+                            int opponent_c = opponentcapture->c;
+                            int opponent_value = opponentcapture->value;
+                            UndoCapture(board, opponentcapture, opponent_r, opponent_c, opponent_value, piecetag);
+                        }
+                        if(piece->value == 1 && original_piece_value == 2)
+                        {
+                            piece->value = 2;
+                        }
+                    }
+                    else
+                    {
+                        board->boardarray[j][k] = originaldesttag;
+                        board->boardarray[originalR][originalC] = originalpiecetag;
+                        piece->r = originalR;
+                        piece->c = originalC;
+                        return 0;
+                    }
+                    
+                }
+                
+            }
+        }
+    }
+    return 1;
+}
+

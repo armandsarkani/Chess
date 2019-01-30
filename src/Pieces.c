@@ -251,7 +251,7 @@ int MoveRook(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_
         }
         return 0;
     }
-    else // moving pawn to a space with your own piece
+    else // moving rook to a space with your own piece
     {
         return 1;
         
@@ -277,7 +277,7 @@ int MoveKnight(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int sr
         }
         return 1;
     }
-    else // moving pawn to a space with your own piece
+    else // moving knight to a space with your own piece
     {
         return 1;
         
@@ -402,7 +402,7 @@ int MoveBishop(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int sr
             return 1;
         }
     }
-    else // moving pawn to a space with your own piece
+    else // moving bishop to a space with your own piece
     {
         return 1;
         
@@ -429,7 +429,7 @@ int MoveKing(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_
         }
         return 1;
     }
-    else  // moving pawn to a space with your own piece
+    else  // moving king to a space with your own piece
     {
         return 1;
         
@@ -449,7 +449,7 @@ int MoveQueen(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src
     }
     else
     {
-        return 1;
+        return 1; // moving queen to a space with your own piece
     }
 }
 
