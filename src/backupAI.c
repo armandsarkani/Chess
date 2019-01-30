@@ -4,8 +4,8 @@
 //  //  Created by Jada Berenguer
 //  //  Last modified on 1/28/19.
 //  //  Copyright © 2019 Jada Berenguer. All rights reserved.
-//  // 
-//
+//  //  
+
 #include "Pieces.h"
 #include "Movegen.h"
 #include "Evaluate.h"
@@ -17,6 +17,8 @@
 /*once it gets all possible moves, use callpiece and see if it returns a 2 (capture)*/
 /*see which piece it captures, assign a score, keep score and move in variables*/
 /*if no captures possible, move first piece it sees in array*/
+/*random function: choose a random number, loop through that random number x times
+ * and choose that move from getmoves*/
 
 void AI(board[8][8], PLAYER *player, PLAYER *opponent){
 	
@@ -32,7 +34,7 @@ void AI(board[8][8], PLAYER *player, PLAYER *opponent){
 		for (int y = 0; y < 8; y++){/*y: dummy variable for coordinate tracking on chess board*/
 			piece = CheckPiece(player, x, y);
 			if(piece != NULL){
-				getmoves(board, player, oppenent, movelist);
+				getmoves(board, player, oppenent, movelist); 
 				tempmove = movelist -> first;
 				while (tempmove != NULL) {
 					for(int i = 0; i < 8; i++){
@@ -47,11 +49,17 @@ void AI(board[8][8], PLAYER *player, PLAYER *opponent){
 						}/*for end*/
 					}/*for end*/
 					if(value != 2) { /*if no pieces can capture*/
+						/*generate a random move*/
+						srand(time(0));
 						/*generate a random move or other type of move*/
-						capturemove = 
+						capturemove = movelist->first;
+						int randnum = rand();
+						for(int a = 0; a < randnum; a++){
+							capturemove = capturemove->nextentry;
+						} /*for end*/
 					} /*if end*/
 				}/*while end*/
-				return capturemove; 
+				return capturemove; /*at the end of the while loop it will return the highest valued capture move*/
 			}/*if end*/ 
 		}/*for end*/
 	}/*for end*/
