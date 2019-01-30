@@ -27,7 +27,7 @@ int main()
         white->color = 'w';
         black->type = 'a';
         global = CreateBoard(white, black, mainboard);
-    
+        
     }
     else
     {
@@ -35,7 +35,7 @@ int main()
         black->type = 'h';
         white->type = 'a';
         global = CreateBoard(white, black, mainboard);
-
+        
     }
     InitializeBoard(global);
     bool IsGameOver = false; // replace with win condition checking functions in modules TBD
@@ -58,7 +58,7 @@ int main()
             else
             {
                 printf("You are in check!\n");
-
+                
             }
         }
         if(black->type == 'h')
@@ -203,6 +203,7 @@ void MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent)
             piece = CheckPiece(p, row_src, col_src);
             callreturn = CallPiece(board, opponent, piece, row_src, col_src, row_dest, col_dest, 1);
         }
+        char *originalpiecetag = board->boardarray[piece->r][piece->c];
         int movereturn = MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
         if(movereturn == 1)
         {
@@ -230,6 +231,10 @@ void MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent)
         }
         if(callreturn == 2) // a piece has been captured
         {
+            if(CheckReturn == 2)
+            {
+                board->boardarray[piece->r][piece->c] = originalpiecetag;
+            }
             log = Log(p->color, piece->piecetype, cCol_dest, row_dest, 1, CheckReturn);
         }
         else
@@ -408,7 +413,7 @@ void CapturePiece(BOARD *board, PIECE *piece)
         piece->value = 0;
         piece = NULL;
     }
-
+    
 }
 void UndoCapture(BOARD *board, PIECE *opponentcapture, int opponent_r, int opponent_c, int opponent_value, char *piecetag)
 {
@@ -424,7 +429,7 @@ FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured,
     char check_char = '\0';
     if(color == 'w')
     {
-       color_string = "White";
+        color_string = "White";
     }
     else
     {
@@ -462,7 +467,7 @@ FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured,
     }
     fclose(log);
     return log;
-} 
+}
 
 BOARD *CreateBoard(PLAYER *white, PLAYER *black, char *boardarray[8][8])
 {
@@ -576,4 +581,3 @@ int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent)
     }
     return 1;
 }
-
