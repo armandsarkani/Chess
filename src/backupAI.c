@@ -15,52 +15,67 @@
 /*if no captures possible, move first piece it sees in array*/
 /*random function: choose a random number, loop through that random number x times
  * and choose that move from getmoves*/
-
-MOVE *AI(board[8][8], PLAYER *player, PLAYER *opponent){
+#include "backupAI.h"
+MOVE *AI(BOARD *new_board, PLAYER *player, PLAYER *opponent){
 	
 	PIECE *piece;
 	PIECE *piececaptured;
 	MOVELIST *movelist; 
-	MOVE *capturemove;
-	list = NewMoveList(); /*allocate mem*/
-	int value; 
+    MOVE *capturemove = NULL;
+    movelist = NewMoveList(); /*allocate mem*/
+    movelist->length = 0;
+	int value = 0;
 	int score = 0;
+    int success;
 	int bestscore = 0;
 	MOVE *tempmove;
-	for (int x = 0; x < 8; x++) {/*x: dummy variable for coordinate tracking on chess board*/
-		for (int y = 0; y < 8; y++){/*y: dummy variable for coordinate tracking on chess board*/
-			piece = CheckPiece(player, x, y);
-			if(piece != NULL){
-				getmoves(board, player, oppenent, movelist); 
-				tempmove = movelist -> first;
-				while (tempmove != NULL) {
-					for(int i = 0; i < 8; i++){
-						for (int j = 0; j < 8; j++){
-							value = CallPiece(board, opponent, piece, x, y, i, j, 1);
-							if(value == 2) {
-								piececaptured = CheckPiece(opponent, i, j);
-								score = piececaptured -> value;
-								if(score > bestscore){
-									bestscore = score;
-									capturemove = tempmove;
-								}/*if end*/
-							}/*if end*/
-							tempmove = tempmove->nextentry;
-						}/*for end*/
-					}/*for end*/
-					if(value != 2) { /*if no pieces can capture*/
-						/*generate a random move*/
-						srand(time(0));
-						/*generate a random move or other type of move*/
-						capturemove = movelist->first;
-						int randnum = rand();
-						for(int a = 0; a < randnum; a++){
-							capturemove = capturemove->nextentry;
-						} /*for end*/
-					} /*if end*/
-				}/*while end*/
-				return capturemove; /*at the end of the while loop it will return the highest valued capture move*/
-			}/*if end*/ 
-		}/*for end*/
-	}/*for end*/
+
+    getmoves(new_board->boardarray, player, opponent, movelist);
+    for(int i = Pawn1; i <= King; i++)
+    {
+        piece = player->piecelist[i];
+        for (int x = 0; x < 8; x++) {/*x: dummy variable for coordinate tracking on chess board*/
+            for (int y = 0; y < 8; y++){/*y: dummy variable for coordinate tracking on chess board*/
+                success = CallPiece(movelist->board, opponent, piece, piece->r, piece->c, x, y, 0);
+                if (success != 1){ /*if CallPiece does not return a failure*/
+                    MovePiece(movelist->board, opponent, piece, x, y);/*makes move on cpyboard*/
+                    AddLegalMoves(movelist, piece->r, piece->c, x, y, movelist->board->boardarray);
+                }
+            }
+        }
+    }
+        tempmove = movelist->first;
+                    while (tempmove != NULL) {
+                        for(int i = 0; i < 8; i++){
+                            for (int j = 0; j < 8; j++){
+                                value = CallPiece(new_board, opponent, piece, x, y, i, j, 1);
+                                if(value == 2) {
+                                    piececaptured = CheckPiece(opponent, i, j);
+                                    score = piececaptured -> value;
+                                    if(score > bestscore){
+                                        bestscore = score;
+                                        capturemove = tempmove;
+                                    }/*if end*/
+                                }/*if end*/
+                                tempmove = tempmove->nextentry;
+                            }/*for end*/
+                        }/*for end*/
+                        if(value != 2) { /*if no pieces can capture*/
+                            /*generate a random move*/
+                            srand((unsigned)time(0));
+                            /*generate a random move or other type of move*/
+                            capturemove = movelist->first;
+                            int randnum = rand() % movelist->length;
+                            for(int a = 0; a < randnum; a++){
+                                capturemove = capturemove->nextentry;
+                            } /*for end*/
+                        } /*if end*/
+                    }/*while end*/
+                }/*if end*/
+            }/*for end*/
+        }/*for end*/
+    }
+
+    return capturemove; /*at the end of the while loop it will return the highest valued capture move*/
+
 }/*EOF*/
