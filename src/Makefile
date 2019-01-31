@@ -14,18 +14,24 @@ DEBUG = -g -DDEBUG
 CFLAGS = -ansi -Wall -c -std=c99
 LFLAGS = -Wall
 
-all: Board
+ASCII: Chess
 
 GUI: GTK_chess
 
-Board: Board.o Pieces.o
-	$(CC) $(LFLAGS) Board.o Pieces.o -o Board
+Chess: Board.o Pieces.o backupAI.o Movegen.o
+	$(CC) $(LFLAGS) Board.o Pieces.o backupAI.o Movegen.o -o Chess
 	
-Board.o: Board.c Board.h Pieces.h
+Board.o: Board.c Board.h Pieces.h backupAI.h Movegen.h
 	$(CC) $(CFLAGS) Board.c -o Board.o
 
-Pieces.o: Pieces.c Pieces.h
+Pieces.o: Pieces.c Pieces.h Board.h
 	$(CC) $(CFLAGS) Pieces.c -o Pieces.o
+
+backupAI.o: backupAI.c backupAI.h Pieces.h Board.h Movegen.h
+	$(CC) $(CFLAGS) backupAI.c -o backupAI.o
+
+Movegen.o: Movegen.c Movegen.h Pieces.h Board.h
+	$(CC) $(CFLAGS) Movegen.c -o Movegen.o
 
 GTK_chess.o: GTK_chess.c GTK_chess.h
 	$(CC) $(CFLAGS) GTK_chess.c $(INC) $(OPTS) -o GTK_chess.o
