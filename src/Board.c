@@ -7,6 +7,8 @@
 
 #include "Board.h"
 #include "Pieces.h"
+#include "backupAI.h"
+#include "Movegen.h"
 
 int main()
 {
@@ -39,24 +41,22 @@ int main()
     }
     InitializeBoard(global);
     bool IsGameOver = false; // replace with win condition checking functions in modules TBD
-    DrawBoard(global);
+    if(white->type == 'h')
+    {
+        DrawBoard(global);
+    }
     int move = 0;
     while(IsGameOver == false)
     {
-        if(white->type == 'h')
-        {
-            printf("Your turn!\n");
-        }
         move = MakeMove(global, white, black);
         DrawBoard(global);
-        //if(Check(global, white, black, (black->piecelist[King]->r)+1, (black->piecelist[King]->c)+1) == 1)
         if(move == 1 || move == 2)
         {
-            //if(Checkmate(global, white, black) == 1) // if black is in checkmate
             if(move == 2)
             {
                 printf("Game over! White wins by checkmate!\n");
-                return 0;
+                IsGameOver = true;
+                break;
             }
             else
             {
@@ -64,20 +64,15 @@ int main()
                 
             }
         }
-        if(black->type == 'h')
-        {
-            printf("Your turn!\n");
-        }
         move = MakeMove(global, black, white);
         DrawBoard(global);
-        //if(Check(global, black, white, (white->piecelist[King]->r)+1, (white->piecelist[King]->c)+1) == 1)
         if(move == 1 || move == 2)
         {
-            //if(Checkmate(global, black, white) == 1) // if white is in checkmate
             if(move == 2)
             {
                 printf("Game over! Black wins by checkmate!\n");
-                return 0;
+                IsGameOver = true;
+                break;
             }
             else
             {
@@ -147,84 +142,117 @@ int MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent)
     while(EXIT == 0)
     {
         assert(p);
-        char cCol_src;
-        int row_src;
-        int col_src;
-        char cCol_dest;
-        int row_dest;
-        int col_dest;
+        char cCol_src = '\0';
+        int row_src = 0;
+        int col_src = 0;
+        char cCol_dest = '\0';
+        int row_dest = 0;
+        int col_dest = 0;
         char *piecetag = NULL;
+        char initial_piecetype = '\0';
+        char *originalpiecetag = NULL;
+        int callreturn = 0;
         PIECE *opponentcapture = NULL;
         int opponent_r = 0;
         int opponent_c = 0;
         int opponent_value = 0;
-        printf("Enter the location of the piece you wish to move. \n");
-        scanf(" %c%d", &cCol_src, &row_src);
-        col_src = AlphatoNum(cCol_src);
-        while((!(col_src >= 1 && col_src <= 8)) || !(row_src >= 1 && row_src <=8))
+        int promotion = 0;
+        PIECE *piece = NULL;
+        if (p->type == 'a') {
+            sleep(0.8);
+            printf("AI's move: \n");
+            MOVE *AImove = AI(board, p, opponent);
+            row_src = AImove->src_row;
+            col_src = AImove->src_col;
+            row_dest = AImove->dst_row;
+            col_dest = AImove->dst_col;
+            piece = CheckPiece(p, row_src+1, col_src+1);
+            originalpiecetag = board->boardarray[piece->r][piece->c];
+            row_src += 1;
+            col_src += 1;
+            row_dest += 1;
+            col_dest += 1;
+            cCol_dest = NumtoAlpha(col_dest);
+            MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
+        }
+        else
         {
-            printf("You have entered an invalid input. Please enter a different location. \n");
+            printf("Your move: \n");
+            printf("Enter the location of the piece you wish to move. \n");
             scanf(" %c%d", &cCol_src, &row_src);
             col_src = AlphatoNum(cCol_src);
-        }
-        while(CheckPiece(p, row_src, col_src) == NULL)
-        {
-            printf("You have made an invalid move. Please enter a different location. \n");
-            scanf(" %c%d", &cCol_src, &row_src);
-            col_src = AlphatoNum(cCol_src);
-        }
-        PIECE *piece = CheckPiece(p, row_src, col_src);
-        int original_piece_value = piece->value;
-        int illegalmoves = CheckNumberofIllegalMoves(board, opponent, piece, row_src, col_src);
-        if(illegalmoves == 64)
-        {
-            printf("You have selected a piece that currently has no legal moves to make. Please try again.\n");
-            continue;
-        }
-        printf("Enter the location to move the piece. \n");
-        scanf(" %c%d", &cCol_dest, &row_dest);
-        col_dest = AlphatoNum(cCol_dest);
-        while((!(col_dest >= 1 && col_dest <= 8)) || !(row_dest >= 1 && row_dest <=8))
-        {
-            printf("You have entered an invalid input. Please enter a different location. \n");
-            scanf(" %c%d", &cCol_dest, &row_dest);
-            col_dest = AlphatoNum(cCol_dest);
-        }
-        if(CheckPiece(opponent, row_dest, col_dest) != NULL)
-        {
-            opponentcapture = CheckPiece(opponent, row_dest, col_dest);
-            piecetag = board->boardarray[opponentcapture->r][opponentcapture->c];
-            opponent_r = opponentcapture->r;
-            opponent_c = opponentcapture->c;
-            opponent_value = opponentcapture->value;
-        }
-        int callreturn = CallPiece(board, opponent, piece, row_src, col_src, row_dest, col_dest, 1);
-        while(callreturn == 1)
-        {
-            printf("Invalid move. \n");
-            printf("Please enter a different location. \n");
-            scanf(" %c%d", &cCol_dest, &row_dest);
-            col_dest = AlphatoNum(cCol_dest);
+            while((!(col_src >= 1 && col_src <= 8)) || !(row_src >= 1 && row_src <=8))
+            {
+                printf("You have entered an invalid input. Please enter a different location. \n");
+                scanf(" %c%d", &cCol_src, &row_src);
+                col_src = AlphatoNum(cCol_src);
+            }
+            while(CheckPiece(p, row_src, col_src) == NULL)
+            {
+                printf("You cannot move an opponent's piece or an empty square. Please enter a different location. \n");
+                scanf(" %c%d", &cCol_src, &row_src);
+                col_src = AlphatoNum(cCol_src);
+            }
             piece = CheckPiece(p, row_src, col_src);
-            callreturn = CallPiece(board, opponent, piece, row_src, col_src, row_dest, col_dest, 1);
+            int original_piece_value = piece->value;
+            int illegalmoves = CheckNumberofIllegalMoves(board, opponent, piece, row_src, col_src);
+            if(illegalmoves == 64)
+            {
+                printf("You have selected a piece that currently has no legal moves to make. Please try again.\n");
+                continue;
+            }
+            printf("Enter the location to move the piece. \n");
+            scanf(" %c%d", &cCol_dest, &row_dest);
+            col_dest = AlphatoNum(cCol_dest);
+            while((!(col_dest >= 1 && col_dest <= 8)) || !(row_dest >= 1 && row_dest <=8))
+            {
+                printf("You have entered an invalid input. Please enter a different location. \n");
+                scanf(" %c%d", &cCol_dest, &row_dest);
+                col_dest = AlphatoNum(cCol_dest);
+            }
+            if(CheckPiece(opponent, row_dest, col_dest) != NULL)
+            {
+                opponentcapture = CheckPiece(opponent, row_dest, col_dest);
+                piecetag = board->boardarray[opponentcapture->r][opponentcapture->c];
+                opponent_r = opponentcapture->r;
+                opponent_c = opponentcapture->c;
+                opponent_value = opponentcapture->value;
+            }
+            int callreturn = CallPiece(board, opponent, piece, row_src, col_src, row_dest, col_dest, 1);
+            while(callreturn == 1)
+            {
+                printf("Invalid move. \n");
+                printf("Please enter a different location. \n");
+                scanf(" %c%d", &cCol_dest, &row_dest);
+                col_dest = AlphatoNum(cCol_dest);
+                piece = CheckPiece(p, row_src, col_src);
+                callreturn = CallPiece(board, opponent, piece, row_src, col_src, row_dest, col_dest, 1);
+            }
+            originalpiecetag = board->boardarray[piece->r][piece->c];
+            int movereturn = MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
+            if(movereturn == 1)
+            {
+                printf("You cannot make a move that will leave you in check. Please try again. \n");
+                if(callreturn == 2)
+                {
+                    UndoCapture(board, opponentcapture, opponent_r, opponent_c, opponent_value, piecetag);
+                }
+                if(piece->value == 1 && original_piece_value == 2)
+                {
+                    piece->value = 2;
+                }
+                continue;
+            }
         }
-        char *originalpiecetag = board->boardarray[piece->r][piece->c];
-        int movereturn = MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
-        if(movereturn == 1)
+        initial_piecetype = piece->piecetype;
+        // Move is legal and does not place the player in check
+        if(piece->piecetype == 'P')
         {
-            printf("You cannot make a move that will leave you in check. Please try again. \n");
-            if(callreturn == 2)
-            {
-                UndoCapture(board, opponentcapture, opponent_r, opponent_c, opponent_value, piecetag);
-            }
-            if(piece->value == 1 && original_piece_value == 2)
-            {
-                piece->value = 2;
-            }
-            continue;
+            promotion = Promotion(board, piece);
         }
         EXIT = 1;
         FILE *log;
+        char info = '\0';
         int CheckReturn = 0;
         if(Checkmate(board, p, opponent) == 1)
         {
@@ -234,14 +262,21 @@ int MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent)
         {
             CheckReturn = 1;
         }
-        board->boardarray[piece->r][piece->c] = originalpiecetag;
+        if(promotion == 0)
+        {
+            board->boardarray[piece->r][piece->c] = originalpiecetag;
+        }
+        else if(promotion == 1)
+        {
+            info = piece->piecetype;
+        }
         if(callreturn == 2) // a piece has been captured
         {
-            log = Log(p->color, piece->piecetype, cCol_dest, row_dest, 1, CheckReturn);
+            log = Log(p->color, initial_piecetype, cCol_dest, row_dest, 1, CheckReturn, info);
         }
         else
         {
-            log = Log(p->color, piece->piecetype, cCol_dest, row_dest, 0, CheckReturn);
+            log = Log(p->color, initial_piecetype, cCol_dest, row_dest, 0, CheckReturn, info);
         }
         if(CheckReturn == 2)
         {
@@ -317,7 +352,7 @@ int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc) 
     board->boardarray[piece->r][piece->c] = "  ";
     piece->r = newr;
     piece->c = newc;
-    if(Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1) == 1)
+    if(Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1) == 1) // undo a move if in check
     {
         board->boardarray[newr][newc] = "  ";
         board->boardarray[tempR][tempC] = temp;
@@ -386,6 +421,42 @@ int AlphatoNum(char alpha)
     }
     return num;
 }
+char NumtoAlpha(int num)
+{
+    char alpha = 0;
+    switch(num)
+    {
+        case 1:
+            alpha = 'a';
+            break;
+        case 2:
+            alpha = 'b';
+            break;
+        case 3:
+            alpha = 'c';
+            break;
+        case 4:
+            alpha = 'd';
+            break;
+        case 5:
+            alpha = 'e';
+            break;
+        case 6:
+            alpha = 'f';
+            break;
+        case 7:
+            alpha = 'g';
+            break;
+        case 8:
+            alpha = 'h';
+            break;
+        default:
+            alpha = 'q';
+            break;
+    }
+    return alpha;
+}
+
 
 PIECE *CheckPiece(PLAYER *p, int r, int c) // check if its your piece in a particular location
 {
@@ -434,7 +505,7 @@ void UndoCapture(BOARD *board, PIECE *opponentcapture, int opponent_r, int oppon
     opponentcapture->c = opponent_c;
     opponentcapture->value = opponent_value;
 }
-FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured, int CheckReturn)
+FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured, int CheckReturn, char info)
 {
     FILE *log = fopen("Chess Move Log.txt", "a");
     char *color_string;
@@ -459,22 +530,22 @@ FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured,
     {
         if(piecetype == 'P')
         {
-            fprintf(log, "%s: x%c%d%c\n", color_string, destcol, destrow, check_char);
+            fprintf(log, "%s: x%c%d%c%c\n", color_string, destcol, destrow, check_char, info);
         }
         else
         {
-            fprintf(log, "%s: %cx%c%d%c\n", color_string, piecetype, destcol, destrow, check_char);
+            fprintf(log, "%s: %cx%c%d%c%c\n", color_string, piecetype, destcol, destrow, check_char, info);
         }
     }
     else
     {
         if(piecetype == 'P')
         {
-            fprintf(log, "%s: %c%d%c\n", color_string, destcol, destrow, check_char);
+            fprintf(log, "%s: %c%d%c%c\n", color_string, destcol, destrow, check_char, info);
         }
         else
         {
-            fprintf(log, "%s: %c%c%d%c\n", color_string, piecetype, destcol, destrow, check_char);
+            fprintf(log, "%s: %c%c%d%c%c\n", color_string, piecetype, destcol, destrow, check_char, info);
         }
     }
     fclose(log);
@@ -544,6 +615,11 @@ int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent)
         char *originalpiecetag = board->boardarray[piece->r][piece->c];
         int original_piece_value = piece->value;
         int movereturn = 0;
+        PIECE *opponentcapture = NULL;
+        int opponent_r = 0;
+        int opponent_c = 0;
+        int opponent_value = 0;
+        char *piecetag = NULL;
         if(piece->value == 0) // captured piece cannot be moved to save the king
         {
             continue;
@@ -560,16 +636,19 @@ int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent)
                 else // if so, can that legal move get them out of check?
                 {
                     char *originaldesttag = board->boardarray[j][k];
-                    movereturn = MovePiece(board, player, piece, j, k);
-                    if(movereturn == 1)
+                    if(IsLegalMove == 2)
                     {
-                        if(IsLegalMove == 2) // resetting captures and value updates
+                        opponentcapture = CheckPiece(player, j+1, k+1);
+                        opponent_r = opponentcapture->r;
+                        opponent_c = opponentcapture->c;
+                        opponent_value = opponentcapture->value;
+                        piecetag = board->boardarray[opponent_r][opponent_c];
+                    }
+                    movereturn = MovePiece(board, player, piece, j, k);
+                    if(movereturn == 1) // if the test move made puts/leaves the opponent in check
+                    {
+                        if(IsLegalMove == 2) // if move is a potential capture move, reset captures and value updates
                         {
-                            PIECE *opponentcapture = CheckPiece(player, j+1, k+1);
-                            char *piecetag = board->boardarray[opponentcapture->r][opponentcapture->c];
-                            int opponent_r = opponentcapture->r;
-                            int opponent_c = opponentcapture->c;
-                            int opponent_value = opponentcapture->value;
                             UndoCapture(board, opponentcapture, opponent_r, opponent_c, opponent_value, piecetag);
                         }
                         if(piece->value == 1 && original_piece_value == 2)
@@ -592,4 +671,98 @@ int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent)
         }
     }
     return 1;
+}
+int Promotion(BOARD *board, PIECE *piece)
+{
+    char choice = '\0';
+    if(piece->player->type == 'a')
+    {
+        if(piece->player->color == 'w' &&  piece->r == 7)
+        {
+            piece->value = 9;
+            piece->piecetype = 'Q';
+            board->boardarray[piece->r][piece->c] = "wQ";
+            return 1;
+        }
+        else if(piece->player->color == 'b' && piece->r == 0)
+        {
+            piece->value = 9;
+            piece->piecetype = 'Q';
+            board->boardarray[piece->r][piece->c] = "bQ";
+            return 1;
+        }
+    }
+    if(piece->player->color == 'w')
+    {
+        if(piece->r == 7)
+        {
+            printf("Pawn Promotion: Please select a piece to promote this pawn to. Enter Q for queen, N for knight, B for bishop, or R for rook.\n");
+            scanf(" %c", &choice);
+        }
+    }
+    else if(piece->player->color == 'b')
+    {
+        if(piece->r == 0)
+        {
+            printf("Pawn Promotion: Please select a piece to promote this pawn to. Enter Q for queen, N for knight, B for bishop, or R for rook.\n");
+            scanf(" %c", &choice);
+        }
+    }
+    if(choice == 'Q' || choice == 'q')
+    {
+        piece->value = 9;
+        piece->piecetype = 'Q';
+        if(piece->player->color == 'w')
+        {
+            board->boardarray[piece->r][piece->c] = "wQ";
+        }
+        else
+        {
+            board->boardarray[piece->r][piece->c] = "bQ";
+        }
+        return 1;
+    }
+    else if(choice == 'N' || choice == 'n')
+    {
+        piece->value = 3;
+        piece->piecetype = 'N';
+        if(piece->player->color == 'w')
+        {
+            board->boardarray[piece->r][piece->c] = "wN";
+        }
+        else
+        {
+            board->boardarray[piece->r][piece->c] = "bN";
+        }
+        return 1;
+    }
+    else if(choice == 'B' || choice == 'b')
+    {
+        piece->value = 3;
+        piece->piecetype = 'B';
+        if(piece->player->color == 'w')
+        {
+            board->boardarray[piece->r][piece->c] = "wB";
+        }
+        else
+        {
+            board->boardarray[piece->r][piece->c] = "bB";
+        }
+        return 1;
+    }
+    else if(choice == 'R' || choice == 'r')
+    {
+        piece->value = 5;
+        piece->piecetype = 'R';
+        if(piece->player->color == 'w')
+        {
+            board->boardarray[piece->r][piece->c] = "wR";
+        }
+        else
+        {
+            board->boardarray[piece->r][piece->c] = "bR";
+        }
+        return 1;
+    }
+    return 0;
 }

@@ -3,7 +3,7 @@
 
 #include "Board.h"
 #include "Pieces.h"
-#include "Movegen.c"
+#include "Movegen.h"
 #include <time.h>
 
 MOVE *AI(BOARD *board, PLAYER *player, PLAYER *opponent);

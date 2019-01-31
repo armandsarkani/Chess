@@ -1,4 +1,7 @@
-
+#ifndef Movegen_h
+#define Movegen_h
+#include "Board.h"
+#include "Pieces.h"
 
 /* Last modified 1/30/2019*/
 
@@ -25,8 +28,10 @@ struct move {
 	int dst_col;
 	MOVE *nextentry;
 	MOVE *preventry;
-
-	char new_board[8][8];
+    int IsCaptured; // 0 = no, 1 = yes
+    PIECE *piece;
+    PIECE *opponentcapture;
+    BOARD *board;
 	int score;
 	MOVELIST *next_level;
 	MOVELIST *prev_level;
@@ -36,15 +41,15 @@ struct move {
 struct movelist {
 	MOVE *first;
 	MOVE *last;
-
+    int length;
 	MOVE *prevmove;
 	BOARD *board;
 };
 /*Adds entries for possible legal moves into a given list by evaluating a given board config and player perspective*/
-void getmoves(char *org_board[8][8],PLAYER *player, PLAYER *oppenent, MOVELIST *list);
+void getmoves(BOARD *board, PLAYER *player, PLAYER *oppenent, MOVELIST *list);
 
 /*Adds move information into the given list, allocating space and making new entries; stores resulting board from making the move*/
-void AddLegalMoves(MOVELIST *list, src_row, src_col, dest_row, dest_col, board[8][8]);
+void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int dest_col, BOARD *board, int IsCaptured, PIECE *piece, PIECE *opponentcapture);
 
 /*Creates a new move list*/
 MOVELIST *NewMoveList(void);
@@ -68,4 +73,4 @@ void DeletePlayer(PLAYER *entry);
 void DeletePiece(PIECE *piece);
 
 
-
+#endif
