@@ -49,6 +49,9 @@ void AddLegalMoves(MOVELIST *list, src_row, src_col, dest_row, dest_col, board[8
 /*Creates a new move list*/
 MOVELIST *NewMoveList(void);
 
+/*Creates a new move*/
+MOVE *CreateMove(void);
+
 /*Deletes list of all possible legal moves: frees memory*/
 void DeleteMoveList(MOVELIST *list);
 

@@ -93,6 +93,13 @@ void AddLegalMoves(MOVELIST *list, src_row, src_col, dest_row, dest_col, board[8
 	}
 }
 
+/*Cretes a move*/
+MOVE *CreateMove(void){
+	move = malloc(sizeof(MOVE));
+	return move;
+}
+
+/*Creates a movelist*/
 MOVELIST *NewMoveList(void){
 	MOVELIST *l;
 	l = malloc(sizeof(MOVELIST));
