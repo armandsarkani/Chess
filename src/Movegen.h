@@ -1,3 +1,6 @@
+//  Movegen.h
+//  Chesster Team 3
+
 #ifndef Movegen_h
 #define Movegen_h
 #include "Board.h"

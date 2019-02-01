@@ -1,9 +1,5 @@
 //  Board.h
-//  Chess
-//
-//  First release was created by Armand Ahadi-Sarkani on 1/16/19.
-//  Copyright © 2019 Armand Ahadi-Sarkani. All rights reserved.
-//
+//  Chesster Team 3
 
 #ifndef Board_h
 #define Board_h

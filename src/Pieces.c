@@ -1,9 +1,5 @@
 //  Pieces.c
-//  Chess
-//
-//  First release was created by Armand Ahadi-Sarkani on 1/18/19.
-//  Copyright © 2019 Armand Ahadi-Sarkani. All rights reserved.
-//
+//  Chesster Team 3
 
 #include "Pieces.h"
 

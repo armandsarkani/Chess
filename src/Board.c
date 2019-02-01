@@ -1,14 +1,11 @@
 //  Board.c
-//  Chess
-//
-//  First release was created by Armand Ahadi-Sarkani on 1/16/19.
-//  Copyright © 2019 Armand Ahadi-Sarkani. All rights reserved.
-//
+//  Chesster Team 3
 
 #include "Board.h"
 #include "Pieces.h"
 #include "backupAI.h"
 #include "Movegen.h"
+#include "Evaluate.h"
 
 int main()
 {
@@ -17,6 +14,9 @@ int main()
     white->color = 'w';
     PLAYER *black = malloc(sizeof(PLAYER));
     black->color = 'b';
+    int game_mode;
+    printf("Please press 1 for human vs. human, 2 for human vs. AI:\n");
+    scanf("%d", &game_mode);
     char human_color;
     printf("Which color would you like to be? \n");
     printf("(w = white, b = black) \n");
@@ -25,17 +25,36 @@ int main()
     if(human_color == 'w' || human_color == 'W')
     {
         printf("You are the white player. \n");
-        white->type = 'h';
         white->color = 'w';
-        black->type = 'a';
+        black->color = 'b';
+        if(game_mode == 1)
+        {
+            white->type = 'h';
+            black->type = 'h';
+        }
+        if(game_mode == 2)
+        {
+            white->type = 'h';
+            black->type = 'a';
+        }
         global = CreateBoard(white, black, mainboard);
         
     }
     else
     {
         printf("You are the black player. \n");
-        black->type = 'h';
-        white->type = 'a';
+        black->color = 'b';
+        white->color = 'w';
+        if(game_mode == 1)
+        {
+            white->type = 'h';
+            black->type = 'h';
+        }
+        if(game_mode == 2)
+        {
+            white->type = 'a';
+            black->type = 'h';
+        }
         global = CreateBoard(white, black, mainboard);
         
     }
@@ -151,21 +170,25 @@ int MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent)
         char *piecetag = NULL;
         char initial_piecetype = '\0';
         char *originalpiecetag = NULL;
-        int callreturn = 0;
         PIECE *opponentcapture = NULL;
         int opponent_r = 0;
         int opponent_c = 0;
         int opponent_value = 0;
+        int callreturn = 0;
         int promotion = 0;
         PIECE *piece = NULL;
         if (p->type == 'a') {
-            sleep(0.8);
+            sleep(1);
             printf("AI's move: \n");
             MOVE *AImove = AI(board, p, opponent);
             row_src = AImove->src_row;
             col_src = AImove->src_col;
             row_dest = AImove->dst_row;
             col_dest = AImove->dst_col;
+            if(AImove->IsCaptured == 1)
+            {
+                callreturn = 2;
+            }
             piece = CheckPiece(p, row_src+1, col_src+1);
             originalpiecetag = board->boardarray[piece->r][piece->c];
             row_src += 1;
@@ -175,7 +198,7 @@ int MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent)
             cCol_dest = NumtoAlpha(col_dest);
             cCol_src = NumtoAlpha(col_src);
             char *piecename = PieceName(piece->piecetype);
-            printf("%s moved from %c%d to %c%d\n", piecename, cCol_src, row_src, cCol_dest, col_dest);
+            printf("%s moved from %c%d to %c%d\n", piecename, cCol_src, row_src, cCol_dest, row_dest);
             MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
             DeleteMoveEntry(AImove);
         }
@@ -222,7 +245,7 @@ int MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent)
                 opponent_c = opponentcapture->c;
                 opponent_value = opponentcapture->value;
             }
-            int callreturn = CallPiece(board, opponent, piece, row_src, col_src, row_dest, col_dest, 1);
+            callreturn = CallPiece(board, opponent, piece, row_src, col_src, row_dest, col_dest, 1);
             while(callreturn == 1)
             {
                 printf("Invalid move. \n");
