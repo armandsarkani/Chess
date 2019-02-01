@@ -1,17 +1,17 @@
 # **Chesster**
-A multi-function chess game
-**Version 1.0a:** Alpha Release 
+A multi-function chess game <br/>
+**Version 1.0a:** Alpha Release <br/>
 February 1, 2019
 
 ## Authors:
 
-Jada Berenguer, manager 
-Benny Lin, presenter
-Armand Ahadi-Sarkani, reflector
-Raiyan Nasim, reflector
-Kevin Selda, reflector
-Marvis Nguyen, recorder
-Daniel Pajulas, recorder
+Jada Berenguer, manager <br/>
+Benny Lin, presenter <br/>
+Armand Ahadi-Sarkani, reflector <br/>
+Raiyan Nasim, reflector <br/>
+Kevin Selda, reflector <br/>
+Marvis Nguyen, recorder <br/>
+Daniel Pajulas, recorder 
 
 ## General Instructions:
 

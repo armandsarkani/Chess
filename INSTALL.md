@@ -1,13 +1,11 @@
 # **Chesster**
-A multi-function chess game
-**Version 1.0a:** Alpha Release 
-February 1, 2019
+A multi-function chess game <br/>
+**Version 1.0a:** Alpha Release <br/>
+February 1, 2019 
 
-## Developer Installation Instructions:
+## User Installation Instructions:
 
-In your terminal, enter the src folder and type:
-**make**
-Then, to run the program, type:
+In your terminal, enter the bin folder, and type: <br/>
 **./Chess**
 
 
