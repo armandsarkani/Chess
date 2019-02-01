@@ -60,7 +60,7 @@ int main()
             }
             else
             {
-                printf("You are in check!\n");
+                printf("Black is in check!\n");
                 
             }
         }
@@ -76,7 +76,7 @@ int main()
             }
             else
             {
-                printf("You are in check!\n");
+                printf("White is in check!\n");
                 
             }
         }
@@ -173,7 +173,11 @@ int MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent)
             row_dest += 1;
             col_dest += 1;
             cCol_dest = NumtoAlpha(col_dest);
+            cCol_src = NumtoAlpha(col_src);
+            char *piecename = PieceName(piece->piecetype);
+            printf("%s moved from %c%d to %c%d\n", piecename, cCol_src, row_src, cCol_dest, col_dest);
             MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
+            DeleteMoveEntry(AImove);
         }
         else
         {
@@ -457,6 +461,35 @@ char NumtoAlpha(int num)
     return alpha;
 }
 
+char *PieceName(char piecename)
+{
+    char *piecestring = NULL;
+    switch(piecename)
+    {
+        case 'P':
+            piecestring = "Pawn";
+            break;
+        case 'R':
+            piecestring = "Rook";
+            break;
+        case 'N':
+            piecestring = "Knight";
+            break;
+        case 'B':
+            piecestring = "Bishop";
+            break;
+        case 'Q':
+            piecestring = "Queen";
+            break;
+        case 'K':
+            piecestring = "King";
+            break;
+        default:
+            piecestring = NULL;
+            break;
+    }
+    return piecestring;
+}
 
 PIECE *CheckPiece(PLAYER *p, int r, int c) // check if its your piece in a particular location
 {
@@ -766,3 +799,4 @@ int Promotion(BOARD *board, PIECE *piece)
     }
     return 0;
 }
+

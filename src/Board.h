@@ -51,6 +51,7 @@ PIECE *CreatePiece(BOARD *board, int r, int c, char piece, char color, PLAYER *p
 int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc);
 int AlphatoNum(char alpha);
 char NumtoAlpha(int num);
+char *PieceName(char piecename);
 PIECE *CheckPiece(PLAYER *p, int r, int c);
 int FindEmptySpace(BOARD *board, int r, int c);
 int Check(BOARD *board, PLAYER *player, PLAYER *opponent, int king_row, int king_col);

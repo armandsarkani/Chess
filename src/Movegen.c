@@ -10,18 +10,30 @@
  * 				*/
 
 
-void getmoves(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *list){
+void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *list){
 	int success; /*if success = 0*/
     int move;
-	int i,x,y;
+	int i,x,y,j;
     PIECE *opponentcapture = NULL;
     char *piecetag = NULL;
+    char *capturedpiece = NULL;
     int IsCaptured = 0;
     int opponent_r = 0, opponent_c = 0, opponent_value = 0;
-
+    char *cpy_board[8][8];
+    for (i = 0; i < 8; i++){/* copies board into a temp board*/
+        for (j = 0; j < 8; j++){
+            cpy_board[i][j] = org_board[i][j]; /*PLEASE DO NOT CHANGE THIS LINE*/
+            /*end for*/
+            /*end for*/
+        }
+    }
 	for(i = Pawn1; i <= King; i++)
     {
 		PIECE *piece = player->piecelist[i];
+        if(piece->r == 9 || piece->c == 9)
+        {
+            continue;
+        }
         int orig_pieceR = piece->r;
         int orig_pieceC = piece->c;
         int orig_piecevalue = piece->value;
@@ -60,12 +72,26 @@ void getmoves(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *list){
                         if(success == 2)
                         {
                             IsCaptured = 1;
+                            capturedpiece = cpy_board[opponentcapture->r][opponentcapture->c];
                         }
+                        cpy_board[x][y] = orig_piecetag;
+                        cpy_board[orig_pieceR][orig_pieceC] = "  ";
                         board->boardarray[x][y] = originaldesttag;
                         board->boardarray[orig_pieceR][orig_pieceC] = orig_piecetag;
                         piece->r = orig_pieceR;
                         piece->c = orig_pieceC;
-                        AddLegalMoves(list, piece->r, piece->c, x, y, board, IsCaptured, piece, opponentcapture);
+                        AddLegalMoves(list, piece->r, piece->c, x, y, board, IsCaptured, piece, opponentcapture, cpy_board);
+                        if(IsCaptured == 1)
+                        {
+                            cpy_board[x][y] = capturedpiece;
+                            cpy_board[orig_pieceR][orig_pieceC] = orig_piecetag;
+                        }
+                        else
+                        {
+                            cpy_board[x][y] = "  ";
+                            cpy_board[orig_pieceR][orig_pieceC] = orig_piecetag;
+                        }
+                        
                     }
 				}
                 continue;
@@ -75,7 +101,7 @@ void getmoves(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *list){
 	}/*end for*/
 }
 
-void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int dest_col, BOARD *board, int IsCaptured, PIECE *piece, PIECE *opponentcapture){
+void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int dest_col, BOARD *board, int IsCaptured, PIECE *piece, PIECE *opponentcapture, char *cpy_board[8][8]){
 /*Adds move information into the given list, allocating space and making new entries; stores resulting board from making the move*/	
 	
 	MOVE *new_entry = malloc(sizeof(MOVE));
@@ -91,11 +117,18 @@ void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int d
         new_entry->IsCaptured = IsCaptured;
         new_entry->piece = piece;
         new_entry->opponentcapture = opponentcapture;
-		new_entry->score = piece->value;
-        new_entry->board= board;
-		
+		new_entry->score = 0;
+        new_entry->board = board;
+        for(int i = 0; i < 8; i++)
+        {
+            for(int j = 0; j < 8; j++)
+            {
+                new_entry->new_board[i][j] = cpy_board[i][j];
+            }
+        }
 		list->last = new_entry;
 		new_entry -> prev_level = list;
+        new_entry->next_level = NULL;
 	
 	}else{
 		list->last->nextentry = new_entry;
@@ -110,9 +143,18 @@ void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int d
         new_entry->IsCaptured = IsCaptured;
         new_entry->piece = piece;
         new_entry->opponentcapture = opponentcapture;
-		new_entry->score = piece->value;
+		new_entry->score = 0;
         new_entry->board = board;
-		new_entry -> prev_level = list;
+        for(int i = 0; i < 8; i++)
+        {
+            for(int j = 0; j < 8; j++)
+            {
+                new_entry->new_board[i][j] = cpy_board[i][j];
+            }
+        }
+		new_entry->prev_level = list;
+        new_entry->next_level = NULL;
+
 	
 	}
     list->length++;

@@ -32,6 +32,7 @@ struct move {
     PIECE *piece;
     PIECE *opponentcapture;
     BOARD *board;
+    char *new_board[8][8];
 	int score;
 	MOVELIST *next_level;
 	MOVELIST *prev_level;
@@ -46,10 +47,10 @@ struct movelist {
 	BOARD *board;
 };
 /*Adds entries for possible legal moves into a given list by evaluating a given board config and player perspective*/
-void getmoves(BOARD *board, PLAYER *player, PLAYER *oppenent, MOVELIST *list);
+void getmoves(char *cpy_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppenent, MOVELIST *list);
 
 /*Adds move information into the given list, allocating space and making new entries; stores resulting board from making the move*/
-void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int dest_col, BOARD *board, int IsCaptured, PIECE *piece, PIECE *opponentcapture);
+void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int dest_col, BOARD *board, int IsCaptured, PIECE *piece, PIECE *opponentcapture, char *cpy_board[8][8]);
 
 /*Creates a new move list*/
 MOVELIST *NewMoveList(void);
