@@ -6,6 +6,7 @@
 #define Pieces_h
 
 #include "Board.h"
+#include "Conditions.h"
 
 
 int CallPiece(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int testing_conditions);

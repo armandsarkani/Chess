@@ -5,6 +5,7 @@
 #define Movegen_h
 #include "Board.h"
 #include "Pieces.h"
+#include "Conditions.h"
 
 /* Last modified 1/30/2019*/
 
