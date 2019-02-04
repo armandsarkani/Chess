@@ -3,42 +3,55 @@
 
 #define MAX_GRID_SIZE 8
 #define MAX_MSGLEN  100 
-#define SQUARE_SIZE 50  
+#define SQUARE_SIZE 50
 #define WINDOW_BORDER 10
 #define BOARD_BORDER 10
 #define BOARD_WIDTH  (MAX_GRID_SIZE*SQUARE_SIZE)
 #define BOARD_HEIGHT (MAX_GRID_SIZE*SQUARE_SIZE)
-#define WINDOW_WIDTH  (BOARD_WIDTH)
-#define WINDOW_HEIGHT (BOARD_HEIGHT)
+#define WINDOW_WIDTH  (WINDOW_BORDER + BOARD_BORDER + BOARD_WIDTH)
+#define WINDOW_HEIGHT (WINDOW_BORDER + BOARD_BORDER + BOARD_HEIGHT)
 
-typedef enum
+
+typedef struct _Chessboard CHESSBOARD;
+
+typedef enum CHESSICON
 {
-	BLACK = 0,
-	WHITE = 1,
-} GRID;
+	BLACK = 1,
+	WHITE = 2,
+	WPAWN = 3,
+	WROOK = 4,
+	WBISHOP = 5,
+	WKNIGHT = 6,
+	WQUEEN = 7,
+	WKING = 8,
+	BPAWN = 9,
+	BROOK = 10,
+	BBISHOP = 11,
+	BKNIGHT = 12, 
+	BQUEEN = 13,
+	BKING = 14
+}chessicon;
 
-typedef enum
+struct _Chessboard
 {
-	WPAWN = 2,
-	BPAWN,
-	WROOK,
-	BROOK,
-	WBISHOP,
-	BBISHOP,
-	WKNIGHT,
-	BKNIGHT,
-	BQUEEN,
-	WQUEEN,
-	BKING,
-	WKING
-} PIECEICON;
+	int PieceNumber;
+	int select;
+	int src_r, src_c, dest_r, dest_c;
+	GtkWidget *window;
+	GtkWidget *table;
+	
+};
 
-void InitBoard(int Board[MAX_GRID_SIZE][MAX_GRID_SIZE]);
-void ReverseGridColor(int Board[MAX_GRID_SIZE][MAX_GRID_SIZE], int g_x, int g_y);
-static gboolean delete_event( GtkWidget *widget, GdkEvent *event, gpointer data);
-static void destroy(GtkWidget *widget, gpointer data);
-void DrawBoard(GtkWidget *table, int Board[MAX_GRID_SIZE][MAX_GRID_SIZE]);
+CHESSBOARD *CreateChessBoard(void);
+void StoreDest(CHESSBOARD *chessboard, int g_x, int g_y);
+void StoreSource(CHESSBOARD *chessboard, int g_x, int g_y);
+void MovePiece(CHESSBOARD *chessboard);
+int PickPiece(CHESSBOARD *chessboard, int x, int y);
+static gboolean delete_event(GtkWidget *widget, GdkEvent *event, gpointer data);
+void InitBoard(CHESSBOARD *chessboard);
+void DrawBoard(CHESSBOARD *chessboard);
+void ReverseGridColor(int g_x, int g_y);
 void CoordToGrid(int c_x, int c_y, int *g_x, int *g_y);
-int area_click (GtkWidget *widget, GdkEvent  *event, gpointer  data);
+gint area_click (GtkWidget *widget, CHESSBOARD *chessboard, GdkEvent *event, gpointer data);
 
 #endif
