@@ -238,7 +238,19 @@ int FiftyConsec (MOVELIST *movelist){
 
 int ThreeFoldRep (MOVELIST *movelist){
 	MOVE CurrentMove = movelist -> last;
-	for (int 
+	MOVE ReferenceMove = movelist -> last -> prevmove -> prevmove;
+	int MoveCounter = 0;
+	while (ReferneceMove != NULL){
+		
+/*		if (CurrentMove -> piece -> piecetype == RefernceMove -> piece -> piecetype){
+			if (//destination columns are the same){
+				if (//destination rows are the same)
+
+				MoveCounter += 1;
+}	
+*/	
+		RefeneceMove = ReferenceMove -> prevmove -> prevmove;
+	}
 
 
 }
