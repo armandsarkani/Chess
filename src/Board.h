@@ -16,7 +16,7 @@
 typedef struct Player PLAYER;
 typedef struct Piece PIECE;
 typedef struct Board BOARD;
-typedef struct movelist MOVELIST;
+//typedef struct movelist MOVELIST;
 
 typedef enum PieceName {Pawn1, Pawn2, Pawn3, Pawn4, Pawn5, Pawn6, Pawn7, Pawn8, Rook1, Rook2, Bishop1, Bishop2, Knight1, Knight2, Queen, King} pieces; // Pawns = 0-7, Rooks = 8-9, Bishops = 10-11, Knights = 12-13, Queen = 14, King = 15
 

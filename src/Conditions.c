@@ -235,3 +235,10 @@ int FiftyConsec (MOVELIST *movelist){
 		return 1;
 
 }
+
+int ThreeFoldRep (MOVELIST *movelist){
+	MOVE CurrentMove = movelist -> last;
+	for (int 
+
+
+}

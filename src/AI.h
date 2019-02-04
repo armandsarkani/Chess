@@ -7,8 +7,8 @@
 #include "Evaluate.h"
 #include "Conditions.h"
 
-typedef struct move MOVE;
-typedef struct movelist MOVELIST;
+//typedef struct move MOVE;
+//typedef struct movelist MOVELIST;
 
 
 MOVE *AI(BOARD *board, PLAYER *player, PLAYER *opponent);
