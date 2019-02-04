@@ -222,3 +222,16 @@ int Stalemate(BOARD *board, PLAYER *player, PLAYER *opponent)
     }
     return 0;
 }
+
+int FiftyConsec (MOVELIST *movelist){
+	MOVE CurrentMove = movelist -> last;
+	for (int i = 0; i < 50 ; i++){
+
+		if (CurrentMove -> IsCaptured == 1 || CurrentMove -> piece -> piecetype == 'P'){
+			return 0;
+		}		
+		CurrentMove = CurrentMove -> preventry;
+}
+		return 1;
+
+}
