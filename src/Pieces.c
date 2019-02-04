@@ -1,43 +1,38 @@
-//
 //  Pieces.c
-//  Chess
-//
-//  Created by Armand Sarkani on 1/17/19.
-//  Copyright © 2019 Armand Sarkani. All rights reserved.
-//
+//  Chesster Team 3
 
 #include "Pieces.h"
 
-int CallPiece(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
+int CallPiece(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int test_conditions)
 {
     char piecetype = piece->piecetype;
     switch(piecetype)
     {
         case 'P':
-            return(MovePawn(opponent, piece, src_row, src_col, dest_row, dest_col));
+            return(MovePawn(board, opponent, piece, src_row, src_col, dest_row, dest_col, test_conditions));
             break;
         case 'R':
-            return(MoveRook(opponent, piece, src_row, src_col, dest_row, dest_col));
+            return(MoveRook(board, opponent, piece, src_row, src_col, dest_row, dest_col, test_conditions));
             break;
         case 'N':
-            return(MoveKnight(opponent, piece, src_row, src_col, dest_row, dest_col));
+            return(MoveKnight(board, opponent, piece, src_row, src_col, dest_row, dest_col, test_conditions));
             break;
         case 'K':
-            return(MoveKing(opponent, piece, src_row, src_col, dest_row, dest_col));
+            return(MoveKing(board, opponent, piece, src_row, src_col, dest_row, dest_col, test_conditions));
             break;
         case 'Q':
-            return(MoveQueen(opponent, piece, src_row, src_col, dest_row, dest_col));
+            return(MoveQueen(board, opponent, piece, src_row, src_col, dest_row, dest_col, test_conditions));
             break;
         case 'B':
-            return(MoveBishop(opponent, piece, src_row, src_col, dest_row, dest_col));
+            return(MoveBishop(board, opponent, piece, src_row, src_col, dest_row, dest_col, test_conditions));
             break;
     }
     return 1;
 }
 
-int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
+int MovePawn(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int test_conditions)
 {
-    if(FindEmptySpace(dest_row, dest_col) == 1) // moving pawn to empty space
+    if(FindEmptySpace(board, dest_row, dest_col) == 1) // moving pawn to empty space
     {
         if(piece->player->color == 'w')
         {
@@ -45,12 +40,18 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
             {
                 if(dest_row == src_row + 2 && (CheckPiece(piece->player, src_row+1, src_col) == NULL) && (CheckPiece(opponent, src_row+1, src_col) == NULL))
                 {
-                    piece->value = 1;
+                    if(test_conditions == 1)
+                    {
+                        piece->value = 1;
+                    }
                     return 0;
                 }
                 else if(dest_row == src_row + 1)
                 {
-                    piece->value = 1;
+                    if(test_conditions == 1)
+                    {
+                        piece->value = 1;
+                    }
                     return 0;
                 }
                 else
@@ -73,12 +74,18 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
             {
                 if(src_row == dest_row + 2 && (CheckPiece(piece->player, src_row -1, src_col) == NULL) && (CheckPiece(opponent, src_row -1, src_col) == NULL))
                 {
-                    piece->value = 1;
+                    if(test_conditions == 1)
+                    {
+                        piece->value = 1;
+                    }
                     return 0;
                 }
                 else if(src_row == dest_row + 1)
                 {
-                    piece->value = 1;
+                    if(test_conditions == 1)
+                    {
+                        piece->value = 1;
+                    }
                     return 0;
                 }
                 else
@@ -106,12 +113,15 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
     {
         if(piece->player->color == 'w')
         {
-            if(((dest_col == src_col + 1) || (dest_col == src_col - 1)) && (dest_row = src_row + 1))
+            if(((dest_col == src_col + 1) || (dest_col == src_col - 1)) && (dest_row == src_row + 1))
             {
-                PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
-                CapturePiece(opponentpiece);
-                
-                return 0;
+                if(test_conditions == 1)
+                {
+                    PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                    CapturePiece(board, opponentpiece);
+                    return 2;
+                }
+                return 2;
             }
             else
             {
@@ -120,11 +130,15 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
         }
         else
         {
-            if(((dest_col == src_col - 1) || (dest_col == src_col + 1)) && (dest_row = src_row - 1))
+            if(((dest_col == src_col - 1) || (dest_col == src_col + 1)) && (dest_row == src_row - 1))
             {
-                PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
-                CapturePiece(opponentpiece);
-                return 0;
+                if(test_conditions == 1)
+                {
+                    PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                    CapturePiece(board, opponentpiece);
+                    return 2;
+                }
+                return 2;
             }
             else
             {
@@ -133,9 +147,9 @@ int MovePawn(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
         }
     }
 }
-int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
+int MoveRook(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int test_conditions)
 {
-    if(FindEmptySpace(dest_row, dest_col) == 1 || CheckPiece(opponent, dest_row, dest_col) != NULL) // moving rook to empty space or a capture space
+    if(FindEmptySpace(board, dest_row, dest_col) == 1 || CheckPiece(opponent, dest_row, dest_col) != NULL) // moving rook to empty space or a capture space
     {
         if(src_row == dest_row && src_col != dest_col) // horizontal
         {
@@ -143,15 +157,20 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
             {
                 for(int i = src_col + 1; i < dest_col; i++)
                 {
-                    if(FindEmptySpace(src_row, i) == 0)
+                    if(FindEmptySpace(board, src_row, i) == 0)
                     {
                         return 1;
                     }
                 }
                 if(CheckPiece(opponent, dest_row, dest_col) != NULL)
                 {
-                    PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
-                    CapturePiece(opponentpiece);
+                    if(test_conditions == 1)
+                    {
+                        PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                        CapturePiece(board, opponentpiece);
+                        return 2;
+                    }
+                    return 2;
                 }
                 return 0;
             }
@@ -159,15 +178,20 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
             {
                 for(int i = src_col - 1; i > dest_col; i--)
                 {
-                    if(FindEmptySpace(src_row, i) == 0)
+                    if(FindEmptySpace(board, src_row, i) == 0)
                     {
                         return 1;
                     }
                 }
                 if(CheckPiece(opponent, dest_row, dest_col) != NULL)
                 {
-                    PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
-                    CapturePiece(opponentpiece);
+                    if(test_conditions == 1)
+                    {
+                        PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                        CapturePiece(board, opponentpiece);
+                        return 2;
+                    }
+                    return 2;
                 }
                 return 0;
             }
@@ -178,15 +202,20 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
             {
                 for(int i = src_row + 1; i < dest_row; i++)
                 {
-                    if(FindEmptySpace(i, src_col) == 0)
+                    if(FindEmptySpace(board, i, src_col) == 0)
                     {
                         return 1;
                     }
                 }
                 if(CheckPiece(opponent, dest_row, dest_col) != NULL)
                 {
-                    PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
-                    CapturePiece(opponentpiece);
+                    if(test_conditions == 1)
+                    {
+                        PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                        CapturePiece(board, opponentpiece);
+                        return 2;
+                    }
+                    return 2;
                 }
                 return 0;
             }
@@ -194,15 +223,20 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
             {
                 for(int i = src_row - 1; i > dest_row; i--)
                 {
-                    if(FindEmptySpace(i, src_col) == 0)
+                    if(FindEmptySpace(board, i, src_col) == 0)
                     {
                         return 1;
                     }
                 }
                 if(CheckPiece(opponent, dest_row, dest_col) != NULL)
                 {
-                    PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
-                    CapturePiece(opponentpiece);
+                    if(test_conditions == 1)
+                    {
+                        PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                        CapturePiece(board, opponentpiece);
+                        return 2;
+                    }
+                    return 2;
                 }
                 return 0;
             }
@@ -213,31 +247,41 @@ int MoveRook(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_
         }
         return 0;
     }
-    else // moving pawn to a space with your own piece
+    else // moving rook to a space with your own piece
     {
         return 1;
         
     }
 }
-int MoveKnight(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
+int MoveKnight(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int test_conditions)
 {
-    if(FindEmptySpace(dest_row, dest_col) == 1) // moving knight to empty space
+    if(FindEmptySpace(board, dest_row, dest_col) == 1 || CheckPiece(opponent, dest_row, dest_col) != NULL) // moving knight to empty space or a capture space
     {
-        return 0;
+        if(((dest_row == src_row+1) && (dest_col == src_col+2)) || ((dest_row == src_row+2) && (dest_col == src_col+1)) || ((dest_row == src_row+2) && (dest_col == src_col-1)) || ((dest_row == src_row+1) && (dest_col == src_col-2)) || ((dest_row == src_row-1) && (dest_col == src_col-2)) || ((dest_row == src_row-2) && (dest_col == src_col-1)) || ((dest_row == src_row-2) && (dest_col == src_col+1)) || ((dest_row == src_row-1) && (dest_col == src_col+2)))
+        {
+           if(CheckPiece(opponent, dest_row, dest_col) != NULL)
+            {
+                if(test_conditions == 1)
+                {
+                    PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                    CapturePiece(board, opponentpiece);
+                    return 2;
+                }
+                return 2;
+            }
+            return 0;
+        }
+        return 1;
     }
-    else if(CheckPiece(piece->player, dest_row, dest_col) != NULL) // moving pawn to a space with your own piece
+    else // moving knight to a space with your own piece
     {
         return 1;
         
     }
-    else // otherwise must be moving to a space with a different player's piece
-    {
-        return 0;
-    }
 }
-int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
+int MoveBishop(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int test_conditions)
 {
-    if(FindEmptySpace(dest_row, dest_col) == 1 || CheckPiece(opponent, dest_row, dest_col) != NULL) // moving bishop to empty space or a capture space
+    if(FindEmptySpace(board, dest_row, dest_col) == 1 || CheckPiece(opponent, dest_row, dest_col) != NULL) // moving bishop to empty space or a capture space
     {
         int dRow = 0; // change in row value
         int dCol = 0; // change in column value
@@ -249,15 +293,20 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
             {
                 for(int i = 1; i < dRow; i++)
                 {
-                    if(FindEmptySpace(src_row-i, src_col-i) == 0) // if there is a piece in the way
+                    if(FindEmptySpace(board, src_row-i, src_col-i) == 0) // if there is a piece in the way
                     {
                         return 1;
                     }
                 }
                 if(CheckPiece(opponent, dest_row, dest_col) != NULL)
                 {
-                    PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
-                    CapturePiece(opponentpiece);
+                    if(test_conditions == 1)
+                    {
+                        PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                        CapturePiece(board, opponentpiece);
+                        return 2;
+                    }
+                    return 2;
                 }
                 return 0;
             }
@@ -271,15 +320,20 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
             {
                 for(int i = 1; i < dRow; i++)
                 {
-                    if(FindEmptySpace(src_row-i, src_col+i) == 0) // if there is a piece in the way
+                    if(FindEmptySpace(board, src_row-i, src_col+i) == 0) // if there is a piece in the way
                     {
                         return 1;
                     }
                 }
                 if(CheckPiece(opponent, dest_row, dest_col) != NULL)
                 {
-                    PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
-                    CapturePiece(opponentpiece);
+                    if(test_conditions == 1)
+                    {
+                        PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                        CapturePiece(board, opponentpiece);
+                        return 2;
+                    }
+                    return 2;
                 }
                 return 0;
             }
@@ -293,15 +347,20 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
             {
                 for(int i = 1; i < dRow; i++)
                 {
-                    if(FindEmptySpace(src_row+i, src_col-i) == 0) // if there is a piece in the way
+                    if(FindEmptySpace(board, src_row+i, src_col-i) == 0) // if there is a piece in the way
                     {
                         return 1;
                     }
                 }
                 if(CheckPiece(opponent, dest_row, dest_col) != NULL)
                 {
-                    PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
-                    CapturePiece(opponentpiece);
+                    if(test_conditions == 1)
+                    {
+                        PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                        CapturePiece(board, opponentpiece);
+                        return 2;
+                    }
+                    return 2;
                 }
                 return 0;
             }
@@ -315,15 +374,20 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
             {
                 for(int i = 1; i < dRow; i++)
                 {
-                    if(FindEmptySpace(src_row+i, src_col+i) == 0) // if there is a piece in the way
+                    if(FindEmptySpace(board, src_row+i, src_col+i) == 0) // if there is a piece in the way
                     {
                         return 1;
                     }
                 }
                 if(CheckPiece(opponent, dest_row, dest_col) != NULL)
                 {
-                    PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
-                    CapturePiece(opponentpiece);
+                    if(test_conditions == 1)
+                    {
+                        PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                        CapturePiece(board, opponentpiece);
+                        return 2;
+                    }
+                    return 2;
                 }
                 return 0;
             }
@@ -334,37 +398,54 @@ int MoveBishop(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int des
             return 1;
         }
     }
-    else // moving pawn to a space with your own piece
+    else // moving bishop to a space with your own piece
     {
         return 1;
         
     }
 }
-int MoveKing(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
+int MoveKing(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int test_conditions)
 {
-    if(FindEmptySpace(dest_row, dest_col) == 1) // moving king to empty space
+    if(FindEmptySpace(board, dest_row, dest_col) == 1 || CheckPiece(opponent, dest_row, dest_col) != NULL) // moving king to empty space or a capture space
     {
-        return 0;
+        if(((dest_row == src_row+1) && (dest_col == src_col-1)) || ((dest_row == src_row+1) && (dest_col == src_col)) || ((dest_row == src_row+1) && (dest_col == src_col+1)) || ((dest_row == src_row) && (dest_col == src_col-1)) || ((dest_row == src_row) && (dest_col == src_col+1)) || ((dest_row == src_row-1) && (dest_col == src_col-1)) || ((dest_row == src_row-1) && (dest_col == src_col)) || ((dest_row == src_row-1) && (dest_col == src_col+1)))
+
+        {
+            if(CheckPiece(opponent, dest_row, dest_col) != NULL)
+            {
+                if(test_conditions == 1)
+                {
+                    PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                    CapturePiece(board, opponentpiece);
+                    return 2;
+                }
+                return 2;
+            }
+               return 0;
+        }
+        return 1;
     }
-    else if(CheckPiece(piece->player, dest_row, dest_col) != NULL) // moving pawn to a space with your own piece
+    else  // moving king to a space with your own piece
     {
         return 1;
         
     }
-    else // otherwise must be moving to a space with a different player's piece
-    {
-        return 0;
-    }
 }
-int MoveQueen(PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col)
+int MoveQueen(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int test_conditions)
 {
-    if((MoveRook(opponent, piece, src_row, src_col, dest_row, dest_col) == 0) || (MoveBishop(opponent, piece, src_row, src_col, dest_row, dest_col) == 0))
+    int rookreturn = MoveRook(board, opponent, piece, src_row, src_col, dest_row, dest_col, test_conditions);
+    int bishopreturn = MoveBishop(board, opponent, piece, src_row, src_col, dest_row, dest_col, test_conditions);
+    if(rookreturn == 0 || rookreturn == 2)
     {
-        return 0;
+        return rookreturn;
+    }
+    else if(bishopreturn == 0 || bishopreturn == 2)
+    {
+        return bishopreturn;
     }
     else
     {
-        return 1;
+        return 1; // moving queen to a space with your own piece
     }
 }
 
