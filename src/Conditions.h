@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include "Board.h"
 #include "Pieces.h"
+#include "Movegen.h"
 
 int Check(BOARD *board, PLAYER *player, PLAYER *opponent, int king_row, int king_col);
 int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent);

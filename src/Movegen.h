@@ -71,6 +71,9 @@ void DeleteMoveEntry(MOVE *entry);
 /*Deletes a board*/
 void DeleteBoard(BOARD *board);
 
+/* Creates a player */
+PLAYER *CreatePlayer(char color, char type);
+
 /*Deletes a player*/
 void DeletePlayer(PLAYER *entry);
 
