@@ -86,6 +86,15 @@ int main()
             IsGameOver = true;
             break;
         }
+
+	if (movelist -> length >= 50){
+		if (FiftyConsec(movelist) == 1){
+			printf("Fifty Turn Rule conditions have been met: Game is a Draw!\n");
+			Log('\0', '\0', '\0', 0, 0, 0, 's');
+			IsGameOver = true;
+			break;
+		}
+	}
         move = MakeMove(global, black, white, movelist);
         DrawBoard(global);
         if(move == 1 || move == 2)
@@ -110,6 +119,15 @@ int main()
             IsGameOver = true;
             break;
         }
+        if (movelist -> length >= 50){
+                if (FiftyConsec(movelist) == 1){
+                        printf("Fifty Turn Rule conditions have been met: Game is a Draw!\n");
+                        Log('\0', '\0', '\0', 0, 0, 0, 's');
+                        IsGameOver = true;
+                        break;
+                }
+        }
+
     }
     return 0;
     
