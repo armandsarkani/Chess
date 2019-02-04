@@ -16,5 +16,6 @@ void CapturePiece(BOARD *board, PIECE *piece);
 void UndoCapture(BOARD *board, PIECE *opponentcapture, int opponent_r, int opponent_c, int opponent_value, char *piecetag);
 int CheckNumberofIllegalMoves(BOARD *board, PLAYER *opponent, PIECE *piece, int row_src, int col_src);
 int Stalemate(BOARD *board, PLAYER *player, PLAYER *opponent);
+int FiftyConsec(MOVELIST *movelist);
 
 #endif /* Conditions_h */
