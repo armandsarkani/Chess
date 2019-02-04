@@ -240,7 +240,7 @@ int ThreeFoldRep (MOVELIST *movelist){
 	MOVE CurrentMove = movelist -> last;
 	MOVE ReferenceMove = movelist -> last -> prevmove -> prevmove;
 	int MoveCounter = 0;
-	while (ReferneceMove != NULL){
+	while (ReferenceMove != NULL){
 		
 /*		if (CurrentMove -> piece -> piecetype == RefernceMove -> piece -> piecetype){
 			if (//destination columns are the same){
@@ -249,7 +249,7 @@ int ThreeFoldRep (MOVELIST *movelist){
 				MoveCounter += 1;
 }	
 */	
-		RefeneceMove = ReferenceMove -> prevmove -> prevmove;
+		ReferenceMove = ReferenceMove -> prevmove -> prevmove;
 	}
 
 
