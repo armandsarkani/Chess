@@ -6,7 +6,8 @@
 #include "Movegen.h"
 #include "backupAI.h"
 #include "Conditions.h"
-//#include "Evaluate.h"
+#include "Evaluate.h"
+#include "AI.h"
 
 int main()
 {
@@ -68,6 +69,7 @@ int main()
             if(move == 2)
             {
                 printf("Game over! White wins by checkmate!\n");
+                Log('\0', '\0', '\0', 0, 0, 0, 'w'); // white wins
                 IsGameOver = true;
                 break;
             }
@@ -80,6 +82,7 @@ int main()
         if(move == 3)
         {
             printf("This game has ended in a stalemate! \n");
+            Log('\0', '\0', '\0', 0, 0, 0, 's'); // stalemate
             IsGameOver = true;
             break;
         }
@@ -90,6 +93,7 @@ int main()
             if(move == 2)
             {
                 printf("Game over! Black wins by checkmate!\n");
+                Log('\0', '\0', '\0', 0, 0, 0, 'b'); // black wins
                 IsGameOver = true;
                 break;
             }
@@ -102,6 +106,7 @@ int main()
         if(move == 3)
         {
             printf("This game has ended in a stalemate! \n");
+            Log('\0', '\0', '\0', 0, 0, 0, 's'); // stalemate
             IsGameOver = true;
             break;
         }
@@ -207,7 +212,7 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
             char *piecename = PieceName(piece->piecetype);
             printf("%s moved from %c%d to %c%d\n", piecename, cCol_src, row_src, cCol_dest, row_dest);
             MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
-            DeleteMoveEntry(AImove);
+            //DeleteMoveEntry(AImove);
         }
         else
         {
@@ -583,6 +588,24 @@ FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured,
     FILE *log = fopen("Chess Move Log.txt", "a");
     char *color_string;
     char check_char = '\0';
+    if(info == 'w')
+    {
+        fprintf(log, "1-0\n");
+        fclose(log);
+        return log;
+    }
+    if(info == 'b')
+    {
+        fprintf(log, "0-1\n");
+        fclose(log);
+        return log;
+    }
+    if(info == 's')
+    {
+        fprintf(log, "1/2-1/2\n");
+        fclose(log);
+        return log;
+    }
     if(color == 'w')
     {
         color_string = "White";
@@ -639,15 +662,5 @@ BOARD *CreateBoard(PLAYER *white, PLAYER *black, char *boardarray[8][8])
     }
     return board;
 }
-PLAYER *CreatePlayer(char color, char type)
-{
-    PLAYER *newplayer = malloc(sizeof(PLAYER));
-    newplayer->color = color;
-    newplayer->type = type;
-    for(int i = Pawn1; i < King; i++)
-    {
-        newplayer->piecelist[i] = malloc(sizeof(PIECE));
-    }
-    return newplayer;
-}
+
 
