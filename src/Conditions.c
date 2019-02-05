@@ -254,3 +254,25 @@ int ThreeFoldRep (MOVELIST *movelist){
 
 
 }
+
+int EnPassant(/*MOVELIST *movelist,*/ BOARD *board, PIECE *piece){
+	//MOVE CurrentMove = movelist -> last;
+	if (piece -> player -> type = 'a'){
+		if (piece -> player -> color == 'w' && piece -> r == 4){
+			
+			//AddLegalMoves();	
+			
+		}
+		else if (piece -> player -> color == 'b' && piece -> r == 3){
+			//AddLegalMoves ();
+		}
+	}
+
+}
+	
+		
+
+
+
+
+

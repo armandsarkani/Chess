@@ -206,6 +206,7 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
         int opponent_value = 0;
         int callreturn = 0;
         int promotion = 0;
+ 	int EnPassant = 0;
         PIECE *piece = NULL;
         if (player->type == 'a') {
             sleep(1);
@@ -318,6 +319,7 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
         if(piece->piecetype == 'P')
         {
             promotion = Promotion(board, piece);
+	    enpassant = EnPassant(board, piece);
         }
         EXIT = 1;
         FILE *log;
@@ -345,6 +347,10 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
             printf("A pawn was promoted to a %s!\n", PieceName(piece->piecetype));
             info = piece->piecetype;
         }
+	/*if (enpassant == 1){
+		printf ("En Passant has been used \n");
+		
+	}*/
         if(callreturn == 2) // a piece has been captured
         {
             log = Log(player->color, initial_piecetype, cCol_dest, row_dest, 1, CheckReturn, info);
