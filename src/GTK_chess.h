@@ -36,9 +36,9 @@ struct _Chessboard
 {
 	int PieceNumber;
 	int select;
-	int src_r, src_c, dest_r, dest_c;
-	GtkWidget *window;
-	GtkWidget *table;
+	//int src_r, src_c, dest_r, dest_c;
+	//GtkWidget *window;
+	//GtkWidget *table;
 	
 };
 
@@ -46,7 +46,7 @@ CHESSBOARD *CreateChessBoard(void);
 void StoreDest(CHESSBOARD *chessboard, int g_x, int g_y);
 void StoreSource(CHESSBOARD *chessboard, int g_x, int g_y);
 void MovePiece(CHESSBOARD *chessboard);
-int PickPiece(CHESSBOARD *chessboard, int x, int y);
+void PickPiece(CHESSBOARD *chessboard, int x, int y);
 static gboolean delete_event(GtkWidget *widget, GdkEvent *event, gpointer data);
 void InitBoard(CHESSBOARD *chessboard);
 void DrawBoard(CHESSBOARD *chessboard);
