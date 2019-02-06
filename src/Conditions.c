@@ -224,7 +224,7 @@ int Stalemate(BOARD *board, PLAYER *player, PLAYER *opponent)
 }
 
 int FiftyConsec (MOVELIST *movelist){
-	MOVE CurrentMove = movelist -> last;
+	MOVE *CurrentMove = movelist -> last;
 	for (int i = 0; i < 50 ; i++){
 
 		if (CurrentMove -> IsCaptured == 1 || CurrentMove -> piece -> piecetype == 'P'){
@@ -233,12 +233,5 @@ int FiftyConsec (MOVELIST *movelist){
 		CurrentMove = CurrentMove -> preventry;
 }
 		return 1;
-
-}
-
-int ThreeFoldRep (MOVELIST *movelist){
-	MOVE CurrentMove = movelist -> last;
-	for (int 
-
 
 }
