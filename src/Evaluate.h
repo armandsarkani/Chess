@@ -32,7 +32,7 @@ int scoremove(MOVE *move, PLAYER *player, PLAYER *opponent);
   		Returns final score*/ 
 
 
-int CheckKillerMoves( int dest_row, int dest_col, PLAYER *opponent);
+int CheckKillerMoves( MOVE *move, PIECE *piece, PLAYER *opponent, BOARD *new_board);
 	/*Scans the given board position and counts the number of ways the opponent can attack the given board position.
   	Creates a subscore using the above data
   		Returns a subscore*/

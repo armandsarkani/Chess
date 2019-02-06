@@ -208,7 +208,7 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
         int promotion = 0;
         PIECE *piece = NULL;
         if (player->type == 'a') {
-            sleep(1);
+            //sleep(1);
             printf("AI's move: \n");
             MOVE *AImove = AI(board, player, opponent);
             row_src = AImove->src_row;
@@ -666,6 +666,21 @@ FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured,
     return log;
 }
 
+BOARD *CreateAIBoard(PLAYER *white, PLAYER *black, char *boardarray[8][8])
+{
+    BOARD *board = malloc(sizeof(BOARD));
+    board->white = CreatePlayer('w', white->type);
+    board->black = CreatePlayer('b', black->type);
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            board->boardarray[i][j] = boardarray[i][j];
+        }
+    }
+    return board;
+}
+
 BOARD *CreateBoard(PLAYER *white, PLAYER *black, char *boardarray[8][8])
 {
     BOARD *board = malloc(sizeof(BOARD));
@@ -680,5 +695,7 @@ BOARD *CreateBoard(PLAYER *white, PLAYER *black, char *boardarray[8][8])
     }
     return board;
 }
-
-
+/*void UndoMove(MOVELIST *movelist)
+{
+    
+}*/
