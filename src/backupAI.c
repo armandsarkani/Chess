@@ -17,6 +17,7 @@ MOVE *backupAI(BOARD *board, PLAYER *player, PLAYER *opponent){
     PIECE *piececaptured;
     MOVELIST *movelist;
     MOVE *capturemove = NULL;
+    PIECE *tempcapture = NULL;
     movelist = NewMoveList(); /*allocate mem*/
     movelist->length = 0;
     int value = 0;
@@ -42,6 +43,7 @@ MOVE *backupAI(BOARD *board, PLAYER *player, PLAYER *opponent){
     }/*while end*/
     if(capturemove != NULL)
     {
+        tempcapture = capturemove->opponentcapture;
         CapturePiece(board, capturemove->opponentcapture);
     }
     if(capturemove == NULL) { /*if no pieces can capture*/
@@ -58,6 +60,7 @@ MOVE *backupAI(BOARD *board, PLAYER *player, PLAYER *opponent){
     blue->src_col = capturemove->src_col;
     blue->dst_row = capturemove->dst_row;
     blue->dst_col = capturemove->dst_col;
+    blue->opponentcapture = tempcapture;
     blue->IsCaptured = capturemove->IsCaptured;
     blue->next_level = NULL;
     DeleteMoveList(movelist);

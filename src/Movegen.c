@@ -118,6 +118,7 @@ void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int d
 /*Adds move information into the given list, allocating space and making new entries; stores resulting board from making the move*/	
 	
 	MOVE *new_entry = malloc(sizeof(MOVE));
+    PIECE *temppiece = NULL;
 	assert(new_entry);
 	if(list->first == NULL){
 		list->first = new_entry;
@@ -132,6 +133,14 @@ void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int d
         new_entry->opponentcapture = opponentcapture;
 		new_entry->score = 0;
         new_entry->board = board;
+        if(opponentcapture == NULL)
+        {
+            temppiece = CheckPiece(piece->player, dest_row, dest_col);
+            if(temppiece != NULL)
+            {
+                new_entry->EnPassantStatus = temppiece->EnPassant;
+            }
+        }
         for(int i = 0; i < 8; i++)
         {
             for(int j = 0; j < 8; j++)
@@ -158,6 +167,14 @@ void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int d
         new_entry->opponentcapture = opponentcapture;
 		new_entry->score = 0;
         new_entry->board = board;
+        if(opponentcapture == NULL)
+        {
+            temppiece = CheckPiece(piece->player, dest_row, dest_col);
+            if(temppiece != NULL)
+            {
+                new_entry->EnPassantStatus = temppiece->EnPassant;
+            }
+        }
         for(int i = 0; i < 8; i++)
         {
             for(int j = 0; j < 8; j++)

@@ -38,6 +38,7 @@ struct move {
     int IsCaptured; // 0 = no, 1 = yes
     PIECE *piece;
     PIECE *opponentcapture;
+    int EnPassantStatus;
     BOARD *board;
     char *new_board[8][8];
 	int score;
