@@ -1,25 +1,6 @@
+nclude "Evaluate.h"
 /*Copyright Benny Lin*/
-/* Last modified 1/30/2019*/
-/* 
- * Things that need to be developed:
-	
-	Functions:
-		int score_move();
-		
-		int CheckKillerMoves();
-		int CheckCaptureMoves();
-		int EvaluatePosition();
-	
-	Constants:
-		Piece-SquareTable (needs some redefinition)
-			*A PST is a 1-D array of 64 elements. Each element represents a position on the board. A position is given more weight if it 
-			is better for the piece to be there. Higher values = better positions. The array encourages certain behaviors for the pieces.
-			i.e. Pawns are enccouraged to move forward and stay in the center, knights are encouraged to stay in the center of the board, 
-			kings are encouraged to stay out of corners of the board 
-		Piece value (needs more discussion on how much a piece is worth vs. position)
-		
-	General formula for what is a good move
-*/
+/* Last modified 2/6/2019*/
 
 /*PIECE SQUARE TABLE*/
 const int PawnTable[64] = {
@@ -88,18 +69,19 @@ const int KingO[64] = {	/*AI KING*/
 	-70	,	-70	,	-70	,	-70	,	-70	,	-70	,	-70	,	-70		
 };
 
-const int Queen[64] = {
-	
-}
 /*END TABLES*/
-	/*Passes a move entry. Move entry is accessed. Data( row, col, new_board) is used to evaluate ce
-  	Calls all other functions and sums the subscores for a final score
-  	Returns final score */
-int scoremove(MOVE *origmove, PLAYER *player, PLAYER *opponent){/* PArent function*/
+
+/*Passes a move entry. Move entry is accessed. Data(row, col, new_board) is used to evaluate
+ *  Calls all other functions and sums the subscores for a final score
+ *   Returns final score*/
+int scoremove(MOVE *origmove, PLAYER *player, PLAYER *opponent){ /*Parent function*/
 	int i, score;
-	int piece_tracker;
-	if( (player->color == 'w')){/* WHo is white and who is black*/
-		if((player->type == 'a')){
+	int piece_tracker = 0;
+    PIECE *piece = NULL;
+    PLAYER *white, *black;
+    BOARD *board;
+	if (player->color == 'w'){/* Who is white and who is black*/
+		if(player->type == 'a'){
 			white = CreatePlayer( 'w', 'a');
 			black = CreatePlayer('b', 'h');
 			
@@ -107,46 +89,76 @@ int scoremove(MOVE *origmove, PLAYER *player, PLAYER *opponent){/* PArent functi
 			white = CreatePlayer('w', 'h');
 			black = CreatePlayer('b', 'a');
 		}
-		BOARD *board = CreateBoard(white, black, move->new_board[8][8]);
+		board = CreateBoard(white, black, origmove->board->boardarray);
 	}else{
-		if((player->type == 'a')){
+		if(player->type == 'a'){
 			black = CreatePlayer('b', 'a');
 			white = CreatePlayer('w', 'h');
 		}else{
 			black = CreatePlayer('b', 'h');
 			white = CreatePlayer('w', 'a');
 		}
-		BOARD *board = CreateBoard(white, black, move->new_board[8][8]);
+		board = CreateBoard(white, black, origmove->new_board);
 	}
 	
-	for (i = 0; i < 16; i++){ /* copies old boARD TO NEW BOARD STRUCT*/
-		white->piecelist[i]->player = white;
-		white->piecelist[i]->piecetype = origmove->prevlevel->board->white->piecelist[i]->piecetype ;
-		white->piecelist[i]->c = origmove->prevlevel->board->white->piecelist[i]->c;
-		white->piecelist[i]->r = origmove->prevlevel->board->white->piecelist[i]->r;
-		white->piecelist[i]->value = origmove->prevlevel->board->white->piecelist[i]->value;
+    for ( i = 0; i < 16; i++){
+        /*trying to copy movelist with that move made*/
+        white->piecelist[i]->player = white;
+        white->piecelist[i]->piecetype = origmove->prev_level->board->white->piecelist[i]->piecetype;
+        white->piecelist[i]->c = origmove->prev_level->board->white->piecelist[i]->c;
+        white->piecelist[i]->r = origmove->prev_level->board->white->piecelist[i]->r;
+        white->piecelist[i]->value = origmove->prev_level->board->white->piecelist[i]->value;
+        
+        if (((white->piecelist[i]->r) == (origmove->src_row))&&((white->piecelist[i]->c) == origmove->src_col)){
+            
+            white->piecelist[i]->r = origmove->dst_row;
+            white->piecelist[i]->c = origmove->dst_col;
+            if (origmove->IsCaptured == 1){
+                piece = CheckPiece(black, (origmove->dst_row)+1, (origmove->dst_col)+1);
+            }
+            
+        }
+        white->piecelist[i]->r = origmove->prev_level->board->white->piecelist[i]->r;
+        white->piecelist[i]->c = origmove->prev_level->board->white->piecelist[i]->c;
+        /*Moves piece in piece list*/
+        
+        black->piecelist[i]->player = black;
+        black->piecelist[i]->piecetype = origmove->prev_level->board->black->piecelist[i]->piecetype;
+        black->piecelist[i]->c = origmove->prev_level->board->black->piecelist[i]->c;
+        black->piecelist[i]->r = origmove->prev_level->board->black->piecelist[i]->r;
+        black->piecelist[i]->value = origmove->prev_level->board->black->piecelist[i]->value;
+        
+        if (((black->piecelist[i]->r) == (origmove->src_row))&&((black->piecelist[i]->c) == origmove->src_col)){
+            black->piecelist[i]->r = origmove->dst_row;
+            black->piecelist[i]->c = origmove->dst_col;
+            
+            if (origmove->IsCaptured == 1){
+                piece = CheckPiece(white, (origmove->dst_row)+1, (origmove->dst_col)+1);
+            }
+        }/*Moves Piece in piece list*/
 		
-		if (((white->piecelist[i]->r) == (origmove->src_row))&&((white->piecelist[i]->c) == origmove->src_col)){
-			white->piecelist[i]->r = origmove->dst_row; 
-			white->piecelist[i]->c = origmove->dst_col;
-			/*Needs to check if it captures a piece and remove that piece from the list*/
-			 piece_tracker = i;
-		}
-		
-		black->piecelist[i]->player = black;
-		black->piecelist[i]->piecetype = origmove->prevlevel->board->black->piecelist[i]->piecetype ;
-		black->piecelist[i]->c = origmove->prevlevel->board->black->piecelist[i]->c;
-		black->piecelist[i]->r = origmove->prevlevel->board->black->piecelist[i]->r;
-		black->piecelist[i]->value = origmove->prevlevel->board->black->piecelist[i]->value;
-		
-		if (((black->piecelist[i]->r) == (origmove->src_row))&&((black->piecelist[i]->c) == origmove->src_col)){
-			black->piecelist[i]->r = origmove->dst_row; 
-			black->piecelist[i]->c = origmove->dst_col;
-			/*Needs to check if it captures a piece and remove that piece from the list*/
-			 piece_tracker = i;
-		}
-	}
-	if((player->color == white->color)){
+		/*indicate piece if offboard if it is captured*/
+        if (origmove->IsCaptured == 1 && piece != NULL){
+            if(piece->piecetype != 'K'){
+
+            piece->r = 9;
+            piece->c = 9;
+            piece->value = 0;
+            if(piece->player->color == 'w')
+            {
+                origmove->prev_level->board->white->piecelist[i] = piece;
+                
+            }
+            else
+            {
+                origmove->prev_level->board->black->piecelist[i] = piece;
+            }
+            }
+        }
+    }
+    
+	/*final scoring of move*/
+	if(player->color == white->color){
 		score = EvaluatePosition(origmove, white->piecelist[piece_tracker], board, white, black);
 	}else {
 		score = EvaluatePosition(origmove, black->piecelist[piece_tracker], board, black, white);
@@ -154,18 +166,78 @@ int scoremove(MOVE *origmove, PLAYER *player, PLAYER *opponent){/* PArent functi
 	return score;
 }
 
-int CheckKillerMoves(MOVE *move, PLAYER *opponent){
-
+/*Checks if the opponent can make a future capture on the player's piece*/
+int CheckKillerMoves(MOVE *move, PIECE *piece, PLAYER *opponent, BOARD *new_board){
+    int x,y;
+    int src_row = move -> src_row;
+    int src_col = move -> src_col;
+    int dst_row = move -> dst_row;
+    int dst_col = move -> dst_col;
+    int result;
+    
+    int new_temp_score = 0;
+    int score = 0;
+    
+    int pos;
+    
+    BOARD *old_board = move->prev_level->board;
+    
+    PLAYER *prev_playerpos = NULL; /*obtaining the player's previous board state data*/
+    PLAYER *player = piece->player;
+    
+    switch (player->color){ /*establish the white or black player of the game*/
+        case 'w':
+            prev_playerpos = move->prev_level->board->white;
+            break;
+        case 'b':
+            prev_playerpos = move->prev_level->board->black;
+            break;
+    }
+    
+    
+    PIECE *piececaptured = NULL;
+    
+    /*make the move using CallPiece*/
+    result = CallPiece(old_board, prev_playerpos, piece, src_row+1, src_col+1, dst_row+1, dst_col+1, 0);
+    if(result == 2) { /*see if the piece captures another piece*/
+        piececaptured = CheckPiece(prev_playerpos, dst_row + 1, dst_col + 1 ); /*find out what piece it captured*/
+        score = (piececaptured -> value); /*add the value to the score*/
+    }/*if end*/
+    
+    PIECE *new_piece;
+    int i;
+    for(i = Pawn1; i <= King; i++){
+        new_piece = opponent->piecelist[i];
+        if (new_piece->r == 9){
+            continue;
+        } 
+        for (x = 0; x < 8; x++) {
+            for (y = 0; y < 8; y++){ /*loop through piecelist to establish the captured piece*/
+                piececaptured = CheckPiece(player, x+1, y+1);
+                result = CallPiece(new_board, player, new_piece, (new_piece->r)+1, (new_piece->c)+1, x+1, y+1, 0);
+                if (result == 2){ /*if player piece returns a capture (Call piece func passes in opponent)*/
+                    piececaptured = CheckPiece(player, x+1, y+1);
+                    pos = BoardtoPSQTable(x, y);
+					/*Final Formula*/
+                    new_temp_score = 0*ReturnPosScore(new_piece->piecetype, pos) + 3*(piececaptured->value);
+                }
+            }
+        }
+        /*end for*/
+    }/*end for*/
+    score = score + new_temp_score;
+    return score;
 }
+
+/*Checks if the player can make a future capture on the opponent based on board state*/
 int CheckCaptureMoves(MOVE *move, PIECE *piece, PLAYER *opponent, BOARD *new_board){
 	int x,y;
 	int src_row = move -> src_row;
-	int src_col = move -> src_col
+    int src_col = move -> src_col;
 	int dst_row = move -> dst_row;
 	int dst_col = move -> dst_col;
 	int result;
 	
-	int temp_score = 0;
 	int new_temp_score = 0;
 	int score = 0;
 	
@@ -173,10 +245,10 @@ int CheckCaptureMoves(MOVE *move, PIECE *piece, PLAYER *opponent, BOARD *new_boa
 	
 	BOARD *old_board = move->prev_level->board;
 	
-	PLAYER *prev_opponentpos;
+	PLAYER *prev_opponentpos = NULL; /*obtaining the opponent's previous board state data*/
 	PLAYER *player = piece->player;
 	
-	switch (opponent->color){
+	switch (opponent->color){ /*establish the white or black player of the game*/
 		case 'w':
 			prev_opponentpos = move->prev_level->board->white; 
 			break;
@@ -186,38 +258,42 @@ int CheckCaptureMoves(MOVE *move, PIECE *piece, PLAYER *opponent, BOARD *new_boa
 	}
 	
 	
-	PIECE *piececaptured; 
+	PIECE *piececaptured = NULL;
 	
 	/*make the move using CallPiece*/
-	result = CallPiece(old_board, prev_opponentpos, piece, src_row, src_col, dst_row, dst_col, 0);
+	result = CallPiece(old_board, prev_opponentpos, piece, src_row+1, src_col+1, dst_row+1, dst_col+1, 0);
 	if(result == 2) { /*see if the piece captures another piece*/
-		piececaptured = CheckPiece(prev_opponentpos, dst_row, dst_col); /*find out what piece it captured*/
-		score = 4*(piececaptured -> value); /*add the value to the score*/
+		piececaptured = CheckPiece(prev_opponentpos, dst_row + 1, dst_col + 1 ); /*find out what piece it captured*/
+		score = (piececaptured -> value); /*add the value to the score*/
 	}/*if end*/
-		/*TO LOOK AHEAD AFTER A PIECE CAPTURES:*/
-		/*scan new_board in the passed in move*/
-		/*once not null use checkpiece to find out which piece it is*/
-		/*get legal moves of that piece (have to edit the for loops and stuff below)*/
-	for(i = 0; i < 16; i++){
+
+    PIECE *new_piece;
+    int i;
+	for(i = Pawn1; i <= King; i++){ /*loop through piecelist to establish the captured piece*/
 		new_piece = player->piecelist[i];
+        if (new_piece->r == 9){
+            continue;
+        }
 		for (x = 0; x < 8; x++) {
 			for (y = 0; y < 8; y++){
-				result = CallPiece(new_board, opponent, new_piece, new_piece->r, new_piece->c, x, y, 0);
-				if (success == 2){ /*if player piece returns a capture*/
-					piececaptured = CheckPiece(opponent, x, y);
-					pos = BoardtoPSQTable(x , y);
-					/*FInal formula needs more work*/
-					new_temp_score = ReturnPosScore(new_piece->piecetype, pos) + (piececaptured->value);
+                piececaptured = CheckPiece(opponent, x+1, y+1);
+				result = CallPiece(new_board, opponent, new_piece, (new_piece->r)+1, (new_piece->c)+1, x+1, y+1, 0);
+				if (result == 2){ /*if player piece returns a capture (Call piece func passes in opponent)*/
+					piececaptured = CheckPiece(opponent, x+1, y+1);
+					pos = BoardtoPSQTable(x, y);
+					/*Final Formula*/
+                    new_temp_score = ReturnPosScore(new_piece->piecetype, pos) + (piececaptured->value);
 				}
 			}	
 		}	
 		/*end for*/
 	}/*end for*/
+    score = score + new_temp_score;
 	return score;
 } /*EOF*/
 	
-
-int EvaluatePositon(MOVE *move, PIECE *piece, BOARD *board, PLAYER *player, PLAYER *opponent){
+/*Gives a score for the move being evaluated based on CheckKillerMoves, CheckCaptureMoves, and ReturnPosScore funcs*/
+int EvaluatePosition(MOVE *move, PIECE *piece, BOARD *board, PLAYER *player, PLAYER *opponent){
 	int x,y, pos, base_score, final_score;
 	x = move->dst_row;
 	y = move->dst_col;
@@ -227,17 +303,14 @@ int EvaluatePositon(MOVE *move, PIECE *piece, BOARD *board, PLAYER *player, PLAY
 	char piecetype = piece->piecetype;
 	base_score = ReturnPosScore(piecetype, pos);
 	
-	final_score = base_score - CheckKillerMoves() + CheckCaptureMoves() /*+ CheckBeyondPiece()*/;
+	final_score = base_score + CheckKillerMoves(move, piece, opponent, board) + CheckCaptureMoves(move, piece, opponent, board) /*+ CheckBeyondPiece()*/;
 	return final_score;
 }
 
-int CheckBeyondPiece(){
-/* IF WE HAVE TIME*/	
-}
-
+/*returns a base score for a piece based on it's position on the board*/
 int ReturnPosScore(char piecetype, int pos){
-	int score;
-	switch(piecetype);{
+	int score = 0;
+	switch(piecetype){
 		case 'P':
 			score = PawnTable[pos];
 			break;
@@ -248,14 +321,14 @@ int ReturnPosScore(char piecetype, int pos){
 			score = KnightTable[pos];
 			break;
 		case 'K':
-			if(/*CHECKS WHOSE KING IT IS*/){
+			/*if(*CHECKS WHOSE KING IT IS){*/
 				score = KingE[pos];
-			}else{
-				score = KingO[pos];
-			}
+			/*}else{
+ * 				//score = KingO[pos];
+ * 							}*/
 			break;
 		case 'Q':
-			score = QueenTable[pos];
+            score = /*QueenTable[pos];*/ BishopTable[pos];
 			break;
 		case 'B':
 			score = BishopTable[pos];
@@ -264,9 +337,9 @@ int ReturnPosScore(char piecetype, int pos){
 	return score;
 }
 
+/*Converting board position to the PSQ table position */
 int BoardtoPSQTable(int row, int col){
 	int pos;
-	pos = (x - 1) * 8 + (y - 1);
+	pos = (row - 1) * 8 + (col - 1);
 	return pos;
 }
-
