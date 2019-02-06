@@ -1,14 +1,12 @@
 //  Pieces.h
-//  Chess
-//
-//  First release was created by Armand Ahadi-Sarkani on 1/18/19.
-//  Copyright © 2019 Armand Ahadi-Sarkani. All rights reserved.
-//
+//  Chesster Team 3
+
 
 #ifndef Pieces_h
 #define Pieces_h
 
 #include "Board.h"
+#include "Conditions.h"
 
 
 int CallPiece(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int testing_conditions);
