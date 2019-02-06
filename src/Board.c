@@ -95,7 +95,15 @@ int main()
 			break;
 		}
 	}
-        move = MakeMove(global, black, white, movelist);
+	if(movelist -> length == 3){
+		if(ThreeFoldRep(movelist) == 1){
+		printf("The conditions of three fold repitition have been met! Game is a Draw! \n");
+		 Log('\0', '\0', '\0', 0, 0, 0, 's');
+                        IsGameOver = true;
+                        break;
+                }
+        }
+	move = MakeMove(global, black, white, movelist);
         DrawBoard(global);
         if(move == 1 || move == 2)
         {
@@ -127,6 +135,15 @@ int main()
                         break;
                 }
         }
+	if(movelist ->  length == 3){
+                if(ThreeFoldRep(movelist) == 1){
+                printf("The conditions of three fold repitition have been met! Game is a Draw! \n");
+                 Log('\0', '\0', '\0', 0, 0, 0, 's');
+                        IsGameOver = true;
+                        break;
+                }
+        }
+
 
     }
     return 0;
