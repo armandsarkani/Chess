@@ -46,7 +46,7 @@ int MovePawn(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_
                     }
                     if(CheckPiece(opponent, dest_row, dest_col+1) != NULL || CheckPiece(opponent, dest_row, dest_col-1) != NULL)
                     {
-                            piece->EnPassant = 1;
+                        piece->EnPassant = 1;
                     }
                     return 0;
                 }

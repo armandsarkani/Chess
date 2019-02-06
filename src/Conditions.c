@@ -235,3 +235,51 @@ int FiftyConsec (MOVELIST *movelist){
 		return 1;
 
 }
+<<<<<<< HEAD
+=======
+
+int ThreeFoldRep(MOVELIST *movelist){
+	MOVE CurrentMove = movelist -> last;
+	MOVE ReferenceMove = movelist -> last -> prevmove -> prevmove;
+	int MoveCounter = 0;
+	while (ReferenceMove != NULL){
+		
+		if (CurrentMove -> piece -> piecetype == ReferenceMove -> piece -> piecetype){
+			if (//CurrentMove -> dst_col == 1){ //if dst_col are the same
+			return 0;
+			}
+			if (//CurrentMove -> dst_row == 1){ //if dst_row are the same
+			return 0;
+			}
+			MoveCounter += 1;
+}	
+		if(MoveCounter == 3){
+		return MoveCounter;
+		}	
+		ReferenceMove = ReferenceMove -> prevmove -> prevmove;
+	}
+
+	return 1;
+}
+<<<<<<< HEAD
+
+int EnPassant(MOVELIST *movelist, BOARD *board, PIECE *piece){
+	MOVE CurrentMove = movelist -> last;
+	if(piece -> player -> color == 'w' && piece -> r == 4){
+	    if(piece -> player -> color == 'w' && piece -> r == 4){
+		//AddLegalMoves();
+	    }
+	else if(piece -> player -> color == 'b' && piece -> r == 3){
+		//AddLegalMoves();
+	    }
+	}
+}																						
+=======
+	
+		
+
+
+
+
+>>>>>>> 53276db7c46f34ef5ca7374d4e3925a657cd329e
+>>>>>>> 0c0e2366db6a5d5a66706c4b06c4d3e5d7c1593f
