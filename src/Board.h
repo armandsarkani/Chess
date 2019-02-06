@@ -42,7 +42,7 @@ struct Piece{
     int r;
     int c;
     int value;
-    int EnPassant; 
+    int EnPassant; // 1 if eligible, 0 if not
 };
 
 void InitializeBoard(BOARD *global);

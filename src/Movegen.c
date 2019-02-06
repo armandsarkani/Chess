@@ -191,6 +191,7 @@ MOVELIST *NewMoveList(void){
 	}
 	l->first = NULL;
 	l->last = NULL;
+    l->prevmove = NULL;
     l->length = 0;
 	return l;
 }

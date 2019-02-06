@@ -3,7 +3,7 @@
 
 #include "Pieces.h"
 
-CallPiece(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int test_conditions)
+int CallPiece(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int test_conditions)
 {
     char piecetype = piece->piecetype;
     switch(piecetype)
@@ -43,10 +43,10 @@ int MovePawn(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_
                     if(test_conditions == 1)
                     {
                         piece->value = 1;
-			/* En Passant */ 
-			if (CheckPiece(opponent, dest_row, dest_col + 1) == 1 || CheckPiece(opponent, dest_row, dest_col - 1 == 1){
-				EnPassant = 1; //If player "passes capturing square" then opponent is eligible for En Passant
-			}
+                    }
+                    if(CheckPiece(opponent, dest_row, dest_col+1) != NULL || CheckPiece(opponent, dest_row, dest_col-1) != NULL)
+                    {
+                            piece->EnPassant = 1;
                     }
                     return 0;
                 }
@@ -82,6 +82,10 @@ int MovePawn(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_
                     {
                         piece->value = 1;
                     }
+                    if(CheckPiece(opponent, dest_row, dest_col+1) != NULL || CheckPiece(opponent, dest_row, dest_col-1) != NULL)
+                    {
+                        piece->EnPassant = 1;
+                    }
                     return 0;
                 }
                 else if(src_row == dest_row + 1)
@@ -111,29 +115,46 @@ int MovePawn(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_
     else if(CheckPiece(piece->player, dest_row, dest_col) != NULL) // moving pawn to a space with your own piece
     {
         return 1;
-        
     }
-    else // otherwise must be moving to a space with a different player's piece (a capture)
+    else if(CheckPiece(opponent, dest_row, dest_col) != NULL)// otherwise must be moving to a space with a different player's piece (a capture)
     {
         if(piece->player->color == 'w')
         {
-		PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
             if(((dest_col == src_col + 1) || (dest_col == src_col - 1)) && (dest_row == src_row + 1))
             {
-		if(test_conditions == 1)
+                if(test_conditions == 1)
                 {
+                    PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
                     CapturePiece(board, opponentpiece);
+                    if(piece->value == 2)
+                    {
+                        piece->value = 1;
+                    }
                     return 2;
                 }
                 return 2;
             }
-	    else if(((dest_col == src_col + 1) || (dest_col == src_col - 1)) && (dest_row == src_row && opponentpiece -> EnPassant == 1))
-		{
-		opponentpiece -> EnPassant = 2;
-		CapturePiece(board, opponentpiece);
-		return 2;
-		} 
-	    else 
+            else if(((dest_col == src_col + 1) || (dest_col == src_col - 1)) && (dest_row == src_row))
+            {
+                PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                if(opponentpiece != NULL)
+                {
+                    if(opponentpiece->EnPassant == 1)
+                    {
+                        if(test_conditions == 1)
+                        {
+                            CapturePiece(board, opponentpiece);
+                            opponentpiece->EnPassant = 0;
+                            return 2;
+                        }
+                        else
+                        {
+                            return 2;
+                        }
+                    }
+                }
+            }
+            else
             {
                 return 1;
             }
@@ -150,12 +171,33 @@ int MovePawn(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_
                 }
                 return 2;
             }
+            else if(((dest_col == src_col + 1) || (dest_col == src_col - 1)) && (dest_row == src_row))
+            {
+                PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
+                if(opponentpiece != NULL)
+                {
+                    if(opponentpiece->EnPassant == 1)
+                    {
+                        if(test_conditions == 1)
+                        {
+                            CapturePiece(board, opponentpiece);
+                            opponentpiece->EnPassant = 0;
+                            return 2;
+                        }
+                        else
+                        {
+                            return 2;
+                        }
+                    }
+                }
+            }
             else
             {
                 return 1;
             }
         }
     }
+    return 1;
 }
 int MoveRook(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int test_conditions)
 {
