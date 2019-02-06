@@ -11,19 +11,19 @@
 /*if no captures possible, move first piece it sees in array*/
 /*random function: choose a random number, loop through that random number x times
  *  * and choose that move from getmoves*/
-MOVE *AI(BOARD *board, PLAYER *player, PLAYER *opponent){
-	
-	PIECE *piece;
-	PIECE *piececaptured;
-	MOVELIST *movelist; 
+MOVE *backupAI(BOARD *board, PLAYER *player, PLAYER *opponent){
+    
+    PIECE *piece;
+    PIECE *piececaptured;
+    MOVELIST *movelist;
     MOVE *capturemove = NULL;
     movelist = NewMoveList(); /*allocate mem*/
     movelist->length = 0;
-	int value = 0;
-	int score = 0;
+    int value = 0;
+    int score = 0;
     //int success = 0;
-	int bestscore = 0;
-	MOVE *tempmove;
+    int bestscore = 0;
+    MOVE *tempmove;
     MOVE *blue = CreateMove();
     getmoves(board->boardarray, board, player, opponent, movelist);
     tempmove = movelist->first;
@@ -39,17 +39,17 @@ MOVE *AI(BOARD *board, PLAYER *player, PLAYER *opponent){
             }/*if end*/
         }/*if end*/
         tempmove = tempmove->nextentry;
-	}/*while end*/
+    }/*while end*/
     if(capturemove != NULL)
     {
         CapturePiece(board, capturemove->opponentcapture);
     }
     if(capturemove == NULL) { /*if no pieces can capture*/
-		/*generate a random move*/
-		srand((unsigned)time(0));
-		/*generate a random move or other type of move*/
+        /*generate a random move*/
+        srand((unsigned)time(0));
+        /*generate a random move or other type of move*/
         capturemove = movelist->first;
-        int randnum = rand() % (movelist->length + 1);
+        int randnum = rand() % (movelist->length);
         for(int a = 0; a < randnum; a++){
             capturemove = capturemove->nextentry;
         } /*for end*/
@@ -61,5 +61,5 @@ MOVE *AI(BOARD *board, PLAYER *player, PLAYER *opponent){
     blue->IsCaptured = capturemove->IsCaptured;
     blue->next_level = NULL;
     DeleteMoveList(movelist);
-	return blue; /*at the end of the while loop it will return the highest valued capture move*/
+    return blue; /*at the end of the while loop it will return the highest valued capture move*/
 }

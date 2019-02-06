@@ -206,7 +206,7 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
         int opponent_value = 0;
         int callreturn = 0;
         int promotion = 0;
-        PIECE *piece = NULL;
+ 	PIECE *piece = NULL;
         if (player->type == 'a') {
             //sleep(1);
             printf("AI's move: \n");
@@ -229,7 +229,17 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
             cCol_src = NumtoAlpha(col_src);
             char *piecename = PieceName(piece->piecetype);
             printf("%s moved from %c%d to %c%d\n", piecename, cCol_src, row_src, cCol_dest, row_dest);
-            MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
+            opponentcapture = CheckPiece(opponent, row_dest+1, col_dest+1);
+	    if(opponentcapture->EnPassant == 2)
+	    {
+		if(opponentcapture->c == src_col+1)
+		{
+			MovePiece(board, opponent, piece, row_dest+1
+		}
+		opponentcapture->EnPassant = 0;
+		MovePiece(board, opponent, piece, 	
+	    }
+	    MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
             //DeleteMoveEntry(AImove);
         }
         else
@@ -318,6 +328,7 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
         if(piece->piecetype == 'P')
         {
             promotion = Promotion(board, piece);
+	    
         }
         EXIT = 1;
         FILE *log;
@@ -345,6 +356,7 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
             printf("A pawn was promoted to a %s!\n", PieceName(piece->piecetype));
             info = piece->piecetype;
         }
+
         if(callreturn == 2) // a piece has been captured
         {
             log = Log(player->color, initial_piecetype, cCol_dest, row_dest, 1, CheckReturn, info);
