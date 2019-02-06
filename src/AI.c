@@ -14,10 +14,25 @@ MOVE *AI(BOARD *board, PLAYER *AI, PLAYER *human){
 	int AI_tracker = 1; /*keep track of who's turn it is*/
 	
 	if (AI -> color == 'w'){
-		list->board = CreateBoard(AI, human, board->boardarray);
+		list->board = CreateAIBoard(AI, human, board->boardarray);
 	}else {
-		list->board = CreateBoard(human, AI, board->boardarray);
+		list->board = CreateAIBoard(human, AI, board->boardarray);
 	}
+    PLAYER *white = list->board->white;
+    PLAYER *black = list->board->black;
+    for (int i = 0; i < 16; i++){
+        // trying to copy movelist with that move made
+        white->piecelist[i]->player = white;
+        white->piecelist[i]->piecetype = board->white->piecelist[i]->piecetype;
+        white->piecelist[i]->c = board->white->piecelist[i]->c;
+        white->piecelist[i]->r = board->white->piecelist[i]->r;
+        white->piecelist[i]->value = board->white->piecelist[i]->value;
+        black->piecelist[i]->player = black;
+        black->piecelist[i]->piecetype = board->black->piecelist[i]->piecetype;
+        black->piecelist[i]->c = board->black->piecelist[i]->c;
+        black->piecelist[i]->r = board->black->piecelist[i]->r;
+        black->piecelist[i]->value = board->black->piecelist[i]->value;
+    }
 	getmoves(board->boardarray, board, AI, human, list); /*first layer of list created*/
 	
 	MOVE *temp = NULL; 
@@ -28,7 +43,7 @@ MOVE *AI(BOARD *board, PLAYER *AI, PLAYER *human){
 	int bestscore = -999999999;
 	int alpha = -999999999;
 	int beta = 999999999;
-	int depth = 1;
+	int depth = 2;
 	
 	while (temp != NULL) { 
 		temp->score = NegaMax(depth, temp, alpha, beta, AI_tracker); /*Negamax (recursive func) will return the best score for that move*/
@@ -52,139 +67,121 @@ MOVE *AI(BOARD *board, PLAYER *AI, PLAYER *human){
 	DeleteMoveList(list);
 	return blue;
 }/*EOF*/
+// Pass in the first layers possible moves
+int NegaMax(int depth, MOVE *origmove, int alpha, int beta, int AI_tracker)
+{
+    
+    origmove->next_level = NewMoveList(); //create a new Movelist for the next layer
+    PIECE *piece = origmove->opponentcapture;
+    //int temppiece = 0;
+    origmove->next_level->board = CreateAIBoard(origmove->board->white, origmove->board->black,origmove->new_board); /*set the board of the new layer's Movelist*/
+    PLAYER *white = origmove->next_level->board->white;
+    PLAYER *black = origmove->next_level->board->black;
+    //int j = 0;
+    for (int i = 0; i < 16; i++){
+        // trying to copy movelist with that move made
+        white->piecelist[i]->player = origmove->next_level->board->white;
+        white->piecelist[i]->piecetype = origmove->prev_level->board->white->piecelist[i]->piecetype;
+        white->piecelist[i]->c = origmove->prev_level->board->white->piecelist[i]->c;
+        white->piecelist[i]->r = origmove->prev_level->board->white->piecelist[i]->r;
+        white->piecelist[i]->value = origmove->prev_level->board->white->piecelist[i]->value;
+        
+        if (((white->piecelist[i]->r) == (origmove->src_row))&&((white->piecelist[i]->c) == origmove->src_col)){
 
-/*Pass in the first layers possible moves*/
-int NegaMax(int depth, MOVE *origmove, int alpha, int beta, int AI_tracker){
-    int cpt = 0;
-	origmove->next_level = NewMoveList(); /*create a new Movelist for the next layer*/
-    PIECE *piece = NULL;
-    int temppiece = 0;
-	PLAYER *white = CreatePlayer((origmove->prev_level->board->white->color), (origmove->prev_level->board->white->type));
-	PLAYER *black = CreatePlayer((origmove->prev_level->board->black->color), (origmove->prev_level->board->black->type));
-    int j = 0;
-	for (int i = 0; i < 16; i++){
-			white->piecelist[i]->player = white;
-			white->piecelist[i]->piecetype = origmove->prev_level->board->white->piecelist[i]->piecetype;
-			white->piecelist[i]->c = origmove->prev_level->board->white->piecelist[i]->c;
-			white->piecelist[i]->r = origmove->prev_level->board->white->piecelist[i]->r;
-			white->piecelist[i]->value = origmove->prev_level->board->white->piecelist[i]->value;
-			
-			if (((white->piecelist[i]->r) == (origmove->src_row))&&((white->piecelist[i]->c) == origmove->src_col)){
-				white->piecelist[i]->r = origmove->dst_row; 
-				white->piecelist[i]->c = origmove->dst_col;
-                int counter = 0;
-                if (origmove->IsCaptured == 1){
-                for ( j = 0; j < 16; j++){
-                    piece = origmove->prev_level->board->black->piecelist[j];
-                    if ((piece->r = origmove->dst_row)&&(piece->c = origmove->dst_col)){
-                        printf("White capture move #%d. \n", counter);
-                        temppiece = j;
-                        cpt = 67;
-                        counter++;
+            white->piecelist[i]->r = origmove->dst_row;
+            white->piecelist[i]->c = origmove->dst_col;
+        //Moves piece in data list
+        }
+        black->piecelist[i]->player = origmove->next_level->board->black;
+        black->piecelist[i]->piecetype = origmove->prev_level->board->black->piecelist[i]->piecetype;
+        black->piecelist[i]->c = origmove->prev_level->board->black->piecelist[i]->c;
+        black->piecelist[i]->r = origmove->prev_level->board->black->piecelist[i]->r;
+        black->piecelist[i]->value = origmove->prev_level->board->black->piecelist[i]->value;
+        
+        if (((black->piecelist[i]->r) == (origmove->src_row))&&((black->piecelist[i]->c) == origmove->src_col)){
+            black->piecelist[i]->r = origmove->dst_row;
+            black->piecelist[i]->c = origmove->dst_col;
+        }//Moves Piece in data list
+    }
+        for(int i = 0; i < 16; i++)
+        {
+            if(piece != NULL)
+            {
+                if(piece->player == white)
+                {
+                    if(white->piecelist[i]->r == origmove->dst_row && white->piecelist[i]->c == origmove->dst_col)
+                    {
+                        white->piecelist[i]->r = 9;
+                        white->piecelist[i]->c = 9;
+                        white->piecelist[i]->value = 0;
                         
                     }
                 }
-                }
-			}/*Moves piece in data list*/
-			
-			black->piecelist[i]->player = black;
-			black->piecelist[i]->piecetype = origmove->prev_level->board->black->piecelist[i]->piecetype ;
-			black->piecelist[i]->c = origmove->prev_level->board->black->piecelist[i]->c;
-			black->piecelist[i]->r = origmove->prev_level->board->black->piecelist[i]->r;
-			black->piecelist[i]->value = origmove->prev_level->board->black->piecelist[i]->value;
-			
-			if (((black->piecelist[i]->r) == (origmove->src_row))&&((black->piecelist[i]->c) == origmove->src_col)){
-				black->piecelist[i]->r = origmove->dst_row; 
-				black->piecelist[i]->c = origmove->dst_col;
-                int counter1 = 0;
-                if (origmove->IsCaptured == 1){
-
-                for ( j = 0; j < 16; j++){
-                    piece = origmove->prev_level->board->white->piecelist[j];
-                    if ((piece->r = origmove->dst_row)&&(piece->c = origmove->dst_col)){
-                        printf("Black capture move #%d. \n", counter1);
-                        printf("Black piece #%d. \n", j);
-                        temppiece = j;
-                        cpt = 67;
-                        counter1++;
+                else if(piece->player == black)
+                {
+                    if(black->piecelist[i]->r == origmove->dst_row && black->piecelist[i]->c == origmove->dst_col)
+                    {
+                        black->piecelist[i]->r = 9;
+                        black->piecelist[i]->c = 9;
+                        black->piecelist[i]->value = 0;
                     }
                 }
-                }
-			}/*Moves Piece in data list*/
-	}
-    if (origmove->IsCaptured == 1){
-        if (piece->player->color == 'w'){
-            if (cpt == 67){
-            printf("hello \n");
-            white->piecelist[temppiece]->r = 9; // 9 = off board
-            white->piecelist[temppiece]->c = 9; // 9 = off board
-            white->piecelist[temppiece]->value = 0;
-            white->piecelist[temppiece] = NULL;
-            }
-        }else {
-
-            if (cpt == 67){
-            printf("hello \n");
-            black->piecelist[temppiece]->r = 9; // 9 = off board
-            black->piecelist[temppiece]->c = 9; // 9 = off board
-            black->piecelist[temppiece]->value = 0;
-            black->piecelist[temppiece] = NULL;
             }
         }
-    }
-	
-	origmove->next_level->board = CreateBoard(white, black,origmove->new_board); /*set the board of the new layer's Movelist*/
-	origmove->next_level->prevmove = origmove; /*set the new layer's movelist prevmove to point to the orig move*/
+    
+    origmove->next_level->prevmove = origmove; /*set the new layer's movelist prevmove to point to the orig move*/
     PLAYER *player, *opponent;
-	if ((AI_tracker % 2) == 1){ /*keep track of which player's turn it is down the list*/
-		if(origmove->prev_level->board->white->type == 'a'){ 
-			player = white;
-			opponent = black;
-		}
-		else {
-			player = black;
-			opponent = white;
-		}
-	} else {
-		if(origmove->prev_level->board->white->type == 'a'){ 
+    if ((AI_tracker % 2) == 1){ /*keep track of which player's turn it is down the list*/
+        if(origmove->prev_level->board->white->type == 'a'){
+            player = white;
+            opponent = black;
+        }
+        else {
+            player = black;
             opponent = white;
-			player = black;
-		}
-		else {
-			opponent = black;
-			player = white;
-		}		
-	}
-	
-	
-	if (depth < 1){
-		return scoremove(origmove, player, opponent); /*return scorefromsidePOV*/ /*recursion happens*/
-	} /*if end*/
-	
-	MOVE *temp = NULL; 
-	MOVELIST *movelist = origmove->next_level;
-	 /*newly created Movelist (line 59) is assigned to the next layer*/
-	getmoves(origmove->new_board, origmove->prev_level->board, player, opponent, movelist); /*get legal moves for the passed in origmove*/
-	temp = movelist -> first; 
-
-
-	while (temp) { 
-		temp->score = -(NegaMax((depth-1), temp, -beta, -alpha, (AI_tracker + 1)));
-		if ((temp->score) >= beta){
-
-			//DeleteBoard(temp->next_level->board);
-			//DeleteMoveList(temp->next_level);
-			return beta; /*alpha beta pruning: if temp->score >= beta then that branch will be deleted*/
-		}
-		if ((temp->score) > alpha){
-			alpha = temp->score;
-		}
-        //DeleteBoard(temp->next_level->board); /*delete the branches once we've figured out the highest score and best move*/
-        //DeleteMoveList(temp->next_level);
-		temp = temp->nextentry;
-	} /*while
+        }
+    } else {
+        if(origmove->prev_level->board->white->type == 'a'){
+            opponent = white;
+            player = black;
+        }
+        else {
+            opponent = black;
+            player = white;
+        }
+    }
+    
+    
+    if (depth < 1){
+        return scoremove(origmove, player, opponent); /*return scorefromsidePOV*/ /*recursion happens*/
+    } /*if end*/
+    
+    MOVE *temp = NULL;
+    MOVELIST *movelist = origmove->next_level;
+    /*newly created Movelist (line 59) is assigned to the next layer*/
+    getmoves(origmove->new_board, origmove->next_level->board, opponent, player, movelist); /*get legal moves for the passed in origmove*/
+    temp = movelist -> first;
+    
+    
+    while (temp) {
+        temp->score = -(NegaMax((depth-1), temp, -beta, -alpha, (AI_tracker + 1)));
+        if ((temp->score) >= beta){
+            return beta; /*alpha beta pruning: if temp->score >= beta then that branch will be deleted*/
+        }
+        if ((temp->score) > alpha){
+            alpha = temp->score;
+        }
+        if(temp->next_level != NULL){
+            printf("HELLO \n");
+        DeleteBoard(temp->next_level->board); /*delete the branches once we've figured out the highest score and best move*/
+        DeleteMoveList(temp->next_level);
+        temp->next_level = NULL;
+        }
+        temp = temp->nextentry;
+    } /*while
        end*/
-
-	return alpha;
-	
+    
+    return alpha;
+    
 } /*EOF*/
+

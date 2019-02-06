@@ -224,7 +224,7 @@ int Stalemate(BOARD *board, PLAYER *player, PLAYER *opponent)
 }
 
 int FiftyConsec (MOVELIST *movelist){
-	MOVE CurrentMove = movelist -> last;
+	MOVE *CurrentMove = movelist -> last;
 	for (int i = 0; i < 50 ; i++){
 
 		if (CurrentMove -> IsCaptured == 1 || CurrentMove -> piece -> piecetype == 'P'){
@@ -259,6 +259,7 @@ int ThreeFoldRep(MOVELIST *movelist){
 
 	return 1;
 }
+<<<<<<< HEAD
 
 int EnPassant(MOVELIST *movelist, BOARD *board, PIECE *piece){
 	MOVE CurrentMove = movelist -> last;
@@ -271,3 +272,11 @@ int EnPassant(MOVELIST *movelist, BOARD *board, PIECE *piece){
 	    }
 	}
 }																						
+=======
+	
+		
+
+
+
+
+>>>>>>> 53276db7c46f34ef5ca7374d4e3925a657cd329e

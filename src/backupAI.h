@@ -10,6 +10,6 @@
 #include "Conditions.h"
 #include <time.h>
 
-MOVE *AI(BOARD *board, PLAYER *player, PLAYER *opponent);
+MOVE *backupAI(BOARD *board, PLAYER *player, PLAYER *opponent);
 
 #endif /* AI_h */

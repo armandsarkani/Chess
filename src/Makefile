@@ -23,9 +23,6 @@ GUI: GTK_chess
 Chess: Board.o Pieces.o backupAI.o Movegen.o Conditions.o
 	$(CC) $(LFLAGS) Board.o Pieces.o backupAI.o Movegen.o Conditions.o -o Chess
 
-Board: Board.o Pieces.o
-	$(CC) $(LFLAGS) Board.o Pieces.o -o Board
-	
 Board.o: Board.c Board.h Pieces.h backupAI.h Movegen.h Conditions.h
 	$(CC) $(CFLAGS) Board.c -o Board.o
 

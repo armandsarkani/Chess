@@ -221,13 +221,16 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
         int opponent_r = 0;
         int opponent_c = 0;
         int opponent_value = 0;
+        int opponent_EP = 0;
         int callreturn = 0;
+        int movereturn = 0;
         int promotion = 0;
+        int EnPassant = 0;
         PIECE *piece = NULL;
         if (player->type == 'a') {
-            sleep(1);
+            //sleep(1);
             printf("AI's move: \n");
-            MOVE *AImove = AI(board, player, opponent);
+            MOVE *AImove = backupAI(board, player, opponent);
             row_src = AImove->src_row;
             col_src = AImove->src_col;
             row_dest = AImove->dst_row;
@@ -245,8 +248,38 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
             cCol_dest = NumtoAlpha(col_dest);
             cCol_src = NumtoAlpha(col_src);
             char *piecename = PieceName(piece->piecetype);
-            printf("%s moved from %c%d to %c%d\n", piecename, cCol_src, row_src, cCol_dest, row_dest);
+            opponentcapture = CheckPiece(opponent, row_dest+1, col_dest+1);
+            if(opponentcapture != NULL)
+            {
+                opponent_EP = opponentcapture->EnPassant;
+            }
+            if(piece->value == 2)
+            {
+                piece->value = 1;
+            }
+            if(opponentcapture != NULL && opponent_EP == 1 && piece->piecetype == 'P' && row_src == row_dest && ((col_dest == col_src + 1) || (col_dest == col_src -1)))
+            {
+                if(piece->player->color == 'w')
+                {
+                    MovePiece(board, opponent, piece, row_dest+1, col_dest);
+                    printf("The AI has made an en passant capture on you!\n");
+                    EnPassant = 1;
+                }
+                else
+                {
+                    MovePiece(board, opponent, piece, row_dest-1, col_dest);
+                    printf("The AI has made an en passant capture on you!\n");
+                    EnPassant = 1;
+                }
+            }
+            else if(movelist->last != NULL && movelist->last->piece->EnPassant == 1)
+            {
+                movelist->prevmove->piece->EnPassant = 0;
+            }
+                
             MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
+            printf("%s moved from %c%d to %c%d\n", piecename, cCol_src, row_src, cCol_dest, row_dest);
+            
             //DeleteMoveEntry(AImove);
         }
         else
@@ -304,6 +337,7 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
                 piecetag = board->boardarray[opponentcapture->r][opponentcapture->c];
                 opponent_r = opponentcapture->r;
                 opponent_c = opponentcapture->c;
+                opponent_EP = opponentcapture->EnPassant;
                 opponent_value = opponentcapture->value;
             }
             callreturn = CallPiece(board, opponent, piece, row_src, col_src, row_dest, col_dest, 1);
@@ -314,7 +348,29 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
                 continue;
             }
             originalpiecetag = board->boardarray[piece->r][piece->c];
-            int movereturn = MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
+            if(opponentcapture != NULL && opponent_EP == 1 && piece->piecetype == 'P' && row_src == row_dest && ((col_dest == col_src + 1) || (col_dest == col_src -1)))
+            {
+                printf("En passant pawn capture!\n");
+                if(piece->player->color == 'w')
+                {
+                    MovePiece(board, opponent, piece, row_dest, col_dest-1);
+                    EnPassant = 1;
+                }
+                else
+                {
+                    MovePiece(board, opponent, piece, row_dest-2, col_dest-1);
+                    EnPassant = 1;
+                }
+            }
+            else if(movelist->last != NULL && movelist->last->piece->EnPassant == 1)
+            {
+                movelist->last->piece->EnPassant = 0;
+                printf("You missed an opportunity to perform an en passant capture!\n");
+            }
+            if(EnPassant != 1)
+            {
+                movereturn = MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
+            }
             if(movereturn == 1)
             {
                 printf("You cannot make a move that will leave you in check. Please try again. \n");
@@ -361,6 +417,10 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
         {
             printf("A pawn was promoted to a %s!\n", PieceName(piece->piecetype));
             info = piece->piecetype;
+        }
+        if(EnPassant == 1)
+        {
+            Log('\0', '\0', '\0', 0, 0, 0, 'e');
         }
         if(callreturn == 2) // a piece has been captured
         {
@@ -641,6 +701,12 @@ FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured,
         fclose(log);
         return log;
     }
+    if(info == 'e')
+    {
+        fprintf(log, "En passant pawn capture! \n");
+        fclose(log);
+        return log;
+    }
     if(color == 'w')
     {
         color_string = "White";
@@ -683,6 +749,21 @@ FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured,
     return log;
 }
 
+BOARD *CreateAIBoard(PLAYER *white, PLAYER *black, char *boardarray[8][8])
+{
+    BOARD *board = malloc(sizeof(BOARD));
+    board->white = CreatePlayer('w', white->type);
+    board->black = CreatePlayer('b', black->type);
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            board->boardarray[i][j] = boardarray[i][j];
+        }
+    }
+    return board;
+}
+
 BOARD *CreateBoard(PLAYER *white, PLAYER *black, char *boardarray[8][8])
 {
     BOARD *board = malloc(sizeof(BOARD));
@@ -697,5 +778,7 @@ BOARD *CreateBoard(PLAYER *white, PLAYER *black, char *boardarray[8][8])
     }
     return board;
 }
-
-
+/*void UndoMove(MOVELIST *movelist)
+{
+    
+}*/

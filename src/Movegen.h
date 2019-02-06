@@ -23,7 +23,10 @@
  * 1 = */
 
 typedef struct move MOVE;
+#ifndef MOVELIST_DEFINED
 typedef struct movelist MOVELIST;
+#define MOVELIST_DEFINED
+#endif
 
 struct move {
 	int src_row;

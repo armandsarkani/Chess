@@ -13,7 +13,7 @@
 
 
 void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *list){
-	int success; /*if success = 0*/
+	int success = 0; /*if success = 0*/
     int move;
 	int i,x,y,j;
     PIECE *opponentcapture = NULL;
@@ -29,6 +29,7 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
             /*end for*/
         }
     }
+    int test = 0;
 	for(i = Pawn1; i <= King; i++)
     {
 		PIECE *piece = player->piecelist[i];
@@ -45,8 +46,12 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
 			for (y = 0; y < 8; y++)
             {
                 success = CallPiece(board, opponent, piece, (piece->r)+1, (piece->c)+1, x+1, y+1, 0);
-				if (success != 1) /*if CallPiece does not return a failure*/
+                if(success == 2)
                 {
+                 test = CallPiece(board, opponent, piece, (piece->r)+1, (piece->c)+1, x+1, y+1, 0);
+                }
+				if (success != 1) /*if CallPiece does not return a failure*/
+                {                    
                     if(success == 2)
                     {
                         opponentcapture = CheckPiece(opponent, x+1, y+1);
@@ -67,6 +72,7 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
                         {
                             piece->value = 2;
                         }
+                        success = 0;
                         continue;
                     }
                     else
@@ -75,6 +81,10 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
                         {
                             IsCaptured = 1;
                             capturedpiece = cpy_board[opponentcapture->r][opponentcapture->c];
+                        }
+                        if(success != 2)
+                        {
+                            IsCaptured = 0;
                         }
                         cpy_board[x][y] = orig_piecetag;
                         cpy_board[orig_pieceR][orig_pieceC] = "  ";
@@ -96,6 +106,7 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
                         
                     }
 				}
+                success = 0;
                 continue;
 			}
 		}	
@@ -165,6 +176,7 @@ void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int d
 /*Cretes a move*/
 MOVE *CreateMove(void){
 	MOVE *move = malloc(sizeof(MOVE));
+    
 	return move;
 }
 
@@ -179,6 +191,8 @@ MOVELIST *NewMoveList(void){
 	}
 	l->first = NULL;
 	l->last = NULL;
+    l->prevmove = NULL;
+    l->length = 0;
 	return l;
 }
 
@@ -187,13 +201,21 @@ void DeleteMoveList(MOVELIST *list){
 	assert(list);
 	MOVE *next;
 	MOVE *temp;
+    if(list->first == NULL)
+    {
+        free(list);
+        list = NULL;
+    }else{
 	temp = list->first;
-	while(temp) {
+	while(temp != NULL) {
 		next = temp->nextentry;
 		DeleteMoveEntry(temp);
+        list->length--;
 		temp = next;
 	}
 	free(list);
+        list = NULL;
+    }
 }
 
 /*Deletes a single move entry within the movelist*/
@@ -201,17 +223,38 @@ void DeleteMoveEntry(MOVE *entry){
 	assert(entry);
 	if (entry->next_level != NULL){
 		DeleteMoveList(entry->next_level);
+        entry->next_level = NULL;
 	}else {
 		free(entry);
+        entry = NULL;
 	}
 }
 
 /*Deletes a board*/
 void DeleteBoard(BOARD *board){
 	assert(board);
-	DeletePlayer(board->white);
-	DeletePlayer(board->black);
-	free(board);
+    if(board != NULL){
+        DeletePlayer(board->white);
+        DeletePlayer(board->black);
+        board->white = NULL;
+        board->black = NULL;
+        free(board);
+        board = NULL;
+    }
+
+}
+
+/*Creates a player*/
+PLAYER *CreatePlayer(char color, char type)
+{
+    PLAYER *newplayer = malloc(sizeof(PLAYER));
+    newplayer->color = color;
+    newplayer->type = type;
+    for(int i = Pawn1; i <= King; i++)
+    {
+        newplayer->piecelist[i] = malloc(sizeof(PIECE));
+    }
+    return newplayer;
 }
 
 /*Deletes a player*/
@@ -221,12 +264,14 @@ void DeletePlayer(PLAYER *entry){
 		DeletePiece(entry->piecelist[i]);
 	} /*for end*/
 	free(entry);
+    entry = NULL;
 }
 
 /*Deletes a piece*/
 void DeletePiece(PIECE *piece){
 	assert(piece);
 	free(piece);
+    piece = NULL;
 }
 
 
