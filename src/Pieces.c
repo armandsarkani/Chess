@@ -3,7 +3,7 @@
 
 #include "Pieces.h"
 
-int CallPiece(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int test_conditions)
+CallPiece(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int test_conditions)
 {
     char piecetype = piece->piecetype;
     switch(piecetype)
@@ -43,6 +43,10 @@ int MovePawn(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_
                     if(test_conditions == 1)
                     {
                         piece->value = 1;
+			/* En Passant */ 
+			if (CheckPiece(opponent, dest_row, dest_col + 1) == 1 || CheckPiece(opponent, dest_row, dest_col - 1 == 1){
+				EnPassant = 1; //If player "passes capturing square" then opponent is eligible for En Passant
+			}
                     }
                     return 0;
                 }
@@ -113,17 +117,23 @@ int MovePawn(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_
     {
         if(piece->player->color == 'w')
         {
+		PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
             if(((dest_col == src_col + 1) || (dest_col == src_col - 1)) && (dest_row == src_row + 1))
             {
-                if(test_conditions == 1)
+		if(test_conditions == 1)
                 {
-                    PIECE *opponentpiece = CheckPiece(opponent, dest_row, dest_col);
                     CapturePiece(board, opponentpiece);
                     return 2;
                 }
                 return 2;
             }
-            else
+	    else if(((dest_col == src_col + 1) || (dest_col == src_col - 1)) && (dest_row == src_row && opponentpiece -> EnPassant == 1))
+		{
+		opponentpiece -> EnPassant = 2;
+		CapturePiece(board, opponentpiece);
+		return 2;
+		} 
+	    else 
             {
                 return 1;
             }

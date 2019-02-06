@@ -38,7 +38,8 @@ struct Piece{
     char piecetype;
     int r;
     int c;
-    int value; 
+    int value;
+    int EnPassant; 
 };
 
 void InitializeBoard(BOARD *global);

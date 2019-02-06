@@ -19,5 +19,5 @@ int CheckNumberofIllegalMoves(BOARD *board, PLAYER *opponent, PIECE *piece, int 
 int Stalemate(BOARD *board, PLAYER *player, PLAYER *opponent);
 int FiftyConsec(MOVELIST *movelist);
 int ThreeFoldRep(MOVELIST *movelist);
-int EnPassant(BOARD *board, PIECE *piece);
+
 #endif /* Conditions_h */
