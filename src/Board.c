@@ -6,8 +6,8 @@
 #include "Movegen.h"
 #include "backupAI.h"
 #include "Conditions.h"
-//#include "Evaluate.h"
-//#include "AI.h"
+#include "Evaluate.h"
+#include "AI.h"
 
 int main()
 {

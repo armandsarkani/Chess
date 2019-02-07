@@ -18,19 +18,30 @@ int Check(BOARD *board, PLAYER *player, PLAYER *opponent, int king_row, int king
 }
 int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent)
 {
+    PIECE *piece = NULL;
+    int originalR = 0;
+    int originalC = 0;
+    char *originalpiecetag = "nm";
+    int original_piece_value = 0;
+    int movereturn = 0;
+    PIECE *opponentcapture = NULL;
+    int opponent_r = 0;
+    int opponent_c = 0;
+    int opponent_value = 0;
+    char *piecetag = "nm";
     for(int i = Pawn1; i <= King; i++)
     {
-        PIECE *piece = opponent->piecelist[i];
-        int originalR = piece->r;
-        int originalC = piece->c;
-        char *originalpiecetag = board->boardarray[piece->r][piece->c];
-        int original_piece_value = piece->value;
-        int movereturn = 0;
-        PIECE *opponentcapture = NULL;
-        int opponent_r = 0;
-        int opponent_c = 0;
-        int opponent_value = 0;
-        char *piecetag = NULL;
+        piece = opponent->piecelist[i];
+        originalR = piece->r;
+        originalC = piece->c;
+        originalpiecetag = board->boardarray[piece->r][piece->c];
+        original_piece_value = piece->value;
+        movereturn = 0;
+        opponentcapture = NULL;
+        opponent_r = 0;
+        opponent_c = 0;
+        opponent_value = 0;
+        piecetag = NULL;
         if(piece->value == 0) // captured piece cannot be moved to save the king
         {
             continue;
@@ -80,6 +91,12 @@ int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent)
                 
             }
         }
+    }
+    if(originalpiecetag != NULL){
+        //free(originalpiecetag);
+    }
+    if(piecetag != NULL){
+        //free(piecetag);
     }
     return 1;
 }

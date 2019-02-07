@@ -5,17 +5,17 @@
 
 /*Last modified 1/24/19*/
 /*Things that need to be added:
- * 	DeleteMoveList
- * 		DeleteMoveEntry
- * 			
- * 				accompanying header file movegen.h
- * 				*/
+ *     DeleteMoveList
+ *         DeleteMoveEntry
+ *
+ *                 accompanying header file movegen.h
+ *                 */
 
 
 void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *list){
-	int success = 0; /*if success = 0*/
+    int success = 0; /*if success = 0*/
     int move;
-	int i,x,y,j;
+    int i,x,y,j;
     PIECE *opponentcapture = NULL;
     char *piecetag = NULL;
     char *capturedpiece = NULL;
@@ -30,9 +30,9 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
         }
     }
     int test = 0;
-	for(i = Pawn1; i <= King; i++)
+    for(i = Pawn1; i <= King; i++)
     {
-		PIECE *piece = player->piecelist[i];
+        PIECE *piece = player->piecelist[i];
         if(piece->r == 9 || piece->c == 9)
         {
             continue;
@@ -43,15 +43,15 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
         char *orig_piecetag = board->boardarray[orig_pieceR][orig_pieceC];
         for (x = 0; x < 8; x++)
         {
-			for (y = 0; y < 8; y++)
+            for (y = 0; y < 8; y++)
             {
                 success = CallPiece(board, opponent, piece, (piece->r)+1, (piece->c)+1, x+1, y+1, 0);
                 if(success == 2)
                 {
-                 test = CallPiece(board, opponent, piece, (piece->r)+1, (piece->c)+1, x+1, y+1, 0);
+                    test = CallPiece(board, opponent, piece, (piece->r)+1, (piece->c)+1, x+1, y+1, 0);
                 }
-				if (success != 1) /*if CallPiece does not return a failure*/
-                {                    
+                if (success != 1) /*if CallPiece does not return a failure*/
+                {
                     if(success == 2)
                     {
                         opponentcapture = CheckPiece(opponent, x+1, y+1);
@@ -59,9 +59,9 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
                         opponent_c = opponentcapture->c;
                         opponent_value = opponentcapture->value;
                         piecetag = board->boardarray[opponent_r][opponent_c];
-                     }
+                    }
                     char *originaldesttag = board->boardarray[x][y];
-					move = MovePiece(board, opponent, piece, x, y);/*makes move on cpyboard*/
+                    move = MovePiece(board, opponent, piece, x, y);/*makes move on cpyboard*/
                     if(move == 1) // if check
                     {
                         if(success == 2)
@@ -73,6 +73,7 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
                             piece->value = 2;
                         }
                         success = 0;
+                        move = 0;
                         continue;
                     }
                     else
@@ -86,86 +87,55 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
                         {
                             IsCaptured = 0;
                         }
-                        cpy_board[x][y] = orig_piecetag;
-                        cpy_board[orig_pieceR][orig_pieceC] = "  ";
-                        board->boardarray[x][y] = originaldesttag;
-                        board->boardarray[orig_pieceR][orig_pieceC] = orig_piecetag;
-                        piece->r = orig_pieceR;
-                        piece->c = orig_pieceC;
-                        AddLegalMoves(list, piece->r, piece->c, x, y, board, IsCaptured, piece, opponentcapture, cpy_board);
-                        if(IsCaptured == 1)
-                        {
-                            cpy_board[x][y] = capturedpiece;
-                            cpy_board[orig_pieceR][orig_pieceC] = orig_piecetag;
-                        }
-                        else
-                        {
-                            cpy_board[x][y] = "  ";
-                            cpy_board[orig_pieceR][orig_pieceC] = orig_piecetag;
+                        if(move == 0){
+                            cpy_board[x][y] = orig_piecetag;
+                            cpy_board[orig_pieceR][orig_pieceC] = "  ";
+                            board->boardarray[x][y] = originaldesttag;
+                            board->boardarray[orig_pieceR][orig_pieceC] = orig_piecetag;
+                            piece->r = orig_pieceR;
+                            piece->c = orig_pieceC;
+                            AddLegalMoves(list, piece->r, piece->c, x, y, board, IsCaptured, piece, opponentcapture, cpy_board);
+                            if(IsCaptured == 1)
+                            {
+                                cpy_board[x][y] = capturedpiece;
+                                cpy_board[orig_pieceR][orig_pieceC] = orig_piecetag;
+                            }
+                            else
+                            {
+                                cpy_board[x][y] = "  ";
+                                cpy_board[orig_pieceR][orig_pieceC] = orig_piecetag;
+                            }
                         }
                         
                     }
-				}
+                }
+                move = 0;
                 success = 0;
                 continue;
-			}
-		}	
-		/*end for*/
-	}/*end for*/
+            }
+        }
+        /*end for*/
+    }/*end for*/
 }
 
 void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int dest_col, BOARD *board, int IsCaptured, PIECE *piece, PIECE *opponentcapture, char *cpy_board[8][8]){
-/*Adds move information into the given list, allocating space and making new entries; stores resulting board from making the move*/	
-	
-	MOVE *new_entry = malloc(sizeof(MOVE));
+    /*Adds move information into the given list, allocating space and making new entries; stores resulting board from making the move*/
+    
+    MOVE *new_entry = malloc(sizeof(MOVE));
     PIECE *temppiece = NULL;
-	assert(new_entry);
-	if(list->first == NULL){
-		list->first = new_entry;
-		new_entry->preventry = NULL;
-		new_entry->nextentry = NULL;
-		new_entry->src_row = src_row;
-		new_entry->src_col = src_col;
-		new_entry->dst_row = dest_row;
-		new_entry->dst_col = dest_col;
-        new_entry->IsCaptured = IsCaptured;
-        new_entry->piece = piece;
-        new_entry->opponentcapture = opponentcapture;
-		new_entry->score = 0;
-        new_entry->board = board;
-        if(opponentcapture == NULL)
-        {
-            temppiece = CheckPiece(piece->player, dest_row, dest_col);
-            if(temppiece != NULL)
-            {
-                new_entry->EnPassantStatus = temppiece->EnPassant;
-            }
-        }
-        for(int i = 0; i < 8; i++)
-        {
-            for(int j = 0; j < 8; j++)
-            {
-                new_entry->new_board[i][j] = cpy_board[i][j];
-            }
-        }
-		list->last = new_entry;
-		new_entry -> prev_level = list;
-        new_entry->next_level = NULL;
-	
-	}else{
-		list->last->nextentry = new_entry;
-		new_entry->preventry = list->last;
+    assert(new_entry);
+    if(list->first == NULL){
+        list->first = new_entry;
+        new_entry->preventry = NULL;
         new_entry->nextentry = NULL;
-		list->last= new_entry;
-
-		new_entry->src_row = src_row;
-		new_entry->src_col = src_col;
-		new_entry->dst_row = dest_row;
-		new_entry->dst_col = dest_col;
+        new_entry->src_row = src_row;
+        new_entry->src_col = src_col;
+        new_entry->dst_row = dest_row;
+        new_entry->dst_col = dest_col;
         new_entry->IsCaptured = IsCaptured;
         new_entry->piece = piece;
         new_entry->opponentcapture = opponentcapture;
-		new_entry->score = 0;
+        new_entry->score = 0;
         new_entry->board = board;
         if(opponentcapture == NULL)
         {
@@ -182,74 +152,112 @@ void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int d
                 new_entry->new_board[i][j] = cpy_board[i][j];
             }
         }
-		new_entry->prev_level = list;
+        list->last = new_entry;
+        new_entry -> prev_level = list;
         new_entry->next_level = NULL;
-
-	
-	}
+        
+    }else{
+        list->last->nextentry = new_entry;
+        new_entry->preventry = list->last;
+        new_entry->nextentry = NULL;
+        list->last= new_entry;
+        
+        new_entry->src_row = src_row;
+        new_entry->src_col = src_col;
+        new_entry->dst_row = dest_row;
+        new_entry->dst_col = dest_col;
+        new_entry->IsCaptured = IsCaptured;
+        new_entry->piece = piece;
+        new_entry->opponentcapture = opponentcapture;
+        new_entry->score = 0;
+        new_entry->board = board;
+        if(opponentcapture == NULL)
+        {
+            temppiece = CheckPiece(piece->player, dest_row, dest_col);
+            if(temppiece != NULL)
+            {
+                new_entry->EnPassantStatus = temppiece->EnPassant;
+            }
+        }
+        for(int i = 0; i < 8; i++)
+        {
+            for(int j = 0; j < 8; j++)
+            {
+                new_entry->new_board[i][j] = cpy_board[i][j];
+            }
+        }
+        new_entry->prev_level = list;
+        new_entry->next_level = NULL;
+        
+        
+    }
     list->length++;
 }
 
 /*Cretes a move*/
 MOVE *CreateMove(void){
-	MOVE *move = malloc(sizeof(MOVE));
+    MOVE *move = malloc(sizeof(MOVE));
     
-	return move;
+    return move;
 }
 
 /*Creates a movelist*/
 MOVELIST *NewMoveList(void){
-	MOVELIST *l;
-	l = malloc(sizeof(MOVELIST));
-	if (!l)
-	{
-		perror("\n Out of Memory! Aborting...");
-		exit(10);
-	}
-	l->first = NULL;
-	l->last = NULL;
+    MOVELIST *l;
+    l = malloc(sizeof(MOVELIST));
+    if (!l)
+    {
+        perror("\n Out of Memory! Aborting...");
+        exit(10);
+    }
+    l->first = NULL;
+    l->last = NULL;
     l->prevmove = NULL;
     l->length = 0;
-	return l;
+    return l;
 }
 
 /*Deletes list of all possible legal moves: frees memory*/
 void DeleteMoveList(MOVELIST *list){
-	assert(list);
-	MOVE *next;
-	MOVE *temp;
+    assert(list);
+    MOVE *next;
+    MOVE *temp;
+    if(list->board){
+        DeleteBoard(list->board);
+        list->board = NULL;
+    }
     if(list->first == NULL)
     {
         free(list);
         list = NULL;
     }else{
-	temp = list->first;
-	while(temp != NULL) {
-		next = temp->nextentry;
-		DeleteMoveEntry(temp);
-        list->length--;
-		temp = next;
-	}
-	free(list);
+        temp = list->first;
+        while(temp != NULL) {
+            next = temp->nextentry;
+            DeleteMoveEntry(temp);
+            list->length--;
+            temp = next;
+        }
+        free(list);
         list = NULL;
     }
 }
 
 /*Deletes a single move entry within the movelist*/
 void DeleteMoveEntry(MOVE *entry){
-	assert(entry);
-	if (entry->next_level != NULL){
-		DeleteMoveList(entry->next_level);
+    assert(entry);
+    if (entry->next_level != NULL){
+        DeleteMoveList(entry->next_level);
         entry->next_level = NULL;
-	}else {
-		free(entry);
+    }else {
+        free(entry);
         entry = NULL;
-	}
+    }
 }
 
 /*Deletes a board*/
 void DeleteBoard(BOARD *board){
-	assert(board);
+    assert(board);
     if(board != NULL){
         DeletePlayer(board->white);
         DeletePlayer(board->black);
@@ -258,7 +266,7 @@ void DeleteBoard(BOARD *board){
         free(board);
         board = NULL;
     }
-
+    
 }
 
 /*Creates a player*/
@@ -276,18 +284,19 @@ PLAYER *CreatePlayer(char color, char type)
 
 /*Deletes a player*/
 void DeletePlayer(PLAYER *entry){
-	assert(entry);
-	for(int i = 0; i < 16; i++){
-		DeletePiece(entry->piecelist[i]);
-	} /*for end*/
-	free(entry);
+    assert(entry);
+    for(int i = 0; i < 16; i++){
+        DeletePiece(entry->piecelist[i]);
+        entry->piecelist[i] = NULL;
+    } /*for end*/
+    free(entry);
     entry = NULL;
 }
 
 /*Deletes a piece*/
 void DeletePiece(PIECE *piece){
-	assert(piece);
-	free(piece);
+    assert(piece);
+    free(piece);
     piece = NULL;
 }
 
