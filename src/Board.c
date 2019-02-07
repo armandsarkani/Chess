@@ -6,8 +6,8 @@
 #include "Movegen.h"
 #include "backupAI.h"
 #include "Conditions.h"
-#include "Evaluate.h"
-#include "AI.h"
+//#include "Evaluate.h"
+//#include "AI.h"
 
 int main()
 {
@@ -86,15 +86,22 @@ int main()
             IsGameOver = true;
             break;
         }
-
-	if (movelist -> length >= 50){
-		if (FiftyConsec(movelist) == 1){
-			printf("Fifty Turn Rule conditions have been met: Game is a Draw!\n");
-			Log('\0', '\0', '\0', 0, 0, 0, 's');
-			IsGameOver = true;
-			break;
-		}
-	}
+        if (movelist -> length >= 50){
+            if (FiftyConsec(movelist) == 1){
+                printf("Fifty Turn Rule conditions have been met: Game is a Draw!\n");
+                Log('\0', '\0', '\0', 0, 0, 0, 's');
+                IsGameOver = true;
+                break;
+            }
+        }
+        if (movelist -> length >= 11){
+            if (ThreeFoldRep(movelist) == 1){
+                printf("Three Fold Repetition conditions have been met: Game is a Draw!\n");
+                Log('\0', '\0', '\0', 0, 0, 0, 's');
+                IsGameOver = true;
+                break;
+            }
+        }
         move = MakeMove(global, black, white, movelist);
         DrawBoard(global);
         if(move == 1 || move == 2)
@@ -126,6 +133,14 @@ int main()
                         IsGameOver = true;
                         break;
                 }
+        }
+        if (movelist -> length >= 11){
+            if (ThreeFoldRep(movelist) == 1){
+                printf("Three Fold Repetition conditions have been met: Game is a Draw!\n");
+                Log('\0', '\0', '\0', 0, 0, 0, 's');
+                IsGameOver = true;
+                break;
+            }
         }
 
     }
@@ -423,7 +438,7 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
         }
         if(EnPassant == 1)
         {
-            Log('\0', '\0', '\0', 0, 0, 0, 'e');
+            info = 'e';
         }
         if(callreturn == 2) // a piece has been captured
         {
@@ -684,6 +699,7 @@ int FindEmptySpace(BOARD *board, int r, int c)
 FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured, int CheckReturn, char info)
 {
     FILE *log = fopen("Chess Move Log.txt", "a");
+    char *special = NULL;
     char *color_string;
     char check_char = '\0';
     if(info == 'w')
@@ -706,9 +722,7 @@ FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured,
     }
     if(info == 'e')
     {
-        fprintf(log, "En passant pawn capture! \n");
-        fclose(log);
-        return log;
+        special = "e.p.";
     }
     if(color == 'w')
     {
@@ -730,7 +744,21 @@ FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured,
     {
         if(piecetype == 'P')
         {
-            fprintf(log, "%s: x%c%d%c%c\n", color_string, destcol, destrow, check_char, info);
+            if(special == NULL)
+            {
+                fprintf(log, "%s: x%c%d%c%c\n", color_string, destcol, destrow, check_char, info);
+            }
+            else
+            {
+                if(color == 'w')
+                {
+                    fprintf(log, "%s: x%c%d%c%s\n", color_string, destcol, destrow+1, check_char, special);
+                }
+                else
+                {
+                    fprintf(log, "%s: x%c%d%c%s\n", color_string, destcol, destrow-1, check_char, special);
+                }
+            }
         }
         else
         {

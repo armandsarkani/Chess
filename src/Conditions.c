@@ -235,3 +235,29 @@ int FiftyConsec (MOVELIST *movelist){
 		return 1;
 
 }
+
+int ThreeFoldRep (MOVELIST *movelist){
+    MOVE *CurrentMove = movelist -> last;
+    MOVE *ReferenceMove = movelist -> last -> preventry -> preventry;
+    int MoveCounter = 0;
+    while (ReferenceMove != NULL){
+        
+        if (CurrentMove -> piece -> piecetype == ReferenceMove -> piece -> piecetype){
+            if (CurrentMove -> dst_col == ReferenceMove -> dst_col){
+                if (CurrentMove -> dst_row == ReferenceMove -> dst_row){
+                    
+                    MoveCounter += 1;
+                }
+            }
+        }
+        if (MoveCounter == 3){
+            return 1;
+        }
+        if(ReferenceMove->preventry == NULL)
+        {
+            return 0;
+        }
+        ReferenceMove = ReferenceMove -> preventry -> preventry;
+    }
+    return 0;    
+}
