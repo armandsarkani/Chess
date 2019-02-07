@@ -544,7 +544,7 @@ PIECE *CreatePiece(BOARD *board, int r, int c, char piece, char color, PLAYER *p
 int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc) // only called when the move is legal
 {
     assert(piece);
-    p->Castling = 1;
+    p->Castling = 0;
     int tempR = piece->r;
     int tempC = piece->c;
     /*int tempOppR = 0;
