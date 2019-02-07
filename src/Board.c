@@ -527,12 +527,14 @@ PIECE *CreatePiece(BOARD *board, int r, int c, char piece, char color, PLAYER *p
             break;
         case 'R':
             p->value = 5;
+            p->Castling = 1;
             break;
         case 'Q':
             p->value = 9;
             break;
         case 'K':
             p->value = 90; //should really be infinity
+            p->Castling = 1;
             break;
         default:
             break;
@@ -542,6 +544,7 @@ PIECE *CreatePiece(BOARD *board, int r, int c, char piece, char color, PLAYER *p
 int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc) // only called when the move is legal
 {
     assert(piece);
+    p->Castling = 1;
     int tempR = piece->r;
     int tempC = piece->c;
     /*int tempOppR = 0;
