@@ -57,8 +57,11 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
                         opponentcapture = CheckPiece(opponent, x+1, y+1);
                         opponent_r = opponentcapture->r;
                         opponent_c = opponentcapture->c;
-                        opponent_value = opponentcapture->value;
                         piecetag = board->boardarray[opponent_r][opponent_c];
+                        opponent_value = opponentcapture->value;
+                        opponentcapture->r = 9;
+                        opponentcapture->c = 9;
+                        opponentcapture->value = 0;
                     }
                     char *originaldesttag = board->boardarray[x][y];
                     move = MovePiece(board, opponent, piece, x, y);/*makes move on cpyboard*/
@@ -88,13 +91,27 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
                             IsCaptured = 0;
                         }
                         if(move == 0){
+                            if(opponentcapture != NULL)
+                            {
+                                opponentcapture->r = opponent_r;
+                                opponentcapture->c = opponent_c;
+                                opponentcapture->value = opponent_value;
+                                board->boardarray[opponent_r][opponent_c] = piecetag;
+                            }
                             cpy_board[x][y] = orig_piecetag;
                             cpy_board[orig_pieceR][orig_pieceC] = "  ";
                             board->boardarray[x][y] = originaldesttag;
                             board->boardarray[orig_pieceR][orig_pieceC] = orig_piecetag;
                             piece->r = orig_pieceR;
                             piece->c = orig_pieceC;
-                            AddLegalMoves(list, piece->r, piece->c, x, y, board, IsCaptured, piece, opponentcapture, cpy_board);
+                            if(Check(board, player, opponent, (opponent->piecelist[King]->r)+1, (opponent->piecelist[King]->c)+1) == 1)
+                            {
+                                AddLegalMoves(list, piece->r, piece->c, x, y, board, IsCaptured, piece, opponentcapture, cpy_board, 1);
+                            }
+                            else
+                            {
+                                AddLegalMoves(list, piece->r, piece->c, x, y, board, IsCaptured, piece, opponentcapture, cpy_board, 0);
+                            }
                             if(IsCaptured == 1)
                             {
                                 cpy_board[x][y] = capturedpiece;
@@ -118,7 +135,7 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
     }/*end for*/
 }
 
-void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int dest_col, BOARD *board, int IsCaptured, PIECE *piece, PIECE *opponentcapture, char *cpy_board[8][8]){
+void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int dest_col, BOARD *board, int IsCaptured, PIECE *piece, PIECE *opponentcapture, char *cpy_board[8][8], int CheckMove){
     /*Adds move information into the given list, allocating space and making new entries; stores resulting board from making the move*/
     
     MOVE *new_entry = malloc(sizeof(MOVE));
@@ -144,6 +161,14 @@ void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int d
             {
                 new_entry->EnPassantStatus = temppiece->EnPassant;
             }
+        }
+        if(CheckMove == 1)
+        {
+            new_entry->CheckMove = 1;
+        }
+        else
+        {
+            new_entry->CheckMove = 0;
         }
         for(int i = 0; i < 8; i++)
         {
@@ -178,6 +203,14 @@ void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int d
             {
                 new_entry->EnPassantStatus = temppiece->EnPassant;
             }
+        }
+        if(CheckMove == 1)
+        {
+            new_entry->CheckMove = 1;
+        }
+        else
+        {
+            new_entry->CheckMove = 0;
         }
         for(int i = 0; i < 8; i++)
         {

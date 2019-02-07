@@ -63,8 +63,11 @@ int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent)
                         opponentcapture = CheckPiece(player, j+1, k+1);
                         opponent_r = opponentcapture->r;
                         opponent_c = opponentcapture->c;
-                        opponent_value = opponentcapture->value;
                         piecetag = board->boardarray[opponent_r][opponent_c];
+                        opponent_value = opponentcapture->value;
+                        opponentcapture->r = 9;
+                        opponentcapture->c = 9;
+                        opponentcapture->value = 0;
                     }
                     movereturn = MovePiece(board, player, piece, j, k);
                     if(movereturn == 1) // if the test move made puts/leaves the opponent in check
@@ -80,6 +83,13 @@ int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent)
                     }
                     else
                     {
+                        if(opponentcapture != NULL)
+                        {
+                            opponentcapture->r = opponent_r;
+                            opponentcapture->c = opponent_c;
+                            opponentcapture->value = opponent_value;
+                            board->boardarray[opponent_r][opponent_c] = piecetag;
+                        }
                         board->boardarray[j][k] = originaldesttag;
                         board->boardarray[originalR][originalC] = originalpiecetag;
                         piece->r = originalR;
@@ -267,7 +277,7 @@ int ThreeFoldRep (MOVELIST *movelist){
                 }
             }
         }
-        if (MoveCounter == 3){
+        if (MoveCounter == 2){
             return 1;
         }
         if(ReferenceMove->preventry == NULL)

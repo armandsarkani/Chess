@@ -44,6 +44,7 @@ struct move {
 	int score;
 	MOVELIST *next_level;
 	MOVELIST *prev_level;
+    int CheckMove; // check if the move puts the opponent in check
 	
 
 };
@@ -58,7 +59,7 @@ struct movelist {
 void getmoves(char *cpy_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppenent, MOVELIST *list);
 
 /*Adds move information into the given list, allocating space and making new entries; stores resulting board from making the move*/
-void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int dest_col, BOARD *board, int IsCaptured, PIECE *piece, PIECE *opponentcapture, char *cpy_board[8][8]);
+void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int dest_col, BOARD *board, int IsCaptured, PIECE *piece, PIECE *opponentcapture, char *cpy_board[8][8], int CheckMove);
 
 /*Creates a new move list*/
 MOVELIST *NewMoveList(void);

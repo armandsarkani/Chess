@@ -1,5 +1,6 @@
 //  Board.c
 //  Chesster Team 3
+//  Latest Version
 
 #include "Board.h"
 #include "Pieces.h"
@@ -94,9 +95,9 @@ int main()
                 break;
             }
         }
-        if (movelist -> length >= 11){
+        if (movelist -> length >= 3){
             if (ThreeFoldRep(movelist) == 1){
-                printf("Three Fold Repetition conditions have been met: Game is a Draw!\n");
+                printf("Threefold repetition conditions have been met: Game is a Draw!\n");
                 Log('\0', '\0', '\0', 0, 0, 0, 's');
                 IsGameOver = true;
                 break;
@@ -237,7 +238,7 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
             if(AImove->IsCaptured == 1)
             {
                 callreturn = 2;
-            }
+            } 
             piece = CheckPiece(player, row_src+1, col_src+1);
             temppiece->r = piece->r+1;
             temppiece->c = piece->c+1;
@@ -450,11 +451,25 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
         }
         if(callreturn == 2)
         {
-            AddLegalMoves(movelist, row_src, col_src, row_dest, col_dest, board, 1, temppiece, opponentcapture, board->boardarray);
+            if(CheckReturn == 1)
+            {
+                AddLegalMoves(movelist, row_src, col_src, row_dest, col_dest, board, 1, temppiece, opponentcapture, board->boardarray, 1);
+            }
+            else
+            {
+                AddLegalMoves(movelist, row_src, col_src, row_dest, col_dest, board, 1, temppiece, opponentcapture, board->boardarray, 0);
+            }
         }
         else
         {
-            AddLegalMoves(movelist, row_src, col_src, row_dest, col_dest, board, 0, temppiece, opponentcapture, board->boardarray);
+            if(CheckReturn == 1)
+            {
+                AddLegalMoves(movelist, row_src, col_src, row_dest, col_dest, board, 0, temppiece, opponentcapture, board->boardarray, 1);
+            }
+            else
+            {
+                AddLegalMoves(movelist, row_src, col_src, row_dest, col_dest, board, 0, temppiece, opponentcapture, board->boardarray, 0);
+            }
         }
         if(StalemateReturn == 1)
         {
@@ -529,19 +544,37 @@ int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc) 
     assert(piece);
     int tempR = piece->r;
     int tempC = piece->c;
+    /*int tempOppR = 0;
+    int tempOppC = 0;
+    int tempOppValue = 0;
+    char *tempOppPiecetag = NULL;
+    PIECE *opponentpiece = CheckPiece(opponent, newr+1, newc+1); */
     char *temp = board->boardarray[piece->r][piece->c];
     board->boardarray[newr][newc] = temp;
     board->boardarray[piece->r][piece->c] = "  ";
     piece->r = newr;
     piece->c = newc;
+   /* if(opponentpiece != NULL && opponentpiece->r != 9)
+    {
+        tempOppR = opponentpiece->r;
+        tempOppC = opponentpiece->c;
+        tempOppValue = opponentpiece->value;
+        tempOppPiecetag = board->boardarray[tempOppR][tempOppC];
+        CapturePiece(board, opponentpiece);
+    }*/
     if(Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1) == 1) // undo a move if in check
     {
+        //UndoCapture(board, opponentpiece, tempOppR, tempOppC, tempOppValue, tempOppPiecetag);
         board->boardarray[newr][newc] = "  ";
         board->boardarray[tempR][tempC] = temp;
         piece->r = tempR;
         piece->c = tempC;
         return 1;
     }
+    /*if(opponentpiece != NULL && opponentpiece->r != 9)
+    {
+        UndoCapture(board, opponentpiece, tempOppR, tempOppC, tempOppValue, tempOppPiecetag);
+    } */
     return 0;
 }
 int AlphatoNum(char alpha)
