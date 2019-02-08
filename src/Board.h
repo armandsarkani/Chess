@@ -43,7 +43,7 @@ struct Piece{
     int c;
     int value;
     int EnPassant; // 1 if eligible, 0 if not
-	int Castling;
+    int castling; // 1 if eligible, 0 if not
 };
 
 void InitializeBoard(BOARD *global);

@@ -335,7 +335,14 @@ void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int d
         new_entry->board = board;
         if(opponentcapture == NULL)
         {
-            temppiece = CheckPiece(piece->player, dest_row, dest_col);
+            if(piece->player->color == 'w')
+            {
+                temppiece = CheckPiece(board->black, dest_row, dest_col);
+            }
+            if(piece->player->color == 'b')
+            {
+                temppiece = CheckPiece(board->white, dest_row, dest_col);
+            }
             if(temppiece != NULL)
             {
                 new_entry->EnPassantStatus = temppiece->EnPassant;

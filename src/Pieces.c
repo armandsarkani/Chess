@@ -46,7 +46,7 @@ int MovePawn(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_
                     }
                     if(CheckPiece(opponent, dest_row, dest_col+1) != NULL || CheckPiece(opponent, dest_row, dest_col-1) != NULL)
                     {
-                            piece->EnPassant = 1;
+                        piece->EnPassant = 1;
                     }
                     return 0;
                 }
@@ -458,10 +458,15 @@ int MoveBishop(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int sr
 }
 int MoveKing(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int test_conditions)
 {
+    int check3Left = 0;
+    int check2Right = 0;
+    int check2Left = 0;
+    int check1Right = 0;
+    int check1Left = 0;
     if(FindEmptySpace(board, dest_row, dest_col) == 1 || CheckPiece(opponent, dest_row, dest_col) != NULL) // moving king to empty space or a capture space
     {
         if(((dest_row == src_row+1) && (dest_col == src_col-1)) || ((dest_row == src_row+1) && (dest_col == src_col)) || ((dest_row == src_row+1) && (dest_col == src_col+1)) || ((dest_row == src_row) && (dest_col == src_col-1)) || ((dest_row == src_row) && (dest_col == src_col+1)) || ((dest_row == src_row-1) && (dest_col == src_col-1)) || ((dest_row == src_row-1) && (dest_col == src_col)) || ((dest_row == src_row-1) && (dest_col == src_col+1)))
-
+            
         {
             if(CheckPiece(opponent, dest_row, dest_col) != NULL)
             {
@@ -473,96 +478,61 @@ int MoveKing(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_
                 }
                 return 2;
             }
-               return 0;
+            return 0;
         }
         //Castling
-        if(piece->Castling == 1 && Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1) != 1)
-            {
-            if((dest_row == src_row) && (dest_col == src_col+2) && piece->player->piecelist[Rook2]->Castling == 1) //Castle Kingside
-            {
-                //Checking Rules
-                if(FindEmptySpace(board, src_row, src_col+1) == 0)
-                {
-                        //printf("Piece in the way %s\n", board->boardarray[src_row+1][src_col]);
-                        //printf("Piece location %d %d\n", src_row+1, src_col);
-                    printf("Cannot Castle through Pieces. error 1\n");
-                    return 1;
-                }
-                for(int i = 0; i < dest_col; i++)
-                {
-                    int moveCheck = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1+i, (piece->player->piecelist[King]->c)+1);
-                    if( moveCheck == 1)
-                    {
-                        printf("Cannot Castle through Check.\n");
-                        return 1;
-                    }
-                }
-            
-            if(test_conditions == 1)
-            {
-              for(int i = 1; i < dest_col; i++)
-                {
-                    if(MovePiece(board, opponent, piece, src_row-1, src_col-1+i) == 1)
-                    {
-                        printf("Cannot Castle through Check.\n");
-                        return 1;
-                    }
-                }
-              //piece->Castling = 0;
-              //piece->player->piecelist[Rook2]->Castling = 0;
-              if(piece->player->color != 'b')
-              {
-                MovePiece(board, opponent, piece->player->piecelist[Rook2], 0, 5);
-                return 0;  
-              }
-              else
-              {  
-                MovePiece(board, opponent, piece->player->piecelist[Rook2], 7, 5);
-                return 0;  
-              }
-            }
-          }
-        
-        else if((dest_row == src_row) && (dest_col == src_col-2) && piece->player->piecelist[Rook1]->Castling == 1) //Castle Queenside
+        if(piece->castling == 1)
         {
+            if((dest_row == src_row) && (dest_col == src_col+2) && piece->player->piecelist[Rook2]->castling == 1) //Castle Kingside
+            {
                 //Checking Rules
-                if(FindEmptySpace(board, src_row, src_col-1) == 0 || FindEmptySpace(board, src_row, src_col-3) == 0)
+                if(FindEmptySpace(board, src_row, src_col+1) == 0 || FindEmptySpace(board, src_row, src_col+2) == 0) // castling prohibited through other pieces
                 {
-                    printf("Cannot Castle through Pieces.\n");
+                    printf("Castling is illegal with other pieces in the way.\n");
                     return 1;
                 }
-
-            if(test_conditions == 1)
-            {
-                for(int i = -1; i > dest_col; i--)
+                if(Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1) == 1) // castling prohibited while in of check
                 {
-                    if(MovePiece(board, opponent, piece, src_row-1, src_col-1+i) == 1)
-                    {
-                        printf("Cannot Castle through Check.\n");
-                        return 1;
-                    }
+                    return 1;
                 }
-                //piece->Castling = 0;
-                //piece->player->piecelist[Rook1]->Castling = 0;
-                if(piece->player->color != 'b')
+                check2Right = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+3); // castling prohibited through check
+                check1Right = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+2);
+                if(check2Right == 1 || check1Right == 1)
                 {
-                    MovePiece(board, opponent, piece->player->piecelist[Rook1], 0, 3);
-                    return 0;
+                    return 1;
                 }
-                else
-                {
-                    MovePiece(board, opponent, piece->player->piecelist[Rook1], 7, 3);
-                    return 0;
-                }
+                return 0;
+                
             }
-        }
+            
+            else if((dest_row == src_row) && (dest_col == src_col-2) && piece->player->piecelist[Rook1]->castling == 1) //Castle Queenside
+            {
+                //Checking Rules
+                if(FindEmptySpace(board, src_row, src_col-1) == 0 || FindEmptySpace(board, src_row, src_col-2) == 0 || FindEmptySpace(board, src_row, src_col-3) == 0) // castling prohibited through other pieces
+                {
+                    printf("Castling is illegal with other pieces in the way.\n");
+                    return 1;
+                }
+                if(Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1) == 1) // castling prohibited while in of check
+                {
+                    return 1;
+                }
+                check3Left = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)-2); // castling prohibited through check
+                check2Left = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)-1);
+                check1Left = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c));
+                if(check3Left == 1 || check2Left == 1 || check1Left == 1)
+                {
+                    return 1;
+                }
+                return 0;
+                
+            }
         }
         return 1;
     }
     else  // moving king to a space with your own piece
     {
         return 1;
-        
     }
 }
 int MoveQueen(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_col, int dest_row, int dest_col, int test_conditions)

@@ -1,7 +1,7 @@
 //  Board.c
 //  Chesster Team 3
 //  Latest Version
-// hello
+
 #include "Board.h"
 #include "Pieces.h"
 #include "Movegen.h"
@@ -228,6 +228,7 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
         int movereturn = 0;
         int promotion = 0;
         int EnPassant = 0;
+        int castling = 0;
         if (player->type == 'a') {
             //sleep(1);
             printf("AI's move: \n");
@@ -376,6 +377,36 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
                 continue;
             }
             originalpiecetag = board->boardarray[piece->r][piece->c];
+            if(piece->piecetype == 'K' && (row_dest == row_src) && (col_dest == col_src + 2))  // kingside castle
+            {
+                if(piece->player->color == 'w')
+                {
+                    MovePiece(board, opponent, piece, 0, 6);
+                    MovePiece(board, opponent, player->piecelist[Rook2], 0, 5);
+                }
+                else
+                {
+                    MovePiece(board, opponent, piece, 7, 6);
+                    MovePiece(board, opponent, player->piecelist[Rook2], 7, 5);
+                }
+                castling = 1;
+                printf("Kingside castle! \n");
+            }
+            else if(piece->piecetype == 'K' && (row_dest == row_src) && (col_dest == col_src - 2)) // queenside castle
+            {
+                if(piece->player->color == 'b')
+                {
+                    MovePiece(board, opponent, piece, 0, 2);
+                    MovePiece(board, opponent, player->piecelist[Rook1], 0, 3);
+                }
+                else
+                {
+                    MovePiece(board, opponent, piece, 7, 2);
+                    MovePiece(board, opponent, player->piecelist[Rook1], 7, 3);
+                }
+                castling = 1;
+                printf("Queenside castle! \n");
+            }
             if(opponentcapture != NULL && opponent_EP == 1 && piece->piecetype == 'P' && row_src == row_dest && ((col_dest == col_src + 1) || (col_dest == col_src -1)))
             {
                 printf("En passant pawn capture!\n");
@@ -395,7 +426,7 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
                 movelist->last->EnPassantStatus = 0;
                 printf("You missed an opportunity to perform an en passant capture!\n");
             }
-            if(EnPassant != 1)
+            if(EnPassant != 1 && castling != 1)
             {
                 movereturn = MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
             }
@@ -497,7 +528,27 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
     return 0;
     
 }
-
+int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc) // only called when the move is legal
+{
+    assert(piece);
+    piece->castling = 0;
+    int tempR = piece->r;
+    int tempC = piece->c;
+    char *temp = board->boardarray[piece->r][piece->c];
+    board->boardarray[newr][newc] = temp;
+    board->boardarray[piece->r][piece->c] = "  ";
+    piece->r = newr;
+    piece->c = newc;
+    if(Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1) == 1) // undo a move if in check
+    {
+        board->boardarray[newr][newc] = "  ";
+        board->boardarray[tempR][tempC] = temp;
+        piece->r = tempR;
+        piece->c = tempC;
+        return 1;
+    }
+    return 0;
+}
 PIECE *CreatePiece(BOARD *board, int r, int c, char piece, char color, PLAYER *player)
 {
     PIECE *p = malloc(sizeof(PIECE));
@@ -537,40 +588,19 @@ PIECE *CreatePiece(BOARD *board, int r, int c, char piece, char color, PLAYER *p
             break;
         case 'R':
             p->value = 5;
-            p->Castling = 1;
+            p->castling = 1;
             break;
         case 'Q':
             p->value = 9;
             break;
         case 'K':
             p->value = 90; //should really be infinity
-            p->Castling = 1;
+            p->castling = 1;
             break;
         default:
             break;
     }
     return p;
-}
-int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc) // only called when the move is legal
-{
-    assert(piece);
-    p->Castling = 0;
-    int tempR = piece->r;
-    int tempC = piece->c;
-    char *temp = board->boardarray[piece->r][piece->c];
-    board->boardarray[newr][newc] = temp;
-    board->boardarray[piece->r][piece->c] = "  ";
-    piece->r = newr;
-    piece->c = newc;
-    if(Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1) == 1) // undo a move if in check
-    {
-        board->boardarray[newr][newc] = "  ";
-        board->boardarray[tempR][tempC] = temp;
-        piece->r = tempR;
-        piece->c = tempC;
-        return 1;
-    }
-    return 0;
 }
 int AlphatoNum(char alpha)
 {
@@ -837,7 +867,3 @@ BOARD *CreateBoard(PLAYER *white, PLAYER *black, char *boardarray[8][8])
     }
     return board;
 }
-/*void UndoMove(MOVELIST *movelist)
-{
-    
-}*/
