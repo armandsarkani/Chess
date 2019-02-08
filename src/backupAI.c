@@ -16,14 +16,15 @@ MOVE *backupAI(BOARD *board, PLAYER *player, PLAYER *opponent){
     PIECE *piece;
     PIECE *piececaptured;
     MOVELIST *movelist;
-    MOVE *capturemove = NULL;
+    MOVE *bestmove = NULL;
     PIECE *tempcapture = NULL;
     movelist = NewMoveList(); /*allocate mem*/
     movelist->length = 0;
+    movelist->board = NULL;
     int value = 0;
     int score = 0;
-    //int success = 0;
     int bestscore = 0;
+    int checkvalue = 0;
     MOVE *tempmove;
     MOVE *blue = CreateMove();
     getmoves(board->boardarray, board, player, opponent, movelist);
@@ -31,37 +32,42 @@ MOVE *backupAI(BOARD *board, PLAYER *player, PLAYER *opponent){
     while (tempmove != NULL) {
         piece = tempmove->piece;
         value = tempmove->IsCaptured;
+        checkvalue = tempmove->CheckMove;
         if(value == 1) {
             piececaptured = tempmove->opponentcapture;
             score = piececaptured -> value;
+            if(checkvalue == 1)
+            {
+                score += 9;
+            }
             if(score > bestscore){
                 bestscore = score;
-                capturemove = tempmove;
+                bestmove = tempmove;
             }/*if end*/
         }/*if end*/
         tempmove = tempmove->nextentry;
     }/*while end*/
-    if(capturemove != NULL)
+    if(bestmove != NULL)
     {
-        tempcapture = capturemove->opponentcapture;
-        CapturePiece(board, capturemove->opponentcapture);
+        tempcapture = bestmove->opponentcapture;
+        CapturePiece(board, bestmove->opponentcapture);
     }
-    if(capturemove == NULL) { /*if no pieces can capture*/
+    if(bestmove == NULL) { /*if no pieces can capture*/
         /*generate a random move*/
         srand((unsigned)time(0));
         /*generate a random move or other type of move*/
-        capturemove = movelist->first;
+        bestmove = movelist->first;
         int randnum = rand() % (movelist->length);
         for(int a = 0; a < randnum; a++){
-            capturemove = capturemove->nextentry;
+            bestmove = bestmove->nextentry;
         } /*for end*/
     } /*if end*/
-    blue->src_row = capturemove->src_row;
-    blue->src_col = capturemove->src_col;
-    blue->dst_row = capturemove->dst_row;
-    blue->dst_col = capturemove->dst_col;
+    blue->src_row = bestmove->src_row;
+    blue->src_col = bestmove->src_col;
+    blue->dst_row = bestmove->dst_row;
+    blue->dst_col = bestmove->dst_col;
     blue->opponentcapture = tempcapture;
-    blue->IsCaptured = capturemove->IsCaptured;
+    blue->IsCaptured = bestmove->IsCaptured;
     blue->next_level = NULL;
     DeleteMoveList(movelist);
     return blue; /*at the end of the while loop it will return the highest valued capture move*/

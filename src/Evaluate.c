@@ -13,9 +13,9 @@ const int PawnTable[64] = {
     10    ,    10    ,    0    ,    -10    ,    -10    ,    0    ,    10    ,    10    ,
     5    ,    0    ,    0    ,    5    ,    5    ,    0    ,    0    ,    5    ,
     0    ,    0    ,    10    ,    20    ,    20    ,    10    ,    0    ,    0    ,
-    5    ,    5    ,    5    ,    10    ,    10    ,    5    ,    5    ,    5    ,
-    10    ,    10    ,    10    ,    20    ,    20    ,    10    ,    10    ,    10    ,
-    20    ,    20    ,    20    ,    30    ,    30    ,    20    ,    20    ,    20    ,
+    50    ,    5    ,    5    ,    20    ,    20    ,    5    ,    5    ,    50    ,
+    10    ,    30    ,    10    ,    50    ,    50    ,    15    ,    15    ,    15   ,
+    10    ,    10    ,    20    ,    20    ,    20    ,    20    ,    10    ,    10    ,
     0    ,    0    ,    0    ,    0    ,    0    ,    0    ,    0    ,    0
 };
 
@@ -329,14 +329,14 @@ int EvaluatePosition(MOVE *move, PIECE *piece, BOARD *board, PLAYER *player, PLA
     char piecetype = piece->piecetype;
     base_score = ReturnPosScore(piecetype, pos, piece);
     if(move->opponentcapture != NULL){
-        final_score = 400*base_score - CheckKillerMoves(move, piece, opponent, board) + 4*CheckCaptureMoves(move, piece, opponent, board) + CheckBeyondPiece(move, piece, opponent, board) + 400*(move->opponentcapture->value);
+        final_score = base_score - CheckKillerMoves(move, piece, opponent, board) + CheckCaptureMoves(move, piece, opponent, board) + CheckBeyondPiece(move, piece, opponent, board) + (move->opponentcapture->value);
         if( piece->piecetype == 'K'){
             //final_score = 0*base_score - 0*CheckKillerMoves(move, piece, opponent, board) + 0*CheckCaptureMoves(move, piece, opponent, board) + CheckBeyondPiece(move, piece, opponent, board) + 0*(move->opponentcapture->value);
             final_score = -final_score;
             
         }
     }else{
-        final_score = 400*base_score - CheckKillerMoves(move, piece, opponent, board) + 4*CheckCaptureMoves(move, piece, opponent, board) + CheckBeyondPiece(move, piece, opponent, board);
+        final_score = base_score - CheckKillerMoves(move, piece, opponent, board) + CheckCaptureMoves(move, piece, opponent, board) + CheckBeyondPiece(move, piece, opponent, board);
         if( piece->piecetype == 'K'){
             //final_score = 0*base_score - 0*CheckKillerMoves(move, piece, opponent, board) + 0*CheckCaptureMoves(move, piece, opponent, board) + CheckBeyondPiece(move, piece, opponent, board);
             final_score = -final_score;

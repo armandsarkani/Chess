@@ -12,10 +12,10 @@
 
 
 /*Things that need to be added:
-  	DeleteMoveList
-	DeleteMoveEntry
-	
-*/
+ DeleteMoveList
+ DeleteMoveEntry
+ 
+ */
 
 /*CallPiece testcondition:
  *
@@ -29,37 +29,39 @@ typedef struct movelist MOVELIST;
 #endif
 
 struct move {
-	int src_row;
-	int src_col;
-	int dst_row;
-	int dst_col;
-	MOVE *nextentry;
-	MOVE *preventry;
+    int src_row;
+    int src_col;
+    int dst_row;
+    int dst_col;
+    MOVE *nextentry;
+    MOVE *preventry;
     int IsCaptured; // 0 = no, 1 = yes
     PIECE *piece;
     PIECE *opponentcapture;
     int EnPassantStatus;
     BOARD *board;
     char *new_board[8][8];
-	int score;
-	MOVELIST *next_level;
-	MOVELIST *prev_level;
-    int CheckMove; // check if the move puts the opponent in check
-	
-
+    int score;
+    MOVELIST *next_level;
+    MOVELIST *prev_level;
+    int CheckMove;
+    int BadMove;
 };
+
 struct movelist {
-	MOVE *first;
-	MOVE *last;
+    MOVE *first;
+    MOVE *last;
     int length;
-	MOVE *prevmove;
-	BOARD *board;
+    MOVE *prevmove;
+    BOARD *board;
 };
 /*Adds entries for possible legal moves into a given list by evaluating a given board config and player perspective*/
-void getmoves(char *cpy_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppenent, MOVELIST *list);
+void getsmartmoves(char *cpy_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppenent, MOVELIST *list, int t_guard, int turn_counter, int king); // smart AI
+void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *list); // backup AI
+
 
 /*Adds move information into the given list, allocating space and making new entries; stores resulting board from making the move*/
-void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int dest_col, BOARD *board, int IsCaptured, PIECE *piece, PIECE *opponentcapture, char *cpy_board[8][8], int CheckMove);
+void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int dest_col, BOARD *board, int IsCaptured, PIECE *piece, PIECE *opponentcapture, char *cpy_board[8][8], int guard);
 
 /*Creates a new move list*/
 MOVELIST *NewMoveList(void);
@@ -85,5 +87,6 @@ void DeletePlayer(PLAYER *entry);
 /*Deletes a piece*/
 void DeletePiece(PIECE *piece);
 
+void DeleteInsertedMove(MOVE *entry);
 
 #endif

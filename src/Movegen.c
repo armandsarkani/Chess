@@ -11,6 +11,180 @@
  *                 accompanying header file movegen.h
  *                 */
 
+void getsmartmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *list, int t_guard, int turn_counter, int king){
+    int success = 0; /*if success = 0*/
+    int move;
+    int exit = 0;
+    int i,x,y,j,a;
+    int guard = 0;
+    PIECE *o_piece = NULL;
+    PIECE *opponentcapture = NULL;
+    int o_result = 1;
+    char *piecetag = NULL;
+    char *capturedpiece = NULL;
+    int IsCaptured = 0;
+    int opponent_r = 0, opponent_c = 0, opponent_value = 0;
+    char *cpy_board[8][8];
+    int CheckMove;
+    int piecestart, pieceend;
+    if(king != 0){
+        if(turn_counter < 2){
+            piecestart = 5;
+            pieceend = 3;
+        }
+        else
+        {
+            piecestart = 14;
+            pieceend = 0;
+        }
+    }
+    else
+    {
+        piecestart = 15;
+        pieceend = 15;
+    }
+    for (i = 0; i < 8; i++){/* copies board into a temp board*/
+        for (j = 0; j < 8; j++){
+            cpy_board[i][j] = org_board[i][j]; /*PLEASE DO NOT CHANGE THIS LINE*/
+            /*end for*/
+            /*end for*/
+        }
+    }
+    int test = 0;
+    for(i = piecestart; i >= pieceend; i--)
+    {
+        PIECE *piece = player->piecelist[i];
+        if(piece->r == 9 || piece->c == 9)
+        {
+            continue;
+        }
+        int orig_pieceR = piece->r;
+        int orig_pieceC = piece->c;
+        int orig_piecevalue = piece->value;
+        char *orig_piecetag = board->boardarray[orig_pieceR][orig_pieceC];
+        for (x = 0; x < 8; x++)
+        {
+            for (y = 0; y < 8; y++)
+            {
+                success = CallPiece(board, opponent, piece, (piece->r)+1, (piece->c)+1, x+1, y+1, 0);
+                if(success == 2)
+                {
+                    test = CallPiece(board, opponent, piece, (piece->r)+1, (piece->c)+1, x+1, y+1, 0);
+                }
+                if (success != 1) /*if CallPiece does not return a failure*/
+                {
+                    if(success == 2)
+                    {
+                        opponentcapture = CheckPiece(opponent, x+1, y+1);
+                        opponent_r = opponentcapture->r;
+                        opponent_c = opponentcapture->c;
+                        opponent_value = opponentcapture->value;
+                        piecetag = board->boardarray[opponent_r][opponent_c];
+                        guard = 1;
+                    }
+                    char *originaldesttag = board->boardarray[x][y];
+                    move = MovePiece(board, opponent, piece, x, y);/*makes move on cpyboard*/
+                    if(move == 1) // if check
+                    {
+                        if(success == 2)
+                        {
+                            UndoCapture(board, opponentcapture, opponent_r, opponent_c, opponent_value, piecetag);
+                        }
+                        if(piece->value == 1 && orig_piecevalue == 2)
+                        {
+                            piece->value = 2;
+                        }
+                        success = 0;
+                        move = 0;
+                        continue;
+                    }
+                    else
+                    {
+                        if(success == 2)
+                        {
+                            IsCaptured = 1;
+                            capturedpiece = cpy_board[opponentcapture->r][opponentcapture->c];
+                        }
+                        if(success != 2)
+                        {
+                            IsCaptured = 0;
+                        }
+                        if(CallPiece(board, opponent, piece, x+1, y+1, (opponent->piecelist[King]->r)+1,
+                                     (opponent->piecelist[King]->c)+1, 0) == 2){
+                            CheckMove = 1;
+                        }
+                        if(move == 0){
+                            if (t_guard == 1){
+                                for(a = 1; a < 16; a++){
+                                    o_piece = opponent->piecelist[a];
+                                    if(o_piece->r == 9){
+                                        continue;
+                                    }
+                                    o_result = CallPiece(board, player, o_piece, o_piece->r+1, o_piece->c+1, x+1, y+1, 0);
+                                    if(o_result == 0){
+                                        if((o_piece->value) < (piece->value)){
+                                            o_result = 1;
+                                            exit = 1;
+                                            break;
+                                        }
+                                        o_result = 0;
+                                    }
+                                }
+                            }
+                            if(exit == 0)
+                            {
+                                cpy_board[x][y] = orig_piecetag;
+                                cpy_board[orig_pieceR][orig_pieceC] = "  ";
+                                board->boardarray[x][y] = originaldesttag;
+                                board->boardarray[orig_pieceR][orig_pieceC] = orig_piecetag;
+                                piece->r = orig_pieceR;
+                                piece->c = orig_pieceC;
+                                AddLegalMoves(list, piece->r, piece->c, x, y, board, IsCaptured, piece, opponentcapture, cpy_board, guard);
+                                guard = 0;
+                                if(IsCaptured == 1)
+                                {
+                                    cpy_board[x][y] = capturedpiece;
+                                    cpy_board[orig_pieceR][orig_pieceC] = orig_piecetag;
+                                }
+                                else
+                                {
+                                    cpy_board[x][y] = "  ";
+                                    cpy_board[orig_pieceR][orig_pieceC] = orig_piecetag;
+                                }
+                            }
+                            else
+                            {
+                                cpy_board[x][y] = orig_piecetag;
+                                cpy_board[orig_pieceR][orig_pieceC] = "  ";
+                                board->boardarray[x][y] = originaldesttag;
+                                board->boardarray[orig_pieceR][orig_pieceC] = orig_piecetag;
+                                piece->r = orig_pieceR;
+                                piece->c = orig_pieceC;
+                                if(IsCaptured == 1)
+                                {
+                                    cpy_board[x][y] = capturedpiece;
+                                    cpy_board[orig_pieceR][orig_pieceC] = orig_piecetag;
+                                }
+                                else
+                                {
+                                    cpy_board[x][y] = "  ";
+                                    cpy_board[orig_pieceR][orig_pieceC] = orig_piecetag;
+                                }
+                                exit = 0;
+                            }
+                        }
+                    }
+                    
+                }
+            }
+            guard = 0;
+            move = 0;
+            success = 0;
+            continue;
+        }
+    }
+    /*end for*/
+}/*end for*/
 
 void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *list){
     int success = 0; /*if success = 0*/
@@ -19,6 +193,7 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
     PIECE *opponentcapture = NULL;
     char *piecetag = NULL;
     char *capturedpiece = NULL;
+    int CheckMove = 0;
     int IsCaptured = 0;
     int opponent_r = 0, opponent_c = 0, opponent_value = 0;
     char *cpy_board[8][8];
@@ -90,6 +265,10 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
                         {
                             IsCaptured = 0;
                         }
+                        if(CallPiece(board, opponent, piece, x+1, y+1, (opponent->piecelist[King]->r)+1, (opponent->piecelist[King]->c)+1, 0) == 2)
+                        {
+                            CheckMove = 1;
+                        }
                         if(move == 0){
                             if(opponentcapture != NULL)
                             {
@@ -104,14 +283,7 @@ void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppon
                             board->boardarray[orig_pieceR][orig_pieceC] = orig_piecetag;
                             piece->r = orig_pieceR;
                             piece->c = orig_pieceC;
-                            if(Check(board, player, opponent, (opponent->piecelist[King]->r)+1, (opponent->piecelist[King]->c)+1) == 1)
-                            {
-                                AddLegalMoves(list, piece->r, piece->c, x, y, board, IsCaptured, piece, opponentcapture, cpy_board, 1);
-                            }
-                            else
-                            {
-                                AddLegalMoves(list, piece->r, piece->c, x, y, board, IsCaptured, piece, opponentcapture, cpy_board, 0);
-                            }
+                            AddLegalMoves(list, piece->r, piece->c, x, y, board, IsCaptured, piece, opponentcapture, cpy_board, CheckMove);
                             if(IsCaptured == 1)
                             {
                                 cpy_board[x][y] = capturedpiece;
@@ -151,7 +323,14 @@ void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int d
         new_entry->dst_col = dest_col;
         new_entry->IsCaptured = IsCaptured;
         new_entry->piece = piece;
-        new_entry->opponentcapture = opponentcapture;
+        if(opponentcapture == NULL)
+        {
+            new_entry->opponentcapture = NULL;
+        }
+        else
+        {
+            new_entry->opponentcapture = opponentcapture;
+        }
         new_entry->score = 0;
         new_entry->board = board;
         if(opponentcapture == NULL)
@@ -193,7 +372,14 @@ void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int d
         new_entry->dst_col = dest_col;
         new_entry->IsCaptured = IsCaptured;
         new_entry->piece = piece;
-        new_entry->opponentcapture = opponentcapture;
+        if(opponentcapture == NULL)
+        {
+            new_entry->opponentcapture = NULL;
+        }
+        else
+        {
+            new_entry->opponentcapture = opponentcapture;
+        }
         new_entry->score = 0;
         new_entry->board = board;
         if(opponentcapture == NULL)
@@ -332,6 +518,34 @@ void DeletePiece(PIECE *piece){
     free(piece);
     piece = NULL;
 }
+
+void DeleteInsertedMove(MOVE *entry){
+    assert(entry);
+    if(entry->preventry == NULL){
+        entry->nextentry->preventry = NULL;
+        entry->prev_level->first = entry->nextentry;
+        entry->prev_level->length--;
+        entry->prev_level = NULL;
+        entry->next_level = NULL;
+        free(entry);
+    }else if(entry->nextentry == NULL){
+        entry->preventry->nextentry = NULL;
+        entry->prev_level->last = entry->preventry;
+        entry->prev_level->length--;
+        entry->prev_level = NULL;
+        entry->next_level = NULL;
+        free(entry);
+    }else{
+        entry->preventry->nextentry = entry->nextentry;
+        entry->nextentry->preventry = entry->preventry;
+        entry->prev_level->length--;
+        entry->prev_level = NULL;
+        entry->next_level = NULL;
+        free(entry);
+    }
+}
+
+
 
 
 

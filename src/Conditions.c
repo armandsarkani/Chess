@@ -32,6 +32,10 @@ int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent)
     for(int i = Pawn1; i <= King; i++)
     {
         piece = opponent->piecelist[i];
+        if(piece->value == 0) // captured piece cannot be moved to save the king
+        {
+            continue;
+        }
         originalR = piece->r;
         originalC = piece->c;
         originalpiecetag = board->boardarray[piece->r][piece->c];
@@ -42,10 +46,6 @@ int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent)
         opponent_c = 0;
         opponent_value = 0;
         piecetag = NULL;
-        if(piece->value == 0) // captured piece cannot be moved to save the king
-        {
-            continue;
-        }
         for(int j = 0; j < 8; j++)
         {
             for(int k = 0; k < 8; k++)
@@ -101,12 +101,6 @@ int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent)
                 
             }
         }
-    }
-    if(originalpiecetag != NULL){
-        //free(originalpiecetag);
-    }
-    if(piecetag != NULL){
-        //free(piecetag);
     }
     return 1;
 }

@@ -9,7 +9,7 @@
 //  //
 #include "AI.h"
 
-MOVE *AI(BOARD *board, PLAYER *AI, PLAYER *human){
+MOVE *AI(BOARD *board, PLAYER *AI, PLAYER *human, int turn_counter){
     MOVELIST *list = NewMoveList();
     int AI_tracker = 1; /*keep track of who's turn it is*/
     
@@ -33,20 +33,60 @@ MOVE *AI(BOARD *board, PLAYER *AI, PLAYER *human){
         black->piecelist[i]->r = board->black->piecelist[i]->r;
         black->piecelist[i]->value = board->black->piecelist[i]->value;
     }
-    getmoves(board->boardarray, board, AI, human, list); /*first layer of list created*/
-    
+    getsmartmoves(board->boardarray, board, AI, human, list, 1, turn_counter, 1); /*first layer of list created*/
+    if(list->first == NULL){
+        getsmartmoves(board->boardarray, board, AI, human, list, 0, turn_counter, 1);
+    }
+    if(list->first == NULL){
+        getsmartmoves(board->boardarray, board, AI, human, list, 0, turn_counter, 0);
+    }
     MOVE *temp = NULL;
     MOVE *bestmove = NULL;
     MOVE *blue = CreateMove();
     temp = list -> first;
     
     int bestscore = -999999999;
-    int alpha = -90000;
-    int beta = 90000;
-    int depth = 2;
+    int alpha = -900000000;
+    int beta = 900000000;
+    int depth = 1;
     
+    if(turn_counter < 2){
+        depth = 2;
+    }else{
+        depth = 5;
+    }
+    
+    MOVE *next = NULL;
+    int list_delete_tracker = 0;
+    int ldt_guard = 0;
     while (temp != NULL) {
-        temp->score = NegaMax(depth, temp, alpha, beta, AI_tracker); /*Negamax (recursive func) will return the best score for that move*/
+        temp->score = NegaMax(depth, temp, alpha, beta, AI_tracker, turn_counter+1, ldt_guard); /*Negamax (recursive func) will return the best score for that move*/
+        next = temp->nextentry;
+        if (temp->BadMove == 1){
+            list_delete_tracker++;
+        }
+        temp = temp->nextentry;
+    } /*while end*/
+    if(list_delete_tracker == list->length){
+        ldt_guard = 1;
+    }
+    else{
+        ldt_guard = 2;
+    }
+    temp = list->first;
+    while (temp != NULL) {
+        next = temp->nextentry;
+        if (ldt_guard == 0){
+            if (temp->BadMove == 0){
+                DeleteInsertedMove(temp);
+                temp = next;
+                next = temp->nextentry;
+                if(next == NULL){
+                    break;
+                }
+            }
+        }
+        temp->score = NegaMax(depth, temp, alpha, beta, AI_tracker, turn_counter+1, ldt_guard); /*Negamax (recursive func) will return the best score for that move*/
         if ((temp->score) > bestscore){
             bestscore = temp->score;
             bestmove = temp;
@@ -58,18 +98,16 @@ MOVE *AI(BOARD *board, PLAYER *AI, PLAYER *human){
     blue->dst_row = bestmove->dst_row;
     blue->dst_col = bestmove->dst_col;
     blue->IsCaptured = bestmove->IsCaptured;
+    blue->opponentcapture = bestmove->opponentcapture;
     blue->next_level = NULL;
     blue->nextentry = NULL;
     
     
-    //free((list->board));
-    //list->board = NULL;
     DeleteMoveList(list);
     return blue;
 }/*EOF*/
 // Pass in the first layers possible moves
-int NegaMax(int depth, MOVE *origmove, int alpha, int beta, int AI_tracker)
-{
+int NegaMax(int depth, MOVE *origmove, int alpha, int beta, int AI_tracker, int turn_counter, int ldt_guard){
     
     origmove->next_level = NewMoveList(); //create a new Movelist for the next layer
     PIECE *piece = origmove->opponentcapture;
@@ -114,7 +152,6 @@ int NegaMax(int depth, MOVE *origmove, int alpha, int beta, int AI_tracker)
                     white->piecelist[i]->r = 9;
                     white->piecelist[i]->c = 9;
                     white->piecelist[i]->value = 0;
-                    
                 }
             }
             else if(piece->player == black)
@@ -131,14 +168,17 @@ int NegaMax(int depth, MOVE *origmove, int alpha, int beta, int AI_tracker)
     
     origmove->next_level->prevmove = origmove; /*set the new layer's movelist prevmove to point to the orig move*/
     PLAYER *player, *opponent;
+    int ldt_2 = 2;
     if ((AI_tracker % 2) == 1){ /*keep track of which player's turn it is down the list*/
         if(origmove->prev_level->board->white->type == 'a'){
             player = white;
             opponent = black;
+            ldt_2 = 0;
         }
         else {
             player = black;
             opponent = white;
+            ldt_2 = 0;
         }
     } else {
         if(origmove->prev_level->board->white->type == 'a'){
@@ -159,38 +199,31 @@ int NegaMax(int depth, MOVE *origmove, int alpha, int beta, int AI_tracker)
     MOVE *temp = NULL;
     MOVELIST *movelist = origmove->next_level;
     /*newly created Movelist (line 59) is assigned to the next layer*/
-    getmoves(origmove->new_board, origmove->next_level->board, opponent, player, movelist); /*get legal moves for the passed in origmove*/
-    /*int move, success;
-     int x,y;
-     temp = movelist -> first;
-     if(player->type == 'a'){ //NEEDS WORK
-     while(temp){
-     for(x = 0; x < 8; x++){
-     for(y = 0; y < 8; y++){
-     move = MovePiece(origmove->next_level->board, player, temp->piece, temp->dst_row, temp->dst_col);//makes move on cpyboard
-     if(move == 1) // if check
-     {
-     success = CallPiece(origmove->next_level->board, player, temp->piece, temp->src_row+1, temp->src_col+1, temp->dst_row+1, temp->dst_col+1, 0);
-     if(success == 2)
-     {
-     UndoCapture(, temp->opponentcapture, temp->opponentcapture->r, temp->opponentcapture->c, temp->opponentcapture->value, temp->opponentcapture->piecetype);
-     }
-     if(piece->value == 1 && orig_piecevalue == 2)
-     {
-     piece->value = 2;
-     }
-     success = 0;
-     move = 0;
-     continue;
-     }
-     }
-     }
-     }
-     
-     }*/
+    getsmartmoves(origmove->new_board, origmove->next_level->board, opponent, player, movelist, 1, turn_counter, 1); /*get legal moves for the passed in origmove*/
+    if(movelist->first == NULL){
+        getsmartmoves(origmove->new_board, origmove->next_level->board, opponent, player, movelist, 0, turn_counter, 1); /*get legal moves for the passed in origmove*/
+    }
+    if(movelist->first == NULL){
+        getsmartmoves(origmove->new_board, origmove->next_level->board, opponent, player, movelist, 0, turn_counter, 0); /*get legal moves for the passed in origmove*/
+    }
     temp = movelist -> first;
+    MOVE *next = NULL;
+    if(ldt_guard == 0){
+        while(temp){
+            next = temp->nextentry;
+            if(AI_tracker == 1){
+                if(temp->CheckMove == 1){
+                    temp->BadMove = 1;
+                    return 0;
+                }
+            }
+            temp = next;
+        }
+    }
+    
     while (temp) {
-        temp->score = -(NegaMax((depth-1), temp, -beta, -alpha, (AI_tracker + 1)));
+        temp->score = -(NegaMax((depth-1), temp, -beta, -alpha, (AI_tracker + 1), turn_counter + 1, ldt_2));
+        
         if ((temp->score) >= beta){
             return beta; /*alpha beta pruning: if temp->score >= beta then that branch will be deleted*/
         }
@@ -205,8 +238,7 @@ int NegaMax(int depth, MOVE *origmove, int alpha, int beta, int AI_tracker)
         temp = temp->nextentry;
     } /*while
        end*/
-    //printf("Alpha %d \n", alpha);
+    printf("Alpha %d \n", alpha);
     return alpha;
-    
 } /*EOF*/
 
