@@ -481,25 +481,39 @@ int MoveKing(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_
             return 0;
         }
         //Castling
-        if(piece->castling == 1)
+        if(piece->castling == 1 && test_conditions !=2)
         {
             if((dest_row == src_row) && (dest_col == src_col+2) && piece->player->piecelist[Rook2]->castling == 1) //Castle Kingside
             {
                 //Checking Rules
                 if(FindEmptySpace(board, src_row, src_col+1) == 0 || FindEmptySpace(board, src_row, src_col+2) == 0) // castling prohibited through other pieces
                 {
-                    printf("Castling is illegal with other pieces in the way.\n");
-                    return 1;
+                    if(piece->player->type == 'h' && test_conditions == 1)
+                    {
+                        printf("Castling is illegal with other pieces in the way.\n");
+                        return 1;
+                    }
                 }
-                if(Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1) == 1) // castling prohibited while in of check
+                if(Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1) == 1) // castling prohibited while in check
                 {
-                    return 1;
+                    if(piece->player->type == 'h' && test_conditions == 1)
+                    {
+                        printf("You cannot castle while in check. \n");
+                        return 1;
+                    }
                 }
-                check2Right = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+3); // castling prohibited through check
-                check1Right = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+2);
+                piece->player->piecelist[King]->c = piece->player->piecelist[King]->c+2;
+                check2Right = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1); // castling prohibited through check
+                piece->player->piecelist[King]->c = piece->player->piecelist[King]->c-1;
+                check1Right = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1);
+                piece->player->piecelist[King]->c = piece->player->piecelist[King]->c-1;
                 if(check2Right == 1 || check1Right == 1)
                 {
-                    return 1;
+                    if(piece->player->type == 'h' && test_conditions == 1)
+                    {
+                        printf("You cannot castle through check. \n");
+                        return 1;
+                    }
                 }
                 return 0;
                 
@@ -510,19 +524,34 @@ int MoveKing(BOARD *board, PLAYER *opponent, PIECE *piece, int src_row, int src_
                 //Checking Rules
                 if(FindEmptySpace(board, src_row, src_col-1) == 0 || FindEmptySpace(board, src_row, src_col-2) == 0 || FindEmptySpace(board, src_row, src_col-3) == 0) // castling prohibited through other pieces
                 {
-                    printf("Castling is illegal with other pieces in the way.\n");
-                    return 1;
+                    if(piece->player->type == 'h' && test_conditions == 1)
+                    {
+                        printf("Castling is illegal with other pieces in the way.\n");
+                        return 1;
+                    }
                 }
                 if(Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1) == 1) // castling prohibited while in of check
                 {
-                    return 1;
+                    if(piece->player->type == 'h' && test_conditions == 1)
+                    {
+                        printf("You cannot castle while in check. \n");
+                        return 1;
+                    }
                 }
-                check3Left = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)-2); // castling prohibited through check
-                check2Left = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)-1);
-                check1Left = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c));
+                piece->player->piecelist[King]->c = piece->player->piecelist[King]->c-3;
+                check3Left = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1); // castling prohibited through check
+                piece->player->piecelist[King]->c = piece->player->piecelist[King]->c+1;
+                check2Left = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1);
+                piece->player->piecelist[King]->c = piece->player->piecelist[King]->c+1;
+                check1Left = Check(board, opponent, piece->player, (piece->player->piecelist[King]->r)+1, (piece->player->piecelist[King]->c)+1);
+                piece->player->piecelist[King]->c = piece->player->piecelist[King]->c+1;
                 if(check3Left == 1 || check2Left == 1 || check1Left == 1)
                 {
-                    return 1;
+                    if(piece->player->type == 'h' && test_conditions == 1)
+                    {
+                        printf("You cannot castle through check. \n");
+                        return 1;
+                    }
                 }
                 return 0;
                 

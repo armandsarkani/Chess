@@ -39,6 +39,7 @@ struct move {
     PIECE *piece;
     PIECE *opponentcapture;
     int EnPassantStatus;
+    int CastlingStatus;
     BOARD *board;
     char *new_board[8][8];
     int score;
@@ -46,6 +47,7 @@ struct move {
     MOVELIST *prev_level;
     int CheckMove;
     int BadMove;
+    int PossibleEzMove;
 };
 
 struct movelist {
@@ -56,12 +58,12 @@ struct movelist {
     BOARD *board;
 };
 /*Adds entries for possible legal moves into a given list by evaluating a given board config and player perspective*/
-void getsmartmoves(char *cpy_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppenent, MOVELIST *list, int t_guard, int turn_counter, int king); // smart AI
+void getsmartmoves(char *cpy_board[8][8], BOARD *board, PLAYER *player, PLAYER *oppenent, MOVELIST *list, int t_guard, int turn_counter, int king, int shawty); // smart AI
 void getmoves(char *org_board[8][8], BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *list); // backup AI
 
 
 /*Adds move information into the given list, allocating space and making new entries; stores resulting board from making the move*/
-void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int dest_col, BOARD *board, int IsCaptured, PIECE *piece, PIECE *opponentcapture, char *cpy_board[8][8], int guard);
+void AddLegalMoves(MOVELIST *list, int src_row, int src_col, int dest_row, int dest_col, BOARD *board, int IsCaptured, PIECE *piece, PIECE *opponentcapture, char *cpy_board[8][8], int CheckMove, int castling);
 
 /*Creates a new move list*/
 MOVELIST *NewMoveList(void);
@@ -88,5 +90,8 @@ void DeletePlayer(PLAYER *entry);
 void DeletePiece(PIECE *piece);
 
 void DeleteInsertedMove(MOVE *entry);
+
+void BadMove(MOVE *move);
+
 
 #endif

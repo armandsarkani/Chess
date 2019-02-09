@@ -20,8 +20,8 @@ ASCII: Chess
 GUI: GTK_chess
 
 
-Chess: Board.o Pieces.o backupAI.o Movegen.o Conditions.o
-	$(CC) $(LFLAGS) Board.o Pieces.o backupAI.o Movegen.o Conditions.o -o Chess
+Chess: Board.o Pieces.o backupAI.o Movegen.o Conditions.o AI.o Evaluate.o
+	$(CC) $(LFLAGS) Board.o Pieces.o backupAI.o Movegen.o Conditions.o AI.o Evaluate.o -o Chess
 
 Board.o: Board.c Board.h Pieces.h backupAI.h Movegen.h Conditions.h
 	$(CC) $(CFLAGS) Board.c -o Board.o
@@ -31,6 +31,12 @@ Pieces.o: Pieces.c Pieces.h Board.h Conditions.h
 
 backupAI.o: backupAI.c backupAI.h Pieces.h Board.h Movegen.h Conditions.h
 	$(CC) $(CFLAGS) backupAI.c -o backupAI.o
+
+AI.o: AI.c AI.h Board.h Pieces.h Movegen.h Evaluate.h Conditions.h
+	$(CC) $(CFLAGS) AI.c -o AI.o
+
+Evaluate.o: Evaluate.c Evaluate.h Board.h Pieces.h Movegen.h
+	$(CC) $(CFLAGS) Evaluate.c -o Evaluate.o
 
 Movegen.o: Movegen.c Movegen.h Pieces.h Board.h Conditions.h
 	$(CC) $(CFLAGS) Movegen.c -o Movegen.o

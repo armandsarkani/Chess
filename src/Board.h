@@ -50,7 +50,7 @@ void InitializeBoard(BOARD *global);
 void DrawBoard(BOARD *board);
 int MakeMove(BOARD *board, PLAYER *p, PLAYER *opponent, MOVELIST *movelist);
 PIECE *CreatePiece(BOARD *board, int r, int c, char piece, char color, PLAYER *player);
-int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc);
+int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc, int CastlingGuard);
 int AlphatoNum(char alpha);
 char NumtoAlpha(int num);
 char *PieceName(char piecename);
@@ -58,7 +58,7 @@ PIECE *CheckPiece(PLAYER *p, int r, int c);
 int FindEmptySpace(BOARD *board, int r, int c);
 BOARD *CreateBoard(PLAYER *human, PLAYER *AI, char *boardarray[8][8]);
 BOARD *CreateAIBoard(PLAYER *white, PLAYER *black, char *boardarray[8][8]);
-FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured, int CheckReturn, char info);
+FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured, int CheckReturn, char info, int castling);
 
 
 #endif /* Board_h */

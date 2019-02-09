@@ -8,6 +8,10 @@ int Check(BOARD *board, PLAYER *player, PLAYER *opponent, int king_row, int king
     int piecereturn = 0;
     for(int i = Pawn1; i <= King; i++)
     {
+        if(player->piecelist[i]->r == 9)
+        {
+            continue;
+        }
         piecereturn = CallPiece(board, opponent, player->piecelist[i], (player->piecelist[i]->r)+1, (player->piecelist[i]->c)+1, king_row, king_col, 0);
         if(piecereturn == 2)
         {
@@ -69,7 +73,7 @@ int Checkmate(BOARD *board, PLAYER *player, PLAYER *opponent)
                         opponentcapture->c = 9;
                         opponentcapture->value = 0;
                     }
-                    movereturn = MovePiece(board, player, piece, j, k);
+                    movereturn = MovePiece(board, player, piece, j, k, 0);
                     if(movereturn == 1) // if the test move made puts/leaves the opponent in check
                     {
                         if(IsLegalMove == 2) // if move is a potential capture move, reset captures and value updates
@@ -224,7 +228,7 @@ int CheckNumberofIllegalMoves(BOARD *board, PLAYER *opponent, PIECE *piece, int 
     {
         for(int j = 1; j <= 8; j++)
         {
-            if(CallPiece(board, opponent, piece, row_src, col_src, i, j, 0) == 1)
+            if(CallPiece(board, opponent, piece, row_src, col_src, i, j, 2) == 1)
             {
                 counter++;
             }

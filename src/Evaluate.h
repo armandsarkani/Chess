@@ -43,4 +43,12 @@ int ReturnPosScore(char piecetype, int pos, PIECE *piece);
 int BoardtoPSQTable(int row, int col);
 /*returns the square that the piece is on*/
 
+int CheckCapturePosition(MOVE *move);
+
+int CheckOppPawnCapture(MOVE *move);
+
+int CheckPawnOutPost(MOVE *move);
+
+int CheckSynergy(void);
+
 #endif

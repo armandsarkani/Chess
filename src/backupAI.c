@@ -33,6 +33,19 @@ MOVE *backupAI(BOARD *board, PLAYER *player, PLAYER *opponent){
         piece = tempmove->piece;
         value = tempmove->IsCaptured;
         checkvalue = tempmove->CheckMove;
+        if(tempmove->CastlingStatus == 1 || tempmove->CastlingStatus == 2)
+        {
+            bestmove = tempmove;
+            blue->src_row = bestmove->src_row;
+            blue->src_col = bestmove->src_col;
+            blue->dst_row = bestmove->dst_row;
+            blue->dst_col = bestmove->dst_col;
+            blue->opponentcapture = tempcapture;
+            blue->IsCaptured = bestmove->IsCaptured;
+            blue->next_level = NULL;
+            DeleteMoveList(movelist);
+            return blue;
+        }
         if(value == 1) {
             piececaptured = tempmove->opponentcapture;
             score = piececaptured -> value;

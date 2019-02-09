@@ -70,7 +70,7 @@ int main()
             if(move == 2)
             {
                 printf("Game over! White wins by checkmate!\n");
-                Log('\0', '\0', '\0', 0, 0, 0, 'w'); // white wins
+                Log('\0', '\0', '\0', 0, 0, 0, 'w', 0); // white wins
                 IsGameOver = true;
                 break;
             }
@@ -83,14 +83,14 @@ int main()
         if(move == 3)
         {
             printf("This game has ended in a stalemate! \n");
-            Log('\0', '\0', '\0', 0, 0, 0, 's'); // stalemate
+            Log('\0', '\0', '\0', 0, 0, 0, 's', 0); // stalemate
             IsGameOver = true;
             break;
         }
         if (movelist -> length >= 50){
             if (FiftyConsec(movelist) == 1){
                 printf("Fifty Turn Rule conditions have been met: Game is a Draw!\n");
-                Log('\0', '\0', '\0', 0, 0, 0, 's');
+                Log('\0', '\0', '\0', 0, 0, 0, 's', 0);
                 IsGameOver = true;
                 break;
             }
@@ -98,7 +98,7 @@ int main()
         if (movelist -> length >= 3){
             if (ThreeFoldRep(movelist) == 1){
                 printf("Threefold repetition conditions have been met: Game is a Draw!\n");
-                Log('\0', '\0', '\0', 0, 0, 0, 's');
+                Log('\0', '\0', '\0', 0, 0, 0, 's', 0);
                 IsGameOver = true;
                 break;
             }
@@ -110,7 +110,7 @@ int main()
             if(move == 2)
             {
                 printf("Game over! Black wins by checkmate!\n");
-                Log('\0', '\0', '\0', 0, 0, 0, 'b'); // black wins
+                Log('\0', '\0', '\0', 0, 0, 0, 'b', 0); // black wins
                 IsGameOver = true;
                 break;
             }
@@ -123,14 +123,14 @@ int main()
         if(move == 3)
         {
             printf("This game has ended in a stalemate! \n");
-            Log('\0', '\0', '\0', 0, 0, 0, 's'); // stalemate
+            Log('\0', '\0', '\0', 0, 0, 0, 's', 0); // stalemate
             IsGameOver = true;
             break;
         }
         if (movelist -> length >= 50){
                 if (FiftyConsec(movelist) == 1){
                         printf("Fifty Turn Rule conditions have been met: Game is a Draw!\n");
-                        Log('\0', '\0', '\0', 0, 0, 0, 's');
+                        Log('\0', '\0', '\0', 0, 0, 0, 's', 0);
                         IsGameOver = true;
                         break;
                 }
@@ -138,7 +138,7 @@ int main()
         if (movelist -> length >= 3){
             if (ThreeFoldRep(movelist) == 1){
                 printf("Three Fold Repetition conditions have been met: Game is a Draw!\n");
-                Log('\0', '\0', '\0', 0, 0, 0, 's');
+                Log('\0', '\0', '\0', 0, 0, 0, 's', 0);
                 IsGameOver = true;
                 break;
             }
@@ -230,10 +230,10 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
         int EnPassant = 0;
         int castling = 0;
         if (player->type == 'a') {
-            //sleep(1);
+            sleep(1);
             printf("AI's move: \n");
-            //MOVE *AImove = AI(board, player, opponent, movelist->length/2);
-            MOVE *AImove = backupAI(board, player, opponent);
+            MOVE *AImove = AI(board, player, opponent, movelist->length/2);
+            //MOVE *AImove = backupAI(board, player, opponent);
             row_src = AImove->src_row;
             col_src = AImove->src_col;
             row_dest = AImove->dst_row;
@@ -259,10 +259,14 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
             char *piecename = PieceName(piece->piecetype);
             opponentcapture = AImove->opponentcapture;
             opponentsmartcapture = CheckPiece(opponent, row_dest, col_dest);
-            if(opponentcapture != NULL)
+            /*if(opponentcapture != NULL) // for backup AI
             {
-                // CapturePiece(board, opponentcapture);
                 opponent_EP = opponentcapture->EnPassant;
+            }*/
+            if(opponentsmartcapture != NULL) // for smart AI
+            {
+                CapturePiece(board, opponentsmartcapture);
+                opponent_EP = opponentsmartcapture->EnPassant;
             }
             if(piece->value == 2)
             {
@@ -272,14 +276,14 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
             {
                 if(piece->player->color == 'w')
                 {
-                    MovePiece(board, opponent, piece, row_dest, col_dest-1);
+                    MovePiece(board, opponent, piece, row_dest, col_dest-1, 1);
                     printf("The AI has made an en passant capture on you!\n");
                     printf("%s moved from %c%d to %c%d\n", piecename, cCol_src, row_src, cCol_dest, row_dest+1);
                     EnPassant = 1;
                 }
                 else
                 {
-                    MovePiece(board, opponent, piece, row_dest-2, col_dest-1);
+                    MovePiece(board, opponent, piece, row_dest-2, col_dest-1, 1);
                     printf("The AI has made an en passant capture on you!\n");
                     printf("%s moved from %c%d to %c%d\n", piecename, cCol_src, row_src, cCol_dest, row_dest-1);
                     EnPassant = 1;
@@ -287,7 +291,7 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
             }
             if(EnPassant != 1)
             {
-                MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
+                MovePiece(board, opponent, piece, row_dest-1, col_dest-1, 1);
             }
             if(movelist->last != NULL && movelist->last->EnPassantStatus == 1)
             {
@@ -381,13 +385,13 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
             {
                 if(piece->player->color == 'w')
                 {
-                    MovePiece(board, opponent, piece, 0, 6);
-                    MovePiece(board, opponent, player->piecelist[Rook2], 0, 5);
+                    MovePiece(board, opponent, piece, 0, 6, 1);
+                    MovePiece(board, opponent, player->piecelist[Rook2], 0, 5, 1);
                 }
                 else
                 {
-                    MovePiece(board, opponent, piece, 7, 6);
-                    MovePiece(board, opponent, player->piecelist[Rook2], 7, 5);
+                    MovePiece(board, opponent, piece, 7, 6, 1);
+                    MovePiece(board, opponent, player->piecelist[Rook2], 7, 5, 1);
                 }
                 castling = 1;
                 printf("Kingside castle! \n");
@@ -396,15 +400,15 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
             {
                 if(piece->player->color == 'b')
                 {
-                    MovePiece(board, opponent, piece, 0, 2);
-                    MovePiece(board, opponent, player->piecelist[Rook1], 0, 3);
+                    MovePiece(board, opponent, piece, 7, 2, 1);
+                    MovePiece(board, opponent, player->piecelist[Rook1], 7, 3, 1);
                 }
                 else
                 {
-                    MovePiece(board, opponent, piece, 7, 2);
-                    MovePiece(board, opponent, player->piecelist[Rook1], 7, 3);
+                    MovePiece(board, opponent, piece, 0, 2, 1);
+                    MovePiece(board, opponent, player->piecelist[Rook1], 0, 3, 1);
                 }
-                castling = 1;
+                castling = 2;
                 printf("Queenside castle! \n");
             }
             if(opponentcapture != NULL && opponent_EP == 1 && piece->piecetype == 'P' && row_src == row_dest && ((col_dest == col_src + 1) || (col_dest == col_src -1)))
@@ -412,12 +416,12 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
                 printf("En passant pawn capture!\n");
                 if(piece->player->color == 'w')
                 {
-                    MovePiece(board, opponent, piece, row_dest, col_dest-1);
+                    MovePiece(board, opponent, piece, row_dest, col_dest-1, 1);
                     EnPassant = 1;
                 }
                 else
                 {
-                    MovePiece(board, opponent, piece, row_dest-2, col_dest-1);
+                    MovePiece(board, opponent, piece, row_dest-2, col_dest-1, 1);
                     EnPassant = 1;
                 }
             }
@@ -426,9 +430,9 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
                 movelist->last->EnPassantStatus = 0;
                 printf("You missed an opportunity to perform an en passant capture!\n");
             }
-            if(EnPassant != 1 && castling != 1)
+            if(EnPassant != 1 && castling == 0)
             {
-                movereturn = MovePiece(board, opponent, piece, row_dest-1, col_dest-1);
+                movereturn = MovePiece(board, opponent, piece, row_dest-1, col_dest-1, 1);
             }
             if(movereturn == 1)
             {
@@ -483,32 +487,32 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
         }
         if(callreturn == 2) // a piece has been captured
         {
-            log = Log(player->color, initial_piecetype, cCol_dest, row_dest, 1, CheckReturn, info);
+            log = Log(player->color, initial_piecetype, cCol_dest, row_dest, 1, CheckReturn, info, castling);
         }
         else
         {
-            log = Log(player->color, initial_piecetype, cCol_dest, row_dest, 0, CheckReturn, info);
+            log = Log(player->color, initial_piecetype, cCol_dest, row_dest, 0, CheckReturn, info, castling);
         }
         if(callreturn == 2)
         {
             if(CheckReturn == 1)
             {
-                AddLegalMoves(movelist, row_src, col_src, row_dest, col_dest, board, 1, temppiece, opponentcapture, board->boardarray, 1);
+                AddLegalMoves(movelist, row_src, col_src, row_dest, col_dest, board, 1, temppiece, opponentcapture, board->boardarray, 1, castling);
             }
             else
             {
-                AddLegalMoves(movelist, row_src, col_src, row_dest, col_dest, board, 1, temppiece, opponentcapture, board->boardarray, 0);
+                AddLegalMoves(movelist, row_src, col_src, row_dest, col_dest, board, 1, temppiece, opponentcapture, board->boardarray, 0, castling);
             }
         }
         else
         {
             if(CheckReturn == 1)
             {
-                AddLegalMoves(movelist, row_src, col_src, row_dest, col_dest, board, 0, temppiece, opponentcapture, board->boardarray, 1);
+                AddLegalMoves(movelist, row_src, col_src, row_dest, col_dest, board, 0, temppiece, opponentcapture, board->boardarray, 1, castling);
             }
             else
             {
-                AddLegalMoves(movelist, row_src, col_src, row_dest, col_dest, board, 0, temppiece, opponentcapture, board->boardarray, 0);
+                AddLegalMoves(movelist, row_src, col_src, row_dest, col_dest, board, 0, temppiece, opponentcapture, board->boardarray, 0, castling);
             }
         }
         if(StalemateReturn == 1)
@@ -528,10 +532,13 @@ int MakeMove(BOARD *board, PLAYER *player, PLAYER *opponent, MOVELIST *movelist)
     return 0;
     
 }
-int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc) // only called when the move is legal
+int MovePiece(BOARD *board, PLAYER *opponent, PIECE *piece, int newr, int newc, int CastlingGuard) // only called when the move is legal
 {
     assert(piece);
-    piece->castling = 0;
+    if(CastlingGuard == 1)
+    {
+        piece->castling = 0;
+    }
     int tempR = piece->r;
     int tempC = piece->c;
     char *temp = board->boardarray[piece->r][piece->c];
@@ -754,7 +761,7 @@ int FindEmptySpace(BOARD *board, int r, int c)
         return 0;
     }
 }
-FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured, int CheckReturn, char info)
+FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured, int CheckReturn, char info, int castling)
 {
     FILE *log = fopen("Chess Move Log.txt", "a");
     char *special = NULL;
@@ -789,6 +796,18 @@ FILE *Log(char color, char piecetype, char destcol, int destrow, int isCaptured,
     else
     {
         color_string = "Black";
+    }
+    if(castling == 1)
+    {
+        fprintf(log, "%s: 0-0\n", color_string); // Kingside castle
+        fclose(log);
+        return log;
+    }
+    if(castling == 2)
+    {
+        fprintf(log, "%s: 0-0-0\n", color_string); // Queenside castle
+        fclose(log);
+        return log;
     }
     if(CheckReturn == 1)
     {

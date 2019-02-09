@@ -10,10 +10,10 @@
 
 
 
+
 MOVE *AI(BOARD *board, PLAYER *player, PLAYER *opponent, int turn_counter);
 
-//int NegaMax(int depth, MOVE *origmove, int alpha, int beta, int AI_tracker);
-int NegaMax(int depth, MOVE *origmove, int alpha, int beta, int AI_tracker, int turn_counter, int ldt_guard);
+int NegaMax(int depth, MOVE *origmove, int alpha, int beta, int AI_tracker, int turn_counter);
 
 
 #endif /* AI_h */
