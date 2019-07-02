@@ -1,7 +1,7 @@
 # **Chesster**
 A multi-function chess game <br/>
-**Version 1.0a:** Alpha Release <br/>
-February 1, 2019
+**Version 1.0:** Final Release <br/>
+February 11, 2019
 
 ## Authors:
 
